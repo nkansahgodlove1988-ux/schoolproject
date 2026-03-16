@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Fee Payment | Elyon Montessori</title>
+    <link rel="icon" type="image/png" href="image/favicon2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #003366;
+            --gold: #FFC107;
+            --light: #f4f7f9;
+            --white: #ffffff;
+            --dark: #0a0a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--light);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Modern Navigation */
+        nav {
+            width: 100%;
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 51, 102, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-left img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .payment-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .pay-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.08);
+            border-top: 5px solid var(--blue);
+        }
+
+        .pay-box h2 {
+            color: var(--blue);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .balance-card {
+            background: rgba(0, 51, 102, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-card span {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .balance-card h3 {
+            color: var(--blue);
+            font-size: 1.5rem;
+        }
+
+        .payment-method {
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .payment-method:hover {
+            border-color: var(--blue);
+            background: rgba(0, 51, 102, 0.02);
+            transform: translateY(-2px);
+        }
+
+        .method-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--blue);
+            font-size: 1.2rem;
+        }
+
+        .method-info strong {
+            display: block;
+            color: var(--blue);
+            margin-bottom: 3px;
+        }
+
+        .method-info p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .upload-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .upload-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .file-input-wrapper {
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary:hover {
+            background: #002244;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #ccc;
+            color: #666;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+        }
+
+        /* Enhanced Footer */
+        .site-footer {
+            background: linear-gradient(135deg, #001f3f, var(--blue));
+            color: rgba(255,255,255,0.85);
+            padding: 80px 10% 25px;
+            margin-top: 60px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 35px;
+        }
+        .footer-col h4 {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+        .footer-col p { font-size: 0.9rem; line-height: 1.7; color: rgba(255,255,255,0.7); }
+        .footer-col ul { list-style: none; padding: 0; }
+        .footer-col ul li { padding: 8px 0; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; }
+        .footer-col ul li i { color: var(--gold); width: 16px; }
+        .footer-col ul li a { color: rgba(255,255,255,0.7); text-decoration: none; transition: 0.3s; }
+        .footer-col ul li a:hover { color: var(--gold); padding-left: 5px; }
+        .footer-bottom { margin-top: 50px; padding: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+
+        @media (max-width: 768px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 500px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .pay-box { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <img src="image/fa123.jpeg" alt="school logo">
+        <div class="logo">ELYON MONTESSORI</div>
+    </div>
+</nav>
+
+<div class="payment-container">
+    <div class="pay-box">
+        <h2>Secure Fee Payment</h2>
+        <p style="color:#666; margin-bottom: 25px;">Complete your tuition or registration fee payment below.</p>
+        
+        <div class="balance-card">
+            <span>Outstanding Balance</span>
+            <h3>GHS 1,500.00</h3>
+        </div>
+        
+        <div class="payment-method">
+            <div class="method-icon"><i class="fas fa-mobile-alt"></i></div>
+            <div class="method-info">
+                <strong>Mobile Money (MTN / Telecel)</strong>
+                <p>Dial *123# | Merchant ID: 556677</p>
+            </div>
+        </div>
+
+        <div class="payment-method">
+            <div class="method-icon"><i class="fas fa-university"></i></div>
+            <div class="method-info">
+                <strong>Bank Transfer / Cash Deposit</strong>
+                <p>Elyon Bank | Acc: 0099887766</p>
+            </div>
+        </div>
+
+        <div class="upload-section">
+            <h3>Upload Proof of Payment</h3>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Once payment is made, upload your screenshot or receipt for verification.</p>
+            <div class="file-input-wrapper">
+                <input type="file" id="receipt">
+            </div>
+            <button class="btn btn-primary" onclick="alert('Payment receipt uploaded successfully! Our accounts department will verify and update your portal within 24 hours.')">
+                <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Submit Receipt
+            </button>
+        </div>
+        
+        <a href="student-portal.html" class="btn btn-outline">Back to Portal Dashboard</a>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Elyon Montessori</h4>
+            <p>Nurturing every child's potential through the Montessori method. Building confident, independent learners.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="login.html">Portals</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Contact Info</h4>
+            <ul>
+                <li><i class="fas fa-phone"></i> 024-443-0918</li>
+                <li><i class="fas fa-envelope"></i> info@elyonmontessori.com</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Location</h4>
+            <p><i class="fas fa-map-marker-alt"></i> Brafoyaw, Cape Coast</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Elyon Montessori School. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

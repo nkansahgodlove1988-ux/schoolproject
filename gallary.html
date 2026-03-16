@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Gallery | Elyon Montessori</title>
+    <link rel="icon" type="image/png" href="image/favicon2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #003366;
+            --gold: #FFC107;
+            --light: #f4f7f9;
+            --white: #ffffff;
+            --dark: #0a0a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--light);
+            line-height: 1.6;
+            color: #222;
+        }
+
+        /* Modern Navigation */
+        nav {
+            width: 100%;
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 51, 102, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-left img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 30px;
+            transition: 0.3s ease;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--gold);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .header-banner {
+            background: linear-gradient(rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.8)),
+                        url("image/WhatsApp Image2.jpeg") center/cover no-repeat;
+            color: white;
+            padding: 120px 10%;
+            text-align: center;
+        }
+
+        .header-banner h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 60px 0 20px;
+            color: var(--blue);
+            font-size: 2.2rem;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 10%;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: 0.8s ease all;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 51, 102, 0.6), transparent);
+            opacity: 0;
+            transition: 0.3s;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-overlay span {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Full image viewer */
+        .viewer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 40px;
+        }
+
+        .viewer img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-viewer {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .close-viewer:hover {
+            color: var(--gold);
+            transform: rotate(90deg);
+        }
+
+        /* Enhanced Footer */
+        .site-footer {
+            background: linear-gradient(135deg, #001f3f, var(--blue));
+            color: rgba(255,255,255,0.85);
+            padding: 80px 10% 0;
+            margin-top: 80px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 35px;
+        }
+        .footer-col h4 {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+        .footer-col p { font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.7); }
+        .footer-col ul { list-style: none; padding: 0; }
+        .footer-col ul li { padding: 8px 0; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
+        .footer-col ul li i { color: var(--gold); font-size: 0.85rem; }
+        .footer-col ul li a { color: rgba(255,255,255,0.7); text-decoration: none; transition: 0.3s; }
+        .footer-col ul li a:hover { color: var(--gold); padding-left: 5px; }
+        .footer-social { display: flex; gap: 15px; margin-top: 25px; }
+        .footer-social a { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; transition: 0.3s; }
+        .footer-social a:hover { background: var(--gold); color: #000; transform: translateY(-3px); }
+        .footer-bottom { margin-top: 50px; padding: 25px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .menu-toggle { display: block; }
+            .nav-left img { width: 50px; height: 50px; }
+            .logo { font-size: 18px; }
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 5%;
+                width: 260px;
+                background: rgba(0, 51, 102, 0.98);
+                border-radius: 20px;
+                padding: 20px;
+                display: none;
+                flex-direction: column;
+                gap: 12px;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            }
+            .nav-links.show { display: flex; }
+            .nav-links a { width: 100%; text-align: center; padding: 14px; }
+            .header-banner h1 { font-size: 2.5rem; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 500px) {
+            .gallery { grid-template-columns: 1fr; padding: 20px 5%; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <img src="image/fa123.jpeg" alt="school logo">
+        <div class="logo">ELYON MONTESSORI</div>
+    </div>
+
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="login.html">Portals</a>
+        <a href="contact.html">Contact</a>
+        <a href="gallary.html" class="active">Gallery</a>
+        <a href="about.html">About Us</a>
+    </div>
+</nav>
+
+<div class="header-banner">
+    <h1 class="reveal">Our School Gallery</h1>
+    <p class="reveal">Capturing the precious moments of growth and discovery.</p>
+</div>
+
+<h2 class="section-title reveal">Moments at Elyon Montessori</h2>
+
+<div class="gallery">
+    <div class="gallery-item reveal" onclick="openImage('image/fa123.jpeg')">
+        <img src="image/fa123.jpeg" alt="School Life">
+        <div class="gallery-overlay"><span>School Logo & Theme</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image2.jpeg')">
+        <img src="image/WhatsApp Image2.jpeg" alt="Facilities">
+        <div class="gallery-overlay"><span>Learning Environment</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.20 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.20 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Student Activity</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Creative Learning</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Outdoor Play</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.20 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.20 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Classroom Session</span></div>
+    </div>
+    <!-- ... same pattern for remaining images ... -->
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.21 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.21 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Collaborative Work</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.21 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.21 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Skill Development</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM (2).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM (2).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Hands-on Learning</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Discovery</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.23 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Exploration</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.23 PM (2).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM (2).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Team Bonding</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.23 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Class Activities</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.24 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Creative Arts</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.24 PM (2).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM (2).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Presentation Day</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.24 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Group Fun</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.25 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.25 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Happy Learners</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.26 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.26 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Assembly Time</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.27 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.27 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Special Events</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.27 PM (3).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.27 PM (3).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Holiday Fun</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.27 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.27 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Creative Build</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Learning by Doing</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM (2).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM (2).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Happy Students</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM (3).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM (3).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Class Activities</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Young Explorers</span></div>
+    </div>
+</div>
+
+<div class="viewer" id="viewer">
+    <span class="close-viewer" onclick="closeImage()">&times;</span>
+    <img id="viewerImg" src="" alt="Expanded View">
+</div>
+
+<footer class="site-footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Elyon Montessori</h4>
+            <p>Nurturing every child's potential through the Montessori method. Building confident, independent, and purpose-driven learners.</p>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+                <a href="#"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="gallary.html">Gallery</a></li>
+                <li><a href="apply.html">Apply Now</a></li>
+                <li><a href="login.html">Portals</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Contact Info</h4>
+            <ul>
+                <li><i class="fas fa-map-marker-alt"></i> Brafoyaw, Cape Coast</li>
+                <li><i class="fas fa-phone"></i> 024-443-0918</li>
+                <li><i class="fas fa-envelope"></i> info@elyonmontessori.com</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Gallery Info</h4>
+            <p>Check back often for new photos of our students and events!</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Elyon Montessori School. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+    function toggleMenu() {
+        document.getElementById("navLinks").classList.toggle("show");
+    }
+
+    document.querySelectorAll('#navLinks a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById("navLinks").classList.remove("show");
+        });
+    });
+
+    function openImage(src) {
+        document.getElementById("viewer").style.display = "flex";
+        document.getElementById("viewerImg").src = src;
+        document.body.style.overflow = "hidden"; // Prevent scroll
+    }
+
+    function closeImage() {
+        document.getElementById("viewer").style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+            }
+        });
+    }, { threshold: 0.1 });
+    revealEls.forEach(el => observer.observe(el));
+
+    // Close viewer on ESC
+    window.addEventListener('keydown', (e) => {
+        if(e.key === "Escape") closeImage();
+    });
+</script>
+
+</body>
+</html>

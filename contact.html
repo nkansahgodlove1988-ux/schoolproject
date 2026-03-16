@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Elyon Montessori</title>
+    <link rel="icon" type="image/png" href="image/favicon2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --blue: #003366;
+            --gold: #FFC107;
+            --light: #f4f7f9;
+            --white: #ffffff;
+            --dark: #0a0a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            background: var(--light);
+            color: #222;
+        }
+
+        /* Modern Navigation */
+        nav {
+            width: 100%;
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 51, 102, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-left img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 30px;
+            transition: 0.3s ease;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .nav-links a:hover {
+            background: var(--gold);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .header-banner {
+            background: linear-gradient(rgba(0, 51, 102, 0.85), rgba(0, 51, 102, 0.85)),
+                        url("image/WhatsApp Image2.jpeg") center/cover no-repeat;
+            color: white;
+            padding: 80px 10%;
+            text-align: center;
+        }
+
+        .header-banner h1 {
+            font-size: 3rem;
+        }
+
+        .content {
+            padding: 50px 12%;
+        }
+
+        .content h2 {
+            color: var(--blue);
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .content p {
+            font-size: 1.05rem;
+        }
+
+        .mission-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: var(--blue);
+            margin-bottom: 10px;
+        }
+
+        .card ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        footer {
+            background: var(--blue);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .nav-left img {
+                width: 55px;
+                height: 55px;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 5%;
+                width: 240px;
+                background: rgba(0, 51, 102, 0.96);
+                border-radius: 15px;
+                padding: 15px;
+                display: none;
+                flex-direction: column;
+                gap: 12px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+                margin: 0;
+            }
+
+            .mission-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-banner h1 {
+                font-size: 2.2rem;
+            }
+
+            .content {
+                padding: 40px 8%;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .logo {
+                font-size: 16px;
+            }
+
+            .header-banner h1 {
+                font-size: 1.8rem;
+            }
+
+            .content h2 {
+                font-size: 1.5rem;
+            }
+
+            .content p {
+                font-size: 0.98rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-left">
+        <img src="image/fa123.jpeg" alt="school logo">
+        <div class="logo">ELYON MONTESSORI</div>
+    </div>
+
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="login.html">Portals</a>
+        <a href="contact.html" class="active">Contact</a>
+        <a href="gallary.html">Gallery</a>
+        <a href="about.html">About Us</a>
+    </div>
+</nav>
+
+<div class="header-banner">
+    <h1>Contact Our School</h1>
+</div>
+
+<div class="content">
+    <h2>Our Contact</h2>
+    <p>Contact Elyon Montessori for more information or enquiries.</p>
+
+    <div class="mission-grid">
+        <div class="card">
+            <h3>Facebook</h3>
+            <ul>
+                <li>Elyon Montessori School</li>
+                <li>El-yon</li>
+                <li>Brafoyaw Elyon</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>TikTok</h3>
+            <p>Elyon Montessori School - Brafoyaw</p>
+        </div>
+
+        <div class="card">
+            <h3>Hotline</h3>
+            <p>024-443-0918</p>
+        </div>
+
+        <div class="card">
+            <h3>WhatsApp</h3>
+            <p>024-443-0918</p>
+        </div>
+    </div>
+</div>
+
+<footer>&copy; 2026 Elyon Montessori School</footer>
+
+<script>
+    function toggleMenu() {
+        document.getElementById("navLinks").classList.toggle("show");
+    }
+
+    document.querySelectorAll('#navLinks a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById("navLinks").classList.remove("show");
+        });
+    });
+</script>
+
+</body>
+</html>

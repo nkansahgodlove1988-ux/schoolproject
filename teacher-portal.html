@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Portal | Elyon Montessori</title>
+  <link rel="icon" type="image/png" href="image/favicon2.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+
+<body>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header" style="background:#002244;">
+      <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
+      <h2>Teacher Portal</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a class="menu-item active" data-target="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li><a class="menu-item" data-target="profile"><i class="fas fa-user"></i> My Profile</a></li>
+      <li><a class="menu-item" data-target="classes"><i class="fas fa-users"></i> My Classes</a></li>
+      <li><a class="menu-item" data-target="results"><i class="fas fa-marker"></i> Results & Grades</a></li>
+      <li><a class="menu-item" data-target="attendance"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+      <li><a class="menu-item" data-target="fees"><i class="fas fa-wallet"></i> Fees & Payments</a></li>
+      <li><a class="menu-item" data-target="assignments"><i class="fas fa-book"></i> Materials Upload</a></li>
+      <li><a class="menu-item" data-target="timetable"><i class="fas fa-clock"></i> Timetable</a></li>
+      <li><a class="menu-item" data-target="communication"><i class="fas fa-comments"></i> Communication</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <header class="topbar">
+      <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
+      <div style="flex:1;"></div>
+      <div class="topbar-right">
+        <div class="user-profile">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span id="currentTeacherName">Teacher</span>
+        </div>
+        <button class="logout-btn" onclick="DB.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section active">
+        <div class="section-header">
+          <h2 class="section-title">Welcome back, <span id="dashName"></span></h2>
+          <p class="section-subtitle">Here is an overview of your teaching responsibilities.</p>
+        </div>
+
+        <div class="dashboard-cards">
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-school"></i></div>
+            <div class="card-info">
+              <h4>Assigned Classes</h4>
+              <h2 id="statClasses">0</h2>
+            </div>
+          </div>
+          <div class="card gold">
+            <div class="card-icon"><i class="fas fa-book-open"></i></div>
+            <div class="card-info">
+              <h4>Assigned Subjects</h4>
+              <h2 id="statSubjects">0</h2>
+            </div>
+          </div>
+          <div class="card green">
+            <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="card-info">
+              <h4>Total Students</h4>
+              <h2 id="statStudents">0</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">My Classes Overview</h3>
+            <ul id="classList" style="list-style:none; padding:10px 0;"></ul>
+          </div>
+          <div class="panel">
+            <h3 class="panel-title">School Announcements</h3>
+            <div id="announcementList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="profile" class="section">
+        <div class="section-header">
+          <h2 class="section-title">My Profile</h2>
+          <p class="section-subtitle">View and update your contact info.</p>
+        </div>
+        <div class="panel">
+          <p>Profile update forms (email/phone/password) will go here.</p>
+        </div>
+      </section>
+
+      <!-- MY CLASSES -->
+      <section id="classes" class="section">
+        <div class="section-header">
+          <h2 class="section-title">My Classes & Students</h2>
+          <p class="section-subtitle">Monitor students in your assigned classes.</p>
+        </div>
+        <div class="panel">
+          <div style="display:flex; gap:15px; margin-bottom:15px;">
+            <select id="classSelect" class="form-control" style="max-width:300px;"
+              onchange="loadStudentsForClass(this.value)">
+              <option value="">Select a Class...</option>
+            </select>
+            <input type="text" class="form-control" id="searchTeacherStudent"
+              placeholder="Search student by name or ID..." style="max-width:300px;">
+          </div>
+          <div class="table-container">
+            <table class="table" id="teacherStudentsTable">
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS & GRADES -->
+      <section id="results" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Results & Grade Entry</h2>
+          <p class="section-subtitle">Enter marks for your students and submit to Administration.</p>
+        </div>
+
+        <div class="panel">
+          <div class="form-row" style="margin-bottom:20px;">
+            <div>
+              <label>Select Class</label>
+              <select id="gradeClassSelect" class="form-control">
+                <option value="">Choose Class...</option>
+              </select>
+            </div>
+            <div>
+              <label>Select Subject</label>
+              <select id="gradeSubjectSelect" class="form-control">
+                <option value="">Choose Subject...</option>
+              </select>
+            </div>
+            <div>
+              <label>Term / Semester</label>
+              <select id="gradeTermSelect" class="form-control">
+                <option value="Term 1">Term 1</option>
+                <option value="Term 2">Term 2</option>
+                <option value="Term 3">Term 3</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary" onclick="loadGradeEntryGrid()" style="width:100%">Load Students</button>
+            </div>
+          </div>
+
+          <div id="gradeEntryArea" style="display:none;">
+            <div class="table-container">
+              <table class="table" id="gradeTable">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Class Score (40%)</th>
+                    <th>Exam Score (60%)</th>
+                    <th>Total (100%)</th>
+                    <th>Grade</th>
+                    <th>Remark</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <div style="margin-top:20px; text-align:right;">
+                <button class="btn btn-success" onclick="submitGrades()"><i class="fas fa-paper-plane"></i> Submit
+                  Results to Admin</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- ATTENDANCE -->
+      <section id="attendance" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Mark Daily Attendance</h2>
+          <p class="section-subtitle">Select a class and date to record student attendance.</p>
+        </div>
+        <div class="panel">
+          <div class="form-row" style="margin-bottom:20px;">
+            <div class="form-group">
+              <label>Select Class</label>
+              <select id="attClassSelect" class="form-control">
+                <option value="">Choose Class...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="attDate" class="form-control">
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary" onclick="loadAttendanceGrid()" style="width:100%">Load Grid</button>
+            </div>
+          </div>
+          <div id="attendanceGridArea" style="display:none;">
+            <div class="table-container">
+              <table class="table" id="attendanceTable">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Status</th>
+                    <th>Remark</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div style="margin-top:20px; text-align:right;">
+              <button class="btn btn-success" onclick="saveAttendance()"><i class="fas fa-save"></i> Save Attendance</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEES & PAYMENTS SEARCH -->
+      <section id="fees" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Fees Checker</h2>
+          <p class="section-subtitle">Search for a student to verify their payment records.</p>
+        </div>
+        <div class="panel">
+          <div style="display:flex; gap:10px; margin-bottom: 25px;">
+            <input type="text" id="searchFeeStudId" class="form-control" placeholder="Enter Student ID (e.g. STU1234)"
+              style="max-width:300px;">
+            <button class="btn btn-primary" onclick="window.checkStudentFees()"><i class="fas fa-search"></i> Check
+              Payments</button>
+          </div>
+
+          <div id="feeResultArea" style="display:none;">
+            <div class="fees-summary-bar" style="margin-bottom:20px;">
+              <div>
+                <h4 style="color:var(--gray);">Student Name</h4>
+                <h3 id="feeResName">-</h3>
+              </div>
+              <div>
+                <h4 style="color:var(--gray);">Total Paid</h4>
+                <h3 id="feeResPaid" style="color:var(--success);">GHS 0.00</h3>
+              </div>
+            </div>
+            <h4>Transaction History</h4>
+            <div class="table-container">
+              <table class="table" id="teacherFeeTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Receipt No</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="feeNotFound" style="display:none; text-align:center; padding: 40px;">
+            <i class="fas fa-user-slash" style="font-size:3rem; color:#ccc; margin-bottom:15px;"></i>
+            <h3 style="color:#666;">Student Not Found</h3>
+            <p>Please double check the Student ID and try again.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMMUNICATION -->
+      <section id="communication" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Communication</h2>
+          <p class="section-subtitle">Send messages directly to students/parents or administration.</p>
+        </div>
+        <div class="panel">
+          <form id="msgForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label>To</label>
+                <select id="msgTo" class="form-control">
+                  <option value="admin">School Administration</option>
+                  <option value="parents">Parents of My Class</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Subject</label>
+                <input type="text" id="msgSubject" class="form-control" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="msgBody" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- PLUGINS -->
+      <section id="assignments" class="section">
+        <h2 class="section-title">Materials Upload</h2>
+        <div class="panel">
+          <p>Upload PDFs/Notes for your classes. (Module placeholder)</p>
+        </div>
+      </section>
+      <section id="timetable" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Class & Exam Timetables</h2>
+          <p class="section-subtitle">View and download published schedules.</p>
+        </div>
+        <div class="panel">
+          <div class="table-container">
+            <table class="table" id="teacherTimetableTable">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Upload Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="js/database.js"></script>
+  <script src="js/teacher.js"></script>
+</body>
+
+</html>

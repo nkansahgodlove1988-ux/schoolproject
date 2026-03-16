@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portals Login | Elyon Montessori</title>
+  <link rel="icon" type="image/png" href="image/favicon2.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --blue: #003366;
+      --gold: #FFC107;
+      --light: #f8f9fa;
+      --success: #28a745;
+      --white: #ffffff;
+      --dark: #0a0a2a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e9ecef;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Navigation */
+    nav {
+      width: 100%;
+      padding: 14px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(0, 51, 102, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-left img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: white;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--white);
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 30px;
+      transition: 0.3s ease;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* Portal containers */
+    .login-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 20px;
+    }
+
+    .portal-selection {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      transition: 0.3s;
+    }
+
+    .portal-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px 20px;
+      width: 280px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      transition: 0.3s;
+      border-top: 5px solid #ccc;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .portal-card i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .admin-card {
+      border-top-color: #e74c3c;
+    }
+
+    .admin-card i {
+      color: #e74c3c;
+    }
+
+    .teacher-card {
+      border-top-color: var(--gold);
+    }
+
+    .teacher-card i {
+      color: var(--gold);
+    }
+
+    .student-card {
+      border-top-color: var(--blue);
+    }
+
+    .student-card i {
+      color: var(--blue);
+    }
+
+    .login-form-container {
+      display: none;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-form-container h2 {
+      color: var(--blue);
+      margin-bottom: 20px;
+      text-transform: capitalize;
+    }
+
+    .login-form-container input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+
+    .login-form-container button {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+      margin-top: 15px;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .login-form-container button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .back-btn {
+      background: #f1f1f1;
+      color: #333;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      align-self: flex-start;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .back-btn:hover {
+      background: #e2e2e2;
+    }
+
+    .error-msg {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 15px;
+      display: none;
+      background: #fdf0ed;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #fad5d0;
+    }
+
+    @media (max-width: 900px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 5%;
+        width: 240px;
+        background: rgba(0, 51, 102, 0.96);
+        border-radius: 15px;
+        padding: 15px;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .nav-links.show {
+        display: flex;
+      }
+
+      .nav-links a {
+        width: 100%;
+        text-align: center;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .logo {
+        font-size: 16px;
+      }
+
+      .nav-left img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .portal-card {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .portal-selection {
+        gap: 15px;
+        padding: 0 10px;
+      }
+
+      .login-form-container {
+        padding: 25px 20px;
+      }
+
+      .login-form-container input {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .login-form-container button {
+        padding: 12px;
+        font-size: 14px;
+      }
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrapper input {
+      padding-right: 45px !important;
+    }
+
+    .password-wrapper i {
+      position: absolute;
+      right: 15px;
+      cursor: pointer;
+      color: #666;
+      font-size: 1.1rem;
+      transition: 0.3s;
+    }
+
+    .password-wrapper i:hover {
+      color: var(--blue);
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <div class="nav-left">
+      <img id="schoolLogo" src="image/logo.jpeg" alt="school logo"
+        onerror="this.src='https://via.placeholder.com/70?text=Logo'">
+      <div class="logo">ELYON MONTESSORI</div>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="login.html" class="active">Portals</a>
+      <a href="apply.html">Apply</a>
+    </div>
+  </nav>
+
+  <div class="login-container">
+    <div class="portal-selection" id="portalSelection">
+      <div class="portal-card admin-card" onclick="openLogin('admin')">
+        <i class="fas fa-user-shield"></i>
+        <h3>Admin Portal</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Full school control, manage staff, announcements.
+        </p>
+      </div>
+
+      <div class="portal-card teacher-card" onclick="openLogin('teacher')">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <h3>Teacher Portal</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Manage class, enter grades, upload materials.</p>
+      </div>
+
+      <div class="portal-card student-card" onclick="openLogin('student')">
+        <i class="fas fa-user-graduate"></i>
+        <h3>Student Portal</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Check progress, view fees, access learning
+          materials.</p>
+      </div>
+
+      <div class="portal-card" style="border-top-color: #9b59b6;" onclick="openLogin('applicant')">
+        <i class="fas fa-file-signature" style="color: #9b59b6;"></i>
+        <h3>Applicant Portal</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Track your admission status and print letters.</p>
+      </div>
+    </div>
+
+    <div class="login-form-container" id="loginFormContainer">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <button class="back-btn" type="button" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+      </div>
+      <i id="formIcon" class="fas fa-user"
+        style="font-size: 3.5rem; color: var(--blue); margin-bottom: 15px; display: block;"></i>
+      <h2 id="formTitle">Login</h2>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <input type="hidden" id="loginRole" value="">
+        <input type="text" id="username" placeholder="Username / Student ID" required>
+        <div class="password-wrapper">
+          <input type="password" id="password" placeholder="Password" required>
+          <i class="fas fa-eye" id="togglePasswordIcon" onclick="togglePassword('password', 'togglePasswordIcon')"></i>
+        </div>
+        <button type="submit">Login Securely</button>
+        <p style="margin-top:15px; font-size:14px;"><a href="#" onclick="showResetForm(event)"
+            style="color:var(--blue); text-decoration:none;">Forgot your password?</a></p>
+        <div id="errorMsg" class="error-msg"><i class="fas fa-exclamation-circle"></i> Invalid credentials. Please try
+          again.</div>
+      </form>
+
+      <form id="resetForm" style="display:none;" onsubmit="handleReset(event)">
+        <p style="margin-bottom:15px; font-size:0.9rem; color:#555;">Enter your assigned username or email to reset your
+          password to default.</p>
+        <input type="text" id="resetUsername" placeholder="Username / Email" required>
+        <button type="submit" style="background:var(--gold); color:#000;">Reset Password</button>
+        <p style="margin-top:15px; font-size:14px;"><a href="#" onclick="showLoginForm(event)"
+            style="color:var(--blue); text-decoration:none;">Back to Login</a></p>
+        <div id="resetMsg" class="error-msg"
+          style="display:none; color:var(--success); background:#e9f7ef; border-color:#d4efdf;"><i
+            class="fas fa-check-circle"></i> Password reset. Check your registered email.</div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/database.js"></script>
+  <script>
+    function toggleMenu() {
+      document.getElementById("navLinks").classList.toggle("show");
+    }
+
+    function openLogin(role) {
+      document.getElementById('portalSelection').style.display = 'none';
+      document.getElementById('loginFormContainer').style.display = 'block';
+      document.getElementById('loginRole').value = role;
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('loginForm').reset();
+
+      const title = document.getElementById('formTitle');
+      const icon = document.getElementById('formIcon');
+
+      if (role === 'admin') {
+        title.innerText = 'Admin Login';
+        icon.className = 'fas fa-user-shield';
+        icon.style.color = '#e74c3c';
+        document.getElementById('username').placeholder = 'Admin Username (e.g., admin)';
+      } else if (role === 'teacher') {
+        title.innerText = 'Teacher Login';
+        icon.className = 'fas fa-chalkboard-teacher';
+        icon.style.color = 'var(--gold)';
+        document.getElementById('username').placeholder = 'Teacher ID (e.g. TCH1234)';
+      } else if (role === 'student') {
+        title.innerText = 'Student Login';
+        icon.className = 'fas fa-user-graduate';
+        icon.style.color = 'var(--blue)';
+        document.getElementById('username').placeholder = 'Student ID';
+      } else if (role === 'applicant') {
+        title.innerText = 'Applicant Login';
+        icon.className = 'fas fa-file-signature';
+        icon.style.color = '#9b59b6';
+        document.getElementById('username').placeholder = 'Email used in application';
+      }
+
+      showLoginForm();
+    }
+
+    function showResetForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('resetForm').style.display = 'block';
+      document.getElementById('formTitle').innerText = 'Reset Password';
+      document.getElementById('resetMsg').style.display = 'none';
+    }
+
+    function showLoginForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('resetForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+
+      const role = document.getElementById('loginRole').value;
+      const title = document.getElementById('formTitle');
+      if (role === 'admin') title.innerText = 'Admin Login';
+      else if (role === 'teacher') title.innerText = 'Teacher Login';
+      else if (role === 'student') title.innerText = 'Student Login';
+      else if (role === 'applicant') title.innerText = 'Applicant Login';
+    }
+
+    function goBack() {
+      document.getElementById('loginFormContainer').style.display = 'none';
+      document.getElementById('portalSelection').style.display = 'flex';
+      document.getElementById('errorMsg').style.display = 'none';
+      showLoginForm();
+    }
+
+    function handleReset(e) {
+      e.preventDefault();
+      const user = document.getElementById('resetUsername').value;
+      const role = document.getElementById('loginRole').value;
+
+      // Simulate reset logic
+      let users = DB.getTable('users');
+      let foundUser = users.find(u => u.username === user && u.role === role);
+
+      if (foundUser) {
+        foundUser.password = 'password123';
+        DB.saveTable('users', users);
+
+        const msg = document.getElementById('resetMsg');
+        msg.innerHTML = '<i class="fas fa-check-circle"></i> Password reset back to default (password123).';
+        msg.style.display = 'block';
+        msg.style.color = "var(--success)";
+        msg.style.backgroundColor = "#e9f7ef";
+        msg.style.borderColor = "#c3e6cb";
+      } else {
+        const msg = document.getElementById('resetMsg');
+        msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Username not found for this role.';
+        msg.style.display = 'block';
+        msg.style.color = "#e74c3c";
+        msg.style.backgroundColor = "#fdf0ed";
+        msg.style.borderColor = "#fad5d0";
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const role = document.getElementById('loginRole').value;
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      // Attempt login via database
+      const loggedInUser = DB.login(user, pass);
+
+      if (loggedInUser) {
+        // Simple role validation
+        let targetPage = '';
+        if (role === 'admin' && loggedInUser.role === 'admin') targetPage = 'admin-portal.html';
+        else if (role === 'teacher' && loggedInUser.role === 'teacher') targetPage = 'teacher-portal.html';
+        else if (role === 'student' && loggedInUser.role === 'student') targetPage = 'student-portal.html';
+        else if (role === 'applicant' && loggedInUser.role === 'applicant') targetPage = 'applicant-portal.html';
+
+        if (targetPage) {
+          window.location.href = targetPage;
+          return;
+        } else {
+          console.error("Role mismatch! Attempted: " + role + " Actual: " + loggedInUser.role);
+        }
+      }
+
+      document.getElementById('errorMsg').style.display = 'block';
+    }
+
+    // Auto-login check
+    window.onload = function () {
+      const user = DB.getCurrentUser();
+      if (user) {
+        if (user.role === 'admin') window.location.href = 'admin-portal.html';
+        if (user.role === 'teacher') window.location.href = 'teacher-portal.html';
+        if (user.role === 'student') window.location.href = 'student-portal.html';
+      }
+    }
+
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  </script>
+</body>
+
+</html>

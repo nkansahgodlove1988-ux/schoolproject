@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Inquiry | Elyon Montessori</title>
+    <link rel="icon" type="image/png" href="image/favicon2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #003366;
+            --gold: #FFC107;
+            --light: #f4f7f9;
+            --white: #ffffff;
+            --dark: #0a0a2a;
+            --success: #28a745;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--light);
+            color: #222;
+        }
+
+        /* Modern Navigation */
+        nav {
+            width: 100%;
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 51, 102, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-left img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--white);
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 30px;
+            transition: 0.3s ease;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:hover {
+            background: var(--gold);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .header-banner {
+            background: linear-gradient(rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.8)),
+                url("image/WhatsApp Image2.jpeg") center/cover no-repeat;
+            color: white;
+            padding: 120px 10%;
+            text-align: center;
+        }
+
+        .header-banner h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Modern Form */
+        .container {
+            max-width: 1000px;
+            margin: 60px auto;
+            background: white;
+            padding: 60px;
+            border-radius: 30px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08);
+            border-top: 8px solid var(--blue);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--blue);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 1.05rem;
+        }
+
+        fieldset {
+            border: none;
+            margin-bottom: 40px;
+            padding: 0;
+        }
+
+        legend {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(0, 51, 102, 0.08);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.95rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 16px;
+            margin-top: 8px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            background: #fdfdfd;
+            font-size: 0.95rem;
+            color: #333;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.05);
+        }
+
+        .main-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .submit-btn {
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 40px auto 0;
+            box-shadow: 0 10px 25px rgba(0, 51, 102, 0.2);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .submit-btn:hover {
+            background: #002244;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 51, 102, 0.3);
+        }
+
+        /* Enhanced Footer */
+        .site-footer {
+            background: linear-gradient(135deg, #001f3f, var(--blue));
+            color: rgba(255, 255, 255, 0.85);
+            padding: 80px 10% 0;
+            margin-top: 80px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 35px;
+        }
+
+        .footer-col h4 {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .footer-col p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-col ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-col ul li {
+            padding: 8px 0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-col ul li i {
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+
+        .footer-col ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--gold);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            margin-top: 50px;
+            padding: 25px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .nav-left img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 5%;
+                width: 260px;
+                background: rgba(0, 51, 102, 0.98);
+                border-radius: 20px;
+                padding: 20px;
+                display: none;
+                flex-direction: column;
+                gap: 12px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+                padding: 14px;
+            }
+
+            .container {
+                padding: 40px 25px;
+                margin: 30px 15px;
+            }
+
+            .main-form-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header-banner h1 {
+                font-size: 2rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .password-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-box input {
+            padding-right: 45px !important;
+        }
+
+        .password-box i {
+            position: absolute;
+            right: 15px;
+            cursor: pointer;
+            color: #666;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+
+        .password-box i:hover {
+            color: var(--blue);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="nav-left">
+            <img src="image/fa123.jpeg" alt="school logo">
+            <div class="logo">ELYON MONTESSORI</div>
+        </div>
+
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="login.html">Portals</a>
+            <a href="contact.html">Contact</a>
+            <a href="gallary.html">Gallery</a>
+            <a href="apply.html" class="active">Apply Now</a>
+        </div>
+    </nav>
+
+    <div class="header-banner">
+        <h1 class="reveal">Admission Inquiry</h1>
+        <p class="reveal">Begin your child's journey into excellence.</p>
+    </div>
+
+    <div class="container reveal">
+        <h2>Start Your Application</h2>
+        <p class="subtitle">Please provide accurate information to help us process your request faster.</p>
+
+        <form id="applyForm">
+            <div class="main-form-grid">
+                <div class="form-col-left">
+                    <fieldset>
+                        <legend><i class="fas fa-child"></i> Child's Information</legend>
+                        <div class="form-grid">
+                            <div class="full-width">
+                                <label for="childName">Child's Name</label>
+                                <input type="text" placeholder="Full Name" id="childName" name="childName" required>
+                            </div>
+
+                            <div>
+                                <label for="age">Age</label>
+                                <input type="number" placeholder="Age" id="age" name="age" min="1" required>
+                            </div>
+
+                            <div>
+                                <label for="dob">Date of Birth</label>
+                                <input type="date" id="dob" name="dob" required>
+                            </div>
+
+                            <div class="full-width">
+                                <label for="gender">Gender</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend><i class="fas fa-graduation-cap"></i> Academic Information</legend>
+                        <div class="form-grid">
+                            <div class="full-width">
+                                <label for="previousSchool">Previous School Attended</label>
+                                <textarea id="previousSchool" name="previousSchool"
+                                    placeholder="Enter previous school name" required></textarea>
+                            </div>
+
+                            <div class="full-width">
+                                <label for="classApplying">Class Applying For</label>
+                                <input type="text" placeholder="e.g. Nursery, KG2, Primary 1" id="classApplying"
+                                    name="classApplying" required>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="form-col-right">
+                    <fieldset>
+                        <legend><i class="fas fa-user-friends"></i> Parent's Information</legend>
+                        <div class="form-grid">
+                            <div class="full-width">
+                                <label for="pname">Parent/Guardian Name</label>
+                                <input type="text" placeholder="Full name of parent or guardian" id="pname" name="pname"
+                                    required>
+                            </div>
+
+                            <div>
+                                <label for="rchild">Relationship</label>
+                                <input type="text" placeholder="e.g. Mother, Father" id="rchild" name="rchild" required>
+                            </div>
+
+                            <div>
+                                <label for="pnumber">Phone Number</label>
+                                <input type="tel" placeholder="+233 240 000 000" id="pnumber" name="pnumber" required>
+                            </div>
+
+                            <div class="full-width">
+                                <label for="email">Email Address (Username)</label>
+                                <input type="email" placeholder="name@example.com" id="email" name="email" required>
+                            </div>
+
+                            <div>
+                                <label for="password">Create Portal Password</label>
+                                <div class="password-box">
+                                    <input type="password" placeholder="Min 6 characters" id="password" name="password"
+                                        required>
+                                    <i class="fas fa-eye" id="toggleAppPass"
+                                        onclick="togglePassword('password', 'toggleAppPass')"></i>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="occupation">Occupation</label>
+                                <input type="text" placeholder="e.g. Banker, Engineer" id="occupation" name="occupation"
+                                    required>
+                            </div>
+
+                            <div class="full-width">
+                                <label for="residentialAddress">Residential Address</label>
+                                <input type="text" placeholder="Full home address" id="residentialAddress"
+                                    name="residentialAddress" required>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn shadow-sm">
+                <i class="fas fa-paper-plane"></i> Send Application
+            </button>
+        </form>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Elyon Montessori</h4>
+                <p>Nurturing every child's potential through the Montessori method. Building confident, independent, and
+                    purpose-driven learners.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="gallary.html">Gallery</a></li>
+                    <li><a href="apply.html">Apply Now</a></li>
+                    <li><a href="login.html">Portals</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Info</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Brafoyaw, Cape Coast</li>
+                    <li><i class="fas fa-phone"></i> 024-443-0918</li>
+                    <li><i class="fas fa-envelope"></i> info@elyonmontessori.com</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Admission Support</h4>
+                <p>If you have issues with the application form, please call 024-443-0918 for assistance.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Elyon Montessori School. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/database.js"></script>
+    <script>
+        function toggleMenu() {
+            document.getElementById("navLinks").classList.toggle("show");
+        }
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        document.querySelectorAll('#navLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById("navLinks").classList.remove("show");
+            });
+        });
+
+        // Scroll reveal
+        const revealEls = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, { threshold: 0.1 });
+        revealEls.forEach(el => observer.observe(el));
+
+        document.getElementById('applyForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Check if user already exists
+            if (DB.findOne('users', { username: email })) {
+                alert("An account with this email already exists. Please track your status via login.");
+                return;
+            }
+
+            // Create applicant user
+            const newUser = DB.insert('users', {
+                username: email,
+                password: password,
+                role: 'applicant',
+                name: document.getElementById('pname').value,
+                status: 'active'
+            });
+
+            // Insert admission
+            DB.insert('admissions', {
+                userId: newUser.id,
+                childName: document.getElementById('childName').value,
+                age: document.getElementById('age').value,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                previousSchool: document.getElementById('previousSchool').value,
+                classApplying: document.getElementById('classApplying').value,
+                pname: document.getElementById('pname').value,
+                rchild: document.getElementById('rchild').value,
+                pnumber: document.getElementById('pnumber').value,
+                email: email,
+                occupation: document.getElementById('occupation').value,
+                residentialAddress: document.getElementById('residentialAddress').value,
+                status: 'pending'
+            });
+
+            alert("Application submitted successfully! You can now log into the Applicant Portal using your email to track your status.");
+            window.location.href = 'login.html';
+        });
+    </script>
+
+</body>
+
+</html>
