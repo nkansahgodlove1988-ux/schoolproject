@@ -1,56 +1,16 @@
 // js/teacher.js
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await DB.init();
     const user = DB.requireAuth('teacher');
     if (!user) return;
     
     document.getElementById('currentTeacherName').innerText = user.name || 'Teacher';
     document.getElementById('dashName').innerText = user.name || 'Teacher';
 
-    // Get teacher record
-    const teacherRec = DB.findOne('teachers', { userId: user.id });
-    if(teacherRec) {
-        document.getElementById('statClasses').innerText = teacherRec.classes.length;
-        document.getElementById('statSubjects').innerText = teacherRec.subjects.length;
-        
-        // Calculate total students across classes
-        const allStudents = DB.getTable('students');
-        let total = 0;
-        teacherRec.classes.forEach(c => {
-            total += allStudents.filter(s => s.className === c || s.classId === c).length;
-        });
-        document.getElementById('statStudents').innerText = total;
-
-        // Populate dropdowns
-        const classSelect = document.getElementById('classSelect');
-        const gradeClassSelect = document.getElementById('gradeClassSelect');
-        const gradeSubjectSelect = document.getElementById('gradeSubjectSelect');
-        const classListUi = document.getElementById('classList');
-
-        teacherRec.classes.forEach(c => {
-            classSelect.add(new Option(c, c));
-            gradeClassSelect.add(new Option(c, c));
-            const attClassSelect = document.getElementById('attClassSelect');
-            if(attClassSelect) attClassSelect.add(new Option(c, c));
-            const li = document.createElement('li');
-            li.style.padding = '8px 0';
-            li.style.borderBottom = '1px solid #eee';
-            li.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success)"></i> ${c}`;
-            classListUi.appendChild(li);
-        });
-
-        teacherRec.subjects.forEach(s => {
-            gradeSubjectSelect.add(new Option(s, s));
-        });
-        
-        // Default subjects if empty for demo purposes
-        if(teacherRec.subjects.length === 0) {
-            ['Mathematics', 'English', 'Science'].forEach(s => {
-                gradeSubjectSelect.add(new Option(s, s));
-            });
-        }
-    }
-
+    loadTeacherDashboard();
+    loadAnnouncements();
+    
     // Sidebar Navigation
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
@@ -74,7 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 else sec.classList.remove('active');
             });
             if(window.innerWidth <= 768) closeSidebar();
-            if(target === 'dashboard') loadAnnouncements();
+            
+            if (target === 'dashboard') loadTeacherDashboard();
+            if (target === 'profile') loadProfile();
+            if (target === 'materials') loadMaterials();
+            if (target === 'timetable') loadTimetables();
+            if (target === 'communication') loadTeacherMessages();
+            if (target === 'salary') {
+                // Future: loadSalaryRecords();
+            }
             if(target === 'fees') {
                 document.getElementById('feeResultArea').style.display = 'none';
                 document.getElementById('feeNotFound').style.display = 'none';
@@ -85,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('attDate').valueAsDate = new Date();
                 loadAttendanceGrid();
             }
+            if(target === 'assignments') loadMaterials();
+            if(target === 'profile') loadProfile();
         });
     });
 
@@ -102,16 +72,288 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadAnnouncements();
     
-    // Quick comms form
+    // Communication form
     const msgForm = document.getElementById('msgForm');
     if(msgForm) {
         msgForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            alert("Message sent successfully!");
+            const to = document.getElementById('msgTo').value;
+            const subject = document.getElementById('msgSubject').value;
+            const body = document.getElementById('msgBody').value;
+            
+            DB.insert('messages', {
+                senderId: user.id,
+                senderName: user.name,
+                senderRole: 'teacher',
+                receiverRole: to,
+                subject,
+                body,
+                date: new Date().toISOString()
+            });
+
+            alert("Message sent successfully and logged in system!");
             msgForm.reset();
         });
     }
+
+    // Material Upload Setup
+    const matForm = document.getElementById('materialUploadForm');
+    if(matForm) {
+        matForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('mTitle').value;
+            const targetClass = document.getElementById('mClass').value;
+            const fileInp = document.getElementById('mFile');
+            const file = fileInp.files[0];
+
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function() {
+                const base64Content = reader.result;
+                DB.insert('learning_materials', {
+                    teacherId: user.id,
+                    teacherName: user.name,
+                    title,
+                    className: targetClass,
+                    fileName: file.name,
+                    content: base64Content,
+                    date: new Date().toISOString()
+                });
+
+                alert("Material uploaded successfully!");
+                window.hideModal('uploadMaterialModal');
+                matForm.reset();
+                loadMaterials();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Profile Form
+    const profForm = document.getElementById('profileUpdateForm');
+    if(profForm) {
+        profForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const phone = document.getElementById('profPhone').value;
+            const newPass = document.getElementById('profNewPass').value;
+            const user = DB.getCurrentUser();
+            const teacherRec = DB.findOne('teachers', { userId: user.id });
+
+            if(teacherRec) {
+                DB.update('teachers', teacherRec.id, { phone });
+                if(newPass) {
+                    DB.update('users', user.id, { password: newPass });
+                    alert("Profile and password updated successfully!");
+                } else {
+                    alert("Profile updated successfully!");
+                }
+                loadProfile();
+                profForm.reset();
+            }
+        });
+    }
 });
+
+function loadProfile() {
+    const user = DB.getCurrentUser();
+    const teacherRec = DB.findOne('teachers', { userId: user.id });
+    if(!teacherRec) return;
+
+    document.getElementById('profName').innerText = teacherRec.name;
+    document.getElementById('profId').innerText = teacherRec.teacherId || 'N/A';
+    document.getElementById('profClasses').innerText = teacherRec.classes.length > 0 ? teacherRec.classes.join(', ') : 'None';
+    document.getElementById('profSubjects').innerText = teacherRec.subjects.length > 0 ? teacherRec.subjects.join(', ') : 'None';
+    document.getElementById('profPhone').value = teacherRec.phone || '';
+}
+
+function loadTeacherDashboard() {
+    const user = DB.getCurrentUser();
+    const teacherRec = DB.findOne('teachers', { userId: user.id });
+    if (!teacherRec) return;
+
+    document.getElementById('statClasses').innerText = teacherRec.classes.length;
+    document.getElementById('statSubjects').innerText = teacherRec.subjects.length;
+
+    // Calculate total students across classes
+    const allStudents = DB.getTable('students');
+    let totalStudents = 0;
+    teacherRec.classes.forEach(c => {
+        totalStudents += allStudents.filter(s => (s.className === c || s.classId === c) && s.status === 'active').length;
+    });
+    document.getElementById('statStudents').innerText = totalStudents;
+
+    // Attendance Today
+    const today = new Date().toISOString().split('T')[0];
+    const allAttendance = DB.getTable('attendance');
+    const todayAttendance = allAttendance.filter(a => a.teacherId === user.id && a.date === today);
+    document.getElementById('statAttToday').innerText = `${todayAttendance.length} / ${totalStudents}`;
+
+    // Populate dropdowns once
+    const classSelect = document.getElementById('classSelect');
+    if (classSelect && classSelect.options.length <= 1) {
+        const gradeClassSelect = document.getElementById('gradeClassSelect');
+        const attClassSelect = document.getElementById('attClassSelect');
+        const gradeSubjectSelect = document.getElementById('gradeSubjectSelect');
+        const classListUi = document.getElementById('classList');
+
+        teacherRec.classes.forEach(c => {
+            if (classSelect) classSelect.add(new Option(c, c));
+            if (gradeClassSelect) gradeClassSelect.add(new Option(c, c));
+            if (attClassSelect) attClassSelect.add(new Option(c, c));
+            if (classListUi) {
+                const li = document.createElement('li');
+                li.style.padding = '8px 0';
+                li.style.borderBottom = '1px solid #eee';
+                li.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success)"></i> ${c}`;
+                classListUi.appendChild(li);
+            }
+        });
+
+        if (gradeSubjectSelect && gradeSubjectSelect.options.length <= 1) {
+            // Pull from DB subjects table first (filtered by teacher's classes)
+            const dbSubjects = DB.getTable('subjects');
+            const teacherClasses = teacherRec.classes;
+            const relevantSubjects = dbSubjects.filter(s =>
+                !s.classId || teacherClasses.includes(s.className) || s.className === 'General' || !s.className
+            );
+
+            if (relevantSubjects.length > 0) {
+                relevantSubjects.forEach(s => gradeSubjectSelect.add(new Option(s.name, s.name)));
+            } else if (teacherRec.subjects.length > 0) {
+                // Fallback: teacher's own subjects
+                teacherRec.subjects.forEach(s => gradeSubjectSelect.add(new Option(s, s)));
+            } else {
+                // Final fallback
+                ['Mathematics', 'English Language', 'Science', 'R.M.E', 'Social Studies', 'ICT', 'French'].forEach(s => {
+                    gradeSubjectSelect.add(new Option(s, s));
+                });
+            }
+        }
+
+        // Populate term dropdown from DB terms
+        const gradeTermSelect = document.getElementById('gradeTermSelect');
+        if (gradeTermSelect && gradeTermSelect.options.length <= 1) {
+            const dbTerms = DB.getTable('terms');
+            if (dbTerms.length > 0) {
+                dbTerms.forEach(t => {
+                    const opt = new Option(`${t.name} - ${t.year}`, `${t.name} - ${t.year}`);
+                    gradeTermSelect.add(opt);
+                    if (t.isActive) gradeTermSelect.value = opt.value;
+                });
+            } else {
+                // Fallback static terms
+                ['1st Term 2024/25', '2nd Term 2024/25', '3rd Term 2024/25'].forEach(t => {
+                    gradeTermSelect.add(new Option(t, t));
+                });
+            }
+        }
+    }
+}
+
+function loadTeacherMessages() {
+    const tbody = document.querySelector('#teacherMessagesTable tbody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+
+    const user = DB.getCurrentUser();
+    
+    // Admin broadcasts to teachers OR direct messages (role: 'teachers' or 'all')
+    const msgs = DB.getTable('messages').filter(m => 
+        m.receiverRole === 'teachers' || 
+        m.receiverRole === 'all'
+    ).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if(msgs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No incoming messages found.</td></tr>';
+        return;
+    }
+
+    msgs.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${m.senderName}</strong><br><small>${m.senderRole.toUpperCase()}</small></td>
+            <td>${m.subject}</td>
+            <td>${new Date(m.date).toLocaleDateString()}</td>
+            <td><button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="viewTeacherMessage('${m.id}')">View</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.viewTeacherMessage = function(id) {
+    const m = DB.findById('messages', id);
+    if(m) {
+        alert(`FROM: ${m.senderName} (${m.senderRole})\nDATE: ${new Date(m.date).toLocaleString()}\n\nSUBJECT: ${m.subject}\n\n${m.body}`);
+    }
+}
+
+window.togglePassword = function(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+window.showUploadModal = function() {
+    const user = DB.getCurrentUser();
+    const teacherRec = DB.findOne('teachers', { userId: user.id });
+    const select = document.getElementById('mClass');
+    if(select && teacherRec) {
+        select.innerHTML = '';
+        teacherRec.classes.forEach(c => select.add(new Option(c, c)));
+    }
+    document.getElementById('uploadMaterialModal').classList.add('active');
+}
+
+window.hideModal = function(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function loadMaterials() {
+    const user = DB.getCurrentUser();
+    const tbody = document.querySelector('#teacherMaterialsTable tbody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+
+    const mats = DB.getTable('learning_materials').filter(m => m.teacherId === user.id).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if(mats.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">You haven\'t uploaded any materials yet.</td></tr>';
+        return;
+    }
+
+    mats.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${m.title}</strong><br><small>${m.fileName}</small></td>
+            <td>${m.className}</td>
+            <td>${new Date(m.date).toLocaleDateString()}</td>
+            <td>
+                <div class="action-btns">
+                    <a href="${m.content}" target="_blank" class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;">View</a>
+                    <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="deleteMaterial('${m.id}')">Delete</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.deleteMaterial = function(id) {
+    if(confirm('Delete this material?')) {
+        DB.delete('learning_materials', id);
+        loadMaterials();
+    }
+}
 
 window.loadStudentsForClass = function(className) {
     const tbody = document.querySelector('#teacherStudentsTable tbody');
@@ -468,10 +710,15 @@ window.saveAttendance = function() {
         const status = tr.querySelector('.att-status').value;
         const remark = tr.querySelector('.att-remark').value;
 
+        // Get active term
+        const activeTerm = DB.getTable('terms').find(t => t.isActive);
+        const termName = activeTerm ? `${activeTerm.name} - ${activeTerm.year}` : new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+
         const data = {
             studentId, studentName, className: cls,
             date, status, remark,
-            teacherId: user.id
+            teacherId: user.id,
+            term: termName
         };
 
         const existing = DB.findOne('attendance', { studentId, date });

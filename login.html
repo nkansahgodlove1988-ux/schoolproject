@@ -376,6 +376,12 @@
         <h3>Applicant Portal</h3>
         <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Track your admission status and print letters.</p>
       </div>
+
+      <div class="portal-card" style="border-top-color: #27ae60;" onclick="openLogin('finance')">
+        <i class="fas fa-file-invoice-dollar" style="color: #27ae60;"></i>
+        <h3>Finance Portal</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Manage fees, expenses, and financial reports.</p>
+      </div>
     </div>
 
     <div class="login-form-container" id="loginFormContainer">
@@ -449,6 +455,11 @@
         icon.className = 'fas fa-file-signature';
         icon.style.color = '#9b59b6';
         document.getElementById('username').placeholder = 'Email used in application';
+      } else if (role === 'finance') {
+        title.innerText = 'Finance Login';
+        icon.className = 'fas fa-wallet';
+        icon.style.color = '#27ae60';
+        document.getElementById('username').placeholder = 'Staff Username';
       }
 
       showLoginForm();
@@ -511,14 +522,14 @@
       }
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
       const role = document.getElementById('loginRole').value;
       const user = document.getElementById('username').value;
       const pass = document.getElementById('password').value;
 
-      // Attempt login via database
-      const loggedInUser = DB.login(user, pass);
+      // Attempt login via server-side API
+      const loggedInUser = await DB.login(user, pass);
 
       if (loggedInUser) {
         // Simple role validation
@@ -527,12 +538,14 @@
         else if (role === 'teacher' && loggedInUser.role === 'teacher') targetPage = 'teacher-portal.html';
         else if (role === 'student' && loggedInUser.role === 'student') targetPage = 'student-portal.html';
         else if (role === 'applicant' && loggedInUser.role === 'applicant') targetPage = 'applicant-portal.html';
+        else if (role === 'finance' && loggedInUser.role === 'finance') targetPage = 'finance-portal.html';
 
         if (targetPage) {
           window.location.href = targetPage;
           return;
         } else {
           console.error("Role mismatch! Attempted: " + role + " Actual: " + loggedInUser.role);
+          alert("Unauthorized role for this portal.");
         }
       }
 
@@ -544,8 +557,10 @@
       const user = DB.getCurrentUser();
       if (user) {
         if (user.role === 'admin') window.location.href = 'admin-portal.html';
-        if (user.role === 'teacher') window.location.href = 'teacher-portal.html';
-        if (user.role === 'student') window.location.href = 'student-portal.html';
+        else if (user.role === 'teacher') window.location.href = 'teacher-portal.html';
+        else if (user.role === 'student') window.location.href = 'student-portal.html';
+        else if (user.role === 'applicant') window.location.href = 'applicant-portal.html';
+        else if (user.role === 'finance') window.location.href = 'finance-portal.html';
       }
     }
 

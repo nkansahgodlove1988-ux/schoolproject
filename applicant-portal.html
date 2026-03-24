@@ -25,6 +25,7 @@
       <li><a class="menu-item active" data-target="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
       <li><a class="menu-item" data-target="status"><i class="fas fa-search"></i> Check Status</a></li>
       <li><a class="menu-item" data-target="letter"><i class="fas fa-envelope-open-text"></i> Admission Letter</a></li>
+      <li><a class="menu-item" data-target="security"><i class="fas fa-lock"></i> Security</a></li>
     </ul>
   </aside>
 
@@ -82,6 +83,26 @@
         </div>
         <div class="panel" id="letterPanel">
           <p>Your admission letter is not available yet. Please wait for your application to be approved.</p>
+        </div>
+      </section>
+      
+      <!-- SECURITY -->
+      <section id="security" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Security Settings</h2>
+          <p class="section-subtitle">Manage your account password.</p>
+        </div>
+        <div class="panel" style="max-width: 500px;">
+          <form id="passForm">
+            <div class="form-group">
+              <label>Update Password</label>
+              <div class="password-box">
+                <input type="password" id="appNewPass" class="form-control" placeholder="Enter new password" required>
+                <i class="fas fa-eye" id="toggleP" onclick="togglePassword('appNewPass', 'toggleP')"></i>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+          </form>
         </div>
       </section>
 
@@ -144,14 +165,24 @@
           icon.style.color = '#28a745';
           text.innerText = 'Congratulations! Your application is Approved.';
 
+          const student = DB.findOne('students', { admissionId: admission.id });
+          const studentMsg = student ? 
+            `<div style="margin-top:20px; padding:15px; background:rgba(0,51,102,0.05); border-radius:8px; border-left:4px solid var(--blue);">
+              <p style="margin:0; font-weight:700; color:var(--blue);">Your New Portal Credentials:</p>
+              <p style="margin:5px 0 0;"><strong>Username (Student ID):</strong> ${student.studentId}</p>
+              <p style="margin:2px 0 0;"><strong>Default Password:</strong> password123</p>
+              <p style="margin:10px 0 0; font-size:0.85rem; color:#666;">Use these to log in to the Student Portal from the main login page.</p>
+            </div>` : '';
+
           document.getElementById('letterPanel').innerHTML = `
             <div style="border: 2px solid #eee; padding: 40px; border-radius: 10px; background: #fafafa; text-align: center;">
               <img src="image/logo.jpeg" alt="Logo" style="width: 80px; margin-bottom: 20px;">
               <h2>OFFICIAL ADMISSION LETTER</h2>
               <p style="margin-top: 20px; font-size: 1.1rem;">Dear Guardian of <strong>${admission.childName}</strong>,</p>
               <p style="margin-top: 15px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-                We are pleased to inform you that your ward has been offered admission into <strong>${admission.classApplying}</strong> at Elyon Montessori School. Please log in to the Student Portal using your new Student ID (available via the Administration office) to view fees and proceed.
+                We are pleased to inform you that your ward has been offered admission into <strong>${admission.classApplying}</strong> at Elyon Montessori School.
               </p>
+              ${studentMsg}
               <button class="btn btn-primary" style="margin-top: 30px;" onclick="window.print()"><i class="fas fa-print"></i> Print Letter</button>
             </div>
           `;
@@ -180,7 +211,31 @@
       } else {
         document.getElementById('statusText').innerText = "No application found. Please ensure you submitted the form properly.";
       }
+
+      // Password Update
+      const passForm = document.getElementById('passForm');
+      if (passForm) {
+        passForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const newPass = document.getElementById('appNewPass').value;
+          DB.update('users', user.id, { password: newPass });
+          alert('Password updated successfully!');
+          passForm.reset();
+        });
+      }
     });
+
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
   </script>
 </body>
 

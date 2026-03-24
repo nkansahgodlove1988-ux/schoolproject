@@ -1,6 +1,7 @@
 // js/student.js
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await DB.init();
     const user = DB.requireAuth('student');
     if (!user) return;
 
@@ -44,7 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 else sec.classList.remove('active');
             });
             if (window.innerWidth <= 768) closeSidebar();
-            if (target === 'dashboard') loadDashboardData();
+            if (target === 'dashboard') {
+                loadDashboardData();
+                loadAttendanceStats();
+            }
             if (target === 'results') {
                 const termSelect = document.getElementById('resultTermSelect');
                 window.loadResults(termSelect.value);
@@ -53,6 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadFeesData();
             }
             if (target === 'timetable') loadTimetables();
+            if (target === 'materials') loadMaterials();
+            if (target === 'communication') loadMessages();
+            if (target === 'attendance') loadAttendanceHistory();
+            if (target === 'library') {
+                loadMyBorrowedBooks();
+                loadLibraryCatalogue();
+            }
         });
     });
 
@@ -65,7 +76,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadDashboardData();
     loadFeesData(); // Initial load for dashboard stats
+    loadAttendanceStats();
+
+    function loadMaterials() {
+        const tbody = document.querySelector('#studentMaterialsTable tbody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+
+        const studentRec = DB.findOne('students', { userId: user.id });
+        if(!studentRec) return;
+
+        const mats = DB.getTable('learning_materials').filter(m => m.className === studentRec.className).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        if(mats.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No materials available for your class yet.</td></tr>';
+            return;
+        }
+
+        mats.forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${m.fileName}</strong><br><small>By ${m.teacherName} on ${new Date(m.date).toLocaleDateString()}</small></td>
+                <td>${m.title}</td>
+                <td><a href="${m.content}" target="_blank" class="btn btn-primary" style="padding:5px 10px; font-size:0.8rem;">Download</a></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Support Form
+    const supportForm = document.getElementById('studentSupportForm');
+    if(supportForm) {
+        supportForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const subject = document.getElementById('supSubject').value;
+            const body = document.getElementById('supBody').value;
+            const studentRec = DB.findOne('students', { userId: user.id });
+
+            DB.insert('messages', {
+                senderId: user.id,
+                senderName: user.name,
+                senderRole: 'student',
+                className: studentRec ? studentRec.className : 'N/A',
+                receiverRole: 'admin',
+                subject,
+                body,
+                date: new Date().toISOString()
+            });
+
+            alert("Your request has been sent to administration. We will get back to you soon!");
+            supportForm.reset();
+        });
+    }
+
+    // Profile Password Update
+    const profForm = document.getElementById('profileForm');
+    if(profForm) {
+        profForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('studNewPass').value;
+            if(!newPass) {
+                alert("Please enter a new password if you wish to change it.");
+                return;
+            }
+
+            DB.update('users', user.id, { password: newPass });
+            alert("Password updated successfully!");
+            document.getElementById('studNewPass').value = '';
+        });
+    }
+
+    // Payment Notice Form
+    const payForm = document.getElementById('paymentNoticeForm');
+    if (payForm) {
+        payForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const amount = document.getElementById('payAmount').value;
+            const ref = document.getElementById('payRef').value;
+            const date = document.getElementById('payDate').value;
+            const studentRec = DB.findOne('students', { userId: user.id });
+
+            if (studentRec) {
+                DB.insert('payments', {
+                    studentId: studentRec.studentId,
+                    amountPaid: parseFloat(amount),
+                    date: new Date(date).toISOString(),
+                    receiptNo: ref,
+                    status: 'Pending Verification',
+                    recordedBy: 'Student'
+                });
+
+                DB.logAction('Submitted Payment Notice', `Amount: ${amount}, Ref: ${ref}`);
+                alert("Payment notice submitted successfully! Admin will verify and update your balance.");
+                payForm.reset();
+                hideModal('paymentModal');
+                loadFeesData();
+            }
+        });
+    }
 });
+
+window.showPaymentModal = function() {
+    document.getElementById('payDate').valueAsDate = new Date();
+    document.getElementById('paymentModal').classList.add('active');
+}
+
+window.hideModal = function(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+window.togglePassword = function(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
 
 function loadDashboardData() {
     // Announcements
@@ -94,7 +227,64 @@ function loadDashboardData() {
     });
 }
 
-window.loadResults = function (term) {
+function loadAttendanceStats() {
+    const user = DB.getCurrentUser();
+    const studentRec = DB.findOne('students', { userId: user.id });
+    if (!studentRec) return;
+
+    const records = DB.getTable('attendance').filter(r => r.studentId === studentRec.studentId);
+    if (records.length === 0) {
+        document.getElementById('statAttendance').innerText = '100.0%'; // Default for new students
+        return;
+    }
+
+    const presentDocs = records.filter(r => r.status === 'Present').length;
+    const lateDocs = records.filter(r => r.status === 'Late').length;
+    const percentage = ((presentDocs + (lateDocs * 0.5)) / records.length * 100).toFixed(1);
+    
+    document.getElementById('statAttendance').innerText = percentage + '%';
+}
+
+function loadMessages() {
+    const tbody = document.querySelector('#studentMessagesTable tbody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+
+    const user = DB.getCurrentUser();
+    const studentRec = DB.findOne('students', { userId: user.id });
+    if(!studentRec) return;
+
+    const msgs = DB.getTable('messages').filter(m => 
+        m.receiverRole === 'all' || 
+        m.receiverRole === 'students' || 
+        (m.receiverRole === 'parents' && m.className === studentRec.className)
+    ).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if(msgs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No messages in your inbox.</td></tr>';
+        return;
+    }
+
+    msgs.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${m.senderName}</strong><br><small>${m.senderRole.toUpperCase()}</small></td>
+            <td>${m.subject}</td>
+            <td>${new Date(m.date).toLocaleDateString()}</td>
+            <td><button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="viewStudentMessage('${m.id}')">View</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.viewStudentMessage = function(id) {
+    const m = DB.findById('messages', id);
+    if(m) {
+        alert(`FROM: ${m.senderName} (${m.senderRole})\nDATE: ${new Date(m.date).toLocaleString()}\n\nSUBJECT: ${m.subject}\n\n${m.body}`);
+    }
+}
+
+window.loadResults = function(term) {
     const user = DB.getCurrentUser();
     const studentRec = DB.findOne('students', { userId: user.id });
     if (!studentRec) return;
@@ -261,6 +451,97 @@ function loadTimetables() {
                 <a href="${tt.content}" target="_blank" class="btn btn-primary" style="text-decoration:none; padding:5px 10px;">View PDF</a>
                 <a href="${tt.content}" download="${tt.fileName}" class="btn btn-success" style="text-decoration:none; padding:5px 10px; margin-left:5px;"><i class="fas fa-download"></i></a>
             </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+function loadAttendanceHistory() {
+    const tbody = document.querySelector('#attendanceHistoryTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    const user = DB.getCurrentUser();
+    const studentRec = DB.findOne('students', { userId: user.id });
+    if (!studentRec) return;
+
+    const records = DB.getTable('attendance')
+        .filter(r => r.studentId === studentRec.studentId)
+        .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if (records.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No attendance records found yet.</td></tr>';
+        return;
+    }
+
+    records.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${new Date(r.date).toLocaleDateString()}</td>
+            <td><span class="badge ${r.status === 'Present' ? 'badge-active' : (r.status === 'Late' ? 'badge-pending' : 'badge-rejected')}">${r.status}</span></td>
+            <td>${r.remark || '--'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function loadMyBorrowedBooks() {
+    const tbody = document.querySelector('#myLibraryTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    const user = DB.getCurrentUser();
+    
+    // In our library system, borrower name is used (could be improved by ID)
+    const issues = DB.getTable('library_issues').filter(i => 
+        (i.borrower === user.name || i.borrowerId === user.id) && i.status === 'issued'
+    );
+
+    if (issues.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">You currently have no borrowed books.</td></tr>';
+        return;
+    }
+
+    issues.forEach(i => {
+        const today = new Date().toISOString().split('T')[0];
+        const overdue = i.dueDate < today;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${i.bookTitle}</strong></td>
+            <td>${i.issueDate}</td>
+            <td style="${overdue ? 'color:red; font-weight:bold;' : ''}">${i.dueDate}</td>
+            <td><span class="badge ${overdue ? 'badge-rejected' : 'badge-pending'}">${overdue ? 'Overdue' : 'Issued'}</span></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.loadLibraryCatalogue = function() {
+    const tbody = document.querySelector('#libraryCatalogueTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const searchTerm = document.getElementById('searchLibrary')?.value.toLowerCase();
+    let books = DB.getTable('library_books');
+
+    if (searchTerm) {
+        books = books.filter(b => 
+            b.title.toLowerCase().includes(searchTerm) || 
+            b.author.toLowerCase().includes(searchTerm) || 
+            b.category.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    if (books.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No books found matching your search.</td></tr>';
+        return;
+    }
+
+    books.forEach(b => {
+        const tr = document.createElement('tr');
+        const avail = b.availableCopies || 0;
+        tr.innerHTML = `
+            <td><strong>${b.title}</strong></td>
+            <td>${b.author}</td>
+            <td>${b.category}</td>
+            <td><span class="badge ${avail > 0 ? 'badge-active' : 'badge-rejected'}">${avail > 0 ? 'Available' : 'Out of Stock'}</span></td>
         `;
         tbody.appendChild(tr);
     });

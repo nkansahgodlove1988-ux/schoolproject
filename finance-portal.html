@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Portal | Elyon Montessori</title>
+  <link rel="icon" type="image/png" href="image/favicon2.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="portal.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF & AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header" style="background:#0a3a40;">
+      <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
+      <h2>Finance Portal</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a class="menu-item active" data-target="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a class="menu-item" data-target="fees"><i class="fas fa-file-invoice-dollar"></i> Student Fees</a></li>
+      <li><a class="menu-item" data-target="arrears"><i class="fas fa-user-clock"></i> Arrears / Debtors</a></li>
+      <li><a class="menu-item" data-target="expenses"><i class="fas fa-wallet"></i> School Expenses</a></li>
+      <li><a class="menu-item" data-target="salaries"><i class="fas fa-money-check-alt"></i> Staff Salaries</a></li>
+      <li><a class="menu-item" data-target="reports"><i class="fas fa-file-invoice"></i> Financial Reports</a></li>
+      <li><a class="menu-item" data-target="messages"><i class="fas fa-envelope"></i> System Messages</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
+      <div style="flex:1;"></div>
+      <div class="topbar-right">
+        <div class="user-profile">
+          <i class="fas fa-user-tie"></i>
+          <span id="currentFinanceName">Accountant</span>
+        </div>
+        <button class="logout-btn" onclick="DB.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </header>
+
+    <!-- Sections Area -->
+    <div class="content-area">
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section active">
+        <div class="section-header">
+          <h2 class="section-title">Financial Dashboard</h2>
+          <p class="section-subtitle">Real-time revenue and expenditure tracking.</p>
+        </div>
+        
+        <div class="dashboard-cards">
+          <div class="card green">
+            <div class="card-icon"><i class="fas fa-coins"></i></div>
+            <div class="card-info">
+              <h4>Total Revenue (Term)</h4>
+              <h2 id="statRevenue">GHS 0.00</h2>
+            </div>
+          </div>
+          <div class="card red">
+            <div class="card-icon"><i class="fas fa-arrow-up"></i></div>
+            <div class="card-info">
+              <h4>Total Expenses (Term)</h4>
+              <h2 id="statExpenses">GHS 0.00</h2>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+            <div class="card-info">
+              <h4>Net Position</h4>
+              <h2 id="statNet">GHS 0.00</h2>
+            </div>
+          </div>
+          <div class="card gold">
+            <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="card-info">
+              <h4>Total Arrears</h4>
+              <h2 id="statArrears">GHS 0.00</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Revenue vs Expenses (Monthly)</h3>
+            <canvas id="financeChart" height="200"></canvas>
+          </div>
+          <div class="panel">
+            <h3 class="panel-title">Recent Transactions</h3>
+            <div class="table-container" style="padding:0; box-shadow:none;">
+              <table class="table" style="font-size:0.85rem;">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Ref</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTransactions">
+                  <!-- JS filled -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STUDENT FEES -->
+      <section id="fees" class="section">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h2 class="section-title">Fee Management</h2>
+            <p class="section-subtitle">Process student payments and view histories.</p>
+          </div>
+          <button class="btn btn-primary" onclick="showModal('paymentModal')"><i class="fas fa-plus"></i> Record Payment</button>
+        </div>
+
+        <div class="panel">
+          <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input type="text" id="searchFeeStudent" class="form-control" placeholder="Search student by name or ID..." oninput="loadFees()">
+            <select id="filterFeeClass" class="form-control" style="width:200px;" onchange="loadFees()">
+              <option value="all">All Classes</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table class="table" id="feesTable">
+              <thead>
+                <tr>
+                  <th>Student Info</th>
+                  <th>Class</th>
+                  <th>Bill (Term)</th>
+                  <th>Paid</th>
+                  <th>Balance</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ARREARS / DEBTORS -->
+      <section id="arrears" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Arrears & Debt Management</h2>
+          <p class="section-subtitle">List of students with outstanding balances.</p>
+        </div>
+        <div class="panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 class="panel-title" style="border:none; margin:0;">Debtors List</h3>
+            <button class="btn btn-success" onclick="exportDebtorsPDF()"><i class="fas fa-file-pdf"></i> Export Debtors List</button>
+          </div>
+          <div class="table-container">
+            <table class="table" id="debtorsTable">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Student ID</th>
+                  <th>Class</th>
+                  <th>Arrears Amount</th>
+                  <th>Guardian Phone</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPENSES -->
+      <section id="expenses" class="section">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h2 class="section-title">Expense Tracking</h2>
+            <p class="section-subtitle">Manage school operational costs and expenditures.</p>
+          </div>
+          <button class="btn btn-danger" onclick="showModal('expenseModal')"><i class="fas fa-plus"></i> Record Expense</button>
+        </div>
+        <div class="panel">
+          <div class="table-container">
+            <table class="table" id="expensesTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Reference</th>
+                  <th>Amount (GHS)</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SALARIES -->
+      <section id="salaries" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Staff Salaries</h2>
+          <p class="section-subtitle">Manage payroll and salary disbursements.</p>
+        </div>
+        <div class="panel">
+          <div class="table-container">
+            <table class="table" id="salaryTable">
+              <thead>
+                <tr>
+                  <th>Staff Name</th>
+                  <th>Role</th>
+                  <th>Base Salary</th>
+                  <th>Last Paid</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="reports" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Financial Reports</h2>
+          <p class="section-subtitle">Generate comprehensive financial summaries.</p>
+        </div>
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Income Statement (P&L)</h3>
+            <div class="form-group">
+              <label>Select Period</label>
+              <div style="display:flex; gap:10px;">
+                <input type="date" id="reportStart" class="form-control">
+                <input type="date" id="reportEnd" class="form-control">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="generatePnLReport()"><i class="fas fa-file-pdf"></i> Generate P&L PDF</button>
+          </div>
+          <div class="panel">
+            <h3 class="panel-title">Revenue Collection Summary</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Detailed breakdown of fees collected by class.</p>
+            <button class="btn btn-success" onclick="generateRevenueReport()"><i class="fas fa-file-pdf"></i> Export Revenue PDF</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MESSAGES -->
+      <section id="messages" class="section">
+        <div class="section-header">
+          <h2 class="section-title">System Messages</h2>
+          <p class="section-subtitle">Communication with Admin and Teachers.</p>
+        </div>
+        <div class="panel">
+          <h3 class="panel-title">Inbox</h3>
+          <div class="table-container">
+            <table class="table" id="inboxTable">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>Subject</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Modals -->
+  
+  <!-- Payment Modal -->
+  <div class="modal-overlay" id="paymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Payment</h3>
+        <button class="close-modal" onclick="hideModal('paymentModal')">&times;</button>
+      </div>
+      <form id="formRecordPayment">
+        <div class="form-group">
+          <label>Student</label>
+          <select id="pStudent" class="form-control" required>
+            <option value="">-- Select Student --</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Amount (GHS)</label>
+            <input type="number" id="pAmount" class="form-control" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label>Receipt No.</label>
+            <input type="text" id="pReceipt" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="pStatus" class="form-control">
+            <option value="Paid">Paid (Full)</option>
+            <option value="Partial">Partial Payment</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Submit Payment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div class="modal-overlay" id="expenseModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Expense</h3>
+        <button class="close-modal" onclick="hideModal('expenseModal')">&times;</button>
+      </div>
+      <form id="formRecordExpense">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="expCategory" class="form-control" required>
+            <option value="Utilities">Utilities (Water/Elec)</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Supplies">Supplies / Stationery</option>
+            <option value="Salaries">Staff Salaries</option>
+            <option value="Food">Food / Canteen</option>
+            <option value="Marketing">Marketing / Ads</option>
+            <option value="Other">Other Operational</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="expDesc" class="form-control" placeholder="e.g. Monthly Electricity Bill" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Amount (GHS)</label>
+            <input type="number" id="expAmount" class="form-control" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label>Reference #</label>
+            <input type="text" id="expRef" class="form-control" placeholder="Voucher/Receipt No">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-danger" style="width:100%">Confirm Expense</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/database.js"></script>
+  <script src="js/finance.js"></script>
+</body>
+</html>

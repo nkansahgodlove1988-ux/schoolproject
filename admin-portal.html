@@ -31,11 +31,17 @@
       <li><a class="menu-item" data-target="classes"><i class="fas fa-school"></i> Classes & Depts</a></li>
       <li><a class="menu-item" data-target="results"><i class="fas fa-poll"></i> Results Approval</a></li>
       <li><a class="menu-item" data-target="attendance"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+            <li><a class="menu-item" data-target="subjects"><i class="fas fa-book-open"></i> Subjects</a></li>
+      <li><a class="menu-item" data-target="terms"><i class="fas fa-calendar-alt"></i> Academic Terms</a></li>
+      <li><a class="menu-item" data-target="library"><i class="fas fa-book"></i> Library</a></li>
       <li><a class="menu-item" data-target="fees"><i class="fas fa-file-invoice-dollar"></i> Fees & Payments</a></li>
+      <li><a class="menu-item" data-target="expenses"><i class="fas fa-wallet"></i> Expenses</a></li>
       <li><a class="menu-item" data-target="announcements"><i class="fas fa-bullhorn"></i> Announcements</a></li>
       <li><a class="menu-item" data-target="timetable"><i class="fas fa-clock"></i> Timetable</a></li>
+      <li><a class="menu-item" data-target="communication"><i class="fas fa-comments"></i> Messages</a></li>
       <li><a class="menu-item" data-target="users"><i class="fas fa-users-cog"></i> Users & Roles</a></li>
       <li><a class="menu-item" data-target="reports"><i class="fas fa-file-alt"></i> Reports</a></li>
+      <li><a class="menu-item" data-target="system"><i class="fas fa-cogs"></i> System Settings</a></li>
     </ul>
   </aside>
 
@@ -221,27 +227,51 @@
         </div>
       </section>
 
-      <!-- CLASSES -->
+      <!-- CLASSES & DEPTS -->
       <section id="classes" class="section">
         <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
             <h2 class="section-title">Class & Department Management</h2>
-            <p class="section-subtitle">Create classes and assign class teachers.</p>
+            <p class="section-subtitle">Organize the school's structural units.</p>
           </div>
-          <button class="btn btn-primary" onclick="showModal('classModal')"><i class="fas fa-plus"></i> Add Class</button>
+          <div class="action-btns">
+            <button class="btn btn-primary" onclick="showModal('classModal')"><i class="fas fa-plus"></i> Add Class</button>
+            <button class="btn btn-success" onclick="showModal('deptModal')"><i class="fas fa-building"></i> Add Dept</button>
+          </div>
         </div>
-        <div class="table-container">
-          <table class="table" id="classesTable">
-            <thead>
-              <tr>
-                <th>Class Name</th>
-                <th>Class Teacher</th>
-                <th>Total Students</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Academic Classes</h3>
+            <div class="table-container">
+              <table class="table" id="classesTable">
+                <thead>
+                  <tr>
+                    <th>Class Name</th>
+                    <th>Teacher</th>
+                    <th>Students</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <h3 class="panel-title">Departments</h3>
+            <div class="table-container">
+              <table class="table" id="deptsTable">
+                <thead>
+                  <tr>
+                    <th>Dept Name</th>
+                    <th>Head</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -275,8 +305,8 @@
           <h2 class="section-title">Attendance Overview</h2>
           <p class="section-subtitle">Monitor school-wide attendance records.</p>
         </div>
-        <div class="panel">
-          <p>Coming Soon. Allows full aggregation of daily teacher submissions.</p>
+        <div class="panel" id="attendancePanel">
+          <!-- Dynamically filled by loadAttendance() in admin.js -->
         </div>
       </section>
 
@@ -301,6 +331,34 @@
                 <th>Amount Paid</th>
                 <th>Receipt No</th>
                 <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- EXPENSES -->
+      <section id="expenses" class="section">
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h2 class="section-title">Expense Management</h2>
+            <p class="section-subtitle">Record and track school operational expenditures.</p>
+          </div>
+          <div class="action-btns">
+            <button class="btn btn-primary" onclick="showModal('expenseModal')"><i class="fas fa-plus"></i> Record New Expense</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="table" id="expensesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount (GHS)</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -344,7 +402,7 @@
         </div>
       </section>
 
-      <!-- TIMETABLE, USERS, REPORTS... (Placeholders for now) -->
+      <!-- TIMETABLE, USERS, REPORTS... -->
       <section id="timetable" class="section">
         <div class="section-header">
           <h2 class="section-title">Timetable Management</h2>
@@ -394,6 +452,58 @@
           </div>
         </div>
       </section>
+
+      <!-- COMMUNICATION -->
+      <section id="communication" class="section">
+        <div class="section-header">
+          <h2 class="section-title">System Communication</h2>
+          <p class="section-subtitle">Read messages sent by teachers and parents.</p>
+        </div>
+        
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Compose Message</h3>
+            <form id="adminMsgForm">
+              <div class="form-group">
+                <label>Recipients</label>
+                <select id="admMsgTo" class="form-control">
+                  <option value="all">All Users</option>
+                  <option value="teachers">All Teachers</option>
+                  <option value="students">All Students</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Subject</label>
+                <input type="text" id="admMsgSubject" class="form-control" placeholder="Subject of the message" required>
+              </div>
+              <div class="form-group">
+                <label>Message Body</label>
+                <textarea id="admMsgBody" class="form-control" style="height: 100px;" placeholder="Type your message here..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send System Message</button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <h3 class="panel-title">Inbound Messages</h3>
+            <div class="table-container">
+              <table class="table" id="messagesTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="users" class="section">
         <div class="section-header">
           <h2 class="section-title">User Accounts Control</h2>
@@ -482,6 +592,202 @@
             <div style="display:flex; align-items:flex-end;">
               <button class="btn btn-success" onclick="generateFinancialReport()" style="width:100%"><i class="fas fa-file-invoice-dollar"></i> Export Revenue PDF</button>
             </div>
+          </div>
+      </section>
+
+      <!-- SYSTEM SETTINGS -->
+      <section id="system" class="section">
+        <div class="section-header">
+          <h2 class="section-title">System Settings & Maintenance</h2>
+          <p class="section-subtitle">Manage system backups, data restoration, and global settings.</p>
+        </div>
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Backup & Restore</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Exports all school data to a local file for safekeeping.</p>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-success" onclick="exportSystemBackup()"><i class="fas fa-download"></i> Export Data (JSON)</button>
+              <button class="btn btn-primary" onclick="triggerImport()"><i class="fas fa-upload"></i> Restore Data</button>
+            </div>
+            <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importSystemBackup(this)">
+          </div>
+          <div class="panel">
+            <h3 class="panel-title">General Settings</h3>
+            <div class="form-group">
+              <label>School Name</label>
+              <input type="text" id="setSchoolName" class="form-control" value="Elyon Montessori School">
+            </div>
+            <button class="btn btn-primary">Save Settings</button>
+          </div>
+        </div>
+      </section>
+      <!-- SUBJECTS MANAGEMENT -->
+      <section id="subjects" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Subject Management</h2>
+          <p class="section-subtitle">Create and manage subjects assigned to classes across the school.</p>
+        </div>
+        <div class="panel" style="margin-bottom:15px;">
+          <div class="form-row-3" style="margin-bottom:0;">
+            <div class="form-group">
+              <input type="text" id="searchSubject" class="form-control" placeholder="Search by subject name or code..." oninput="loadSubjects()">
+            </div>
+            <div class="form-group">
+              <select id="filterSubjectClass" class="form-control" onchange="loadSubjects()">
+                <option value="all">All Classes</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:flex-end;">
+              <button class="btn btn-primary" onclick="showModal('subjectModal')" style="width:100%"><i class="fas fa-plus"></i> Add Subject</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="table-container">
+            <table class="table" id="subjectsTable">
+              <thead>
+                <tr>
+                  <th>Subject Name</th>
+                  <th>Code</th>
+                  <th>Class / Level</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACADEMIC TERMS -->
+      <section id="terms" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Academic Terms</h2>
+          <p class="section-subtitle">Create and manage academic terms/semesters for the school year.</p>
+        </div>
+        <div class="panel" style="margin-bottom:15px;">
+          <div id="activeTermDisplay" style="margin-bottom:15px; font-size:1rem;">Loading...</div>
+          <h3 class="panel-title">Create New Academic Term</h3>
+          <form id="formAddTerm">
+            <div class="form-row-3">
+              <div class="form-group">
+                <label>Term Name</label>
+                <input type="text" id="termName" class="form-control" placeholder="e.g. First Term" required>
+              </div>
+              <div class="form-group">
+                <label>Academic Year</label>
+                <input type="text" id="termYear" class="form-control" placeholder="e.g. 2024/2025" required>
+              </div>
+              <div class="form-group">
+                <label>Set as Active Term?</label>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                  <input type="checkbox" id="termActive" style="width:20px; height:20px; cursor:pointer;">
+                  <label for="termActive" style="cursor:pointer; font-weight:500;">Yes, make this the current term</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" id="termStart" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>End Date</label>
+                <input type="date" id="termEnd" class="form-control" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Create Term</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h3 class="panel-title">All Academic Terms</h3>
+          <div class="table-container">
+            <table class="table" id="termsTable">
+              <thead>
+                <tr>
+                  <th>Term Name</th>
+                  <th>Year</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIBRARY MODULE -->
+      <section id="library" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Library Management</h2>
+          <p class="section-subtitle">Manage the school book catalogue, issue books to students and track returns.</p>
+        </div>
+        <div class="dashboard-cards">
+          <div class="card">
+            <div class="card-icon"><i class="fas fa-books"></i></div>
+            <div class="card-info">
+              <h4>Total Books</h4>
+              <h2 id="libStatTotal">0</h2>
+            </div>
+          </div>
+          <div class="card green">
+            <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="card-info">
+              <h4>Available</h4>
+              <h2 id="libStatAvail">0</h2>
+            </div>
+          </div>
+          <div class="card red">
+            <div class="card-icon"><i class="fas fa-hand-holding-book"></i></div>
+            <div class="card-info">
+              <h4>Issued Out</h4>
+              <h2 id="libStatIssued">0</h2>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+            <input type="text" id="searchBook" class="form-control" style="max-width:300px;" placeholder="Search books..." oninput="loadBookCatalogue()">
+            <button class="btn btn-primary" onclick="showModal('bookModal')"><i class="fas fa-plus"></i> Add Book</button>
+          </div>
+          <h3 class="panel-title">Book Catalogue</h3>
+          <div class="table-container">
+            <table class="table" id="booksTable">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>ISBN</th>
+                  <th>Category</th>
+                  <th>Copies</th>
+                  <th>Availability</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:20px;">
+          <h3 class="panel-title"><i class="fas fa-hand-holding" style="margin-right:8px;"></i>Active Issues (Not Returned)</h3>
+          <div class="table-container">
+            <table class="table" id="issuesTable">
+              <thead>
+                <tr>
+                  <th>Book Title</th>
+                  <th>Borrower</th>
+                  <th>Type</th>
+                  <th>Issue Date</th>
+                  <th>Due Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -605,6 +911,42 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="expenseModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Record School Expense</h3>
+        <button class="close-modal" onclick="hideModal('expenseModal')">&times;</button>
+      </div>
+      <form id="formRecordExpense">
+        <input type="hidden" id="expId">
+        <div class="form-group">
+          <label>Expense Category</label>
+          <select id="expCategory" class="form-control" required>
+            <option value="Salary">Staff Salary</option>
+            <option value="Utilities">Utilities (Water/Elec/Internet)</option>
+            <option value="Maintenance">Maintenance & Repairs</option>
+            <option value="Supplies">School Supplies / Stationary</option>
+            <option value="Food">Feeding / Kitchen</option>
+            <option value="Other">Other Expenses</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="expDesc" class="form-control" placeholder="e.g. March Electricity Bill" required>
+        </div>
+        <div class="form-group">
+          <label>Amount (GHS)</label>
+          <input type="number" id="expAmount" class="form-control" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="expDate" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Save Expense Record</button>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="setFeesModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -700,6 +1042,156 @@
       </div>
     </div>
   </div>
+  <!-- Subject Modal -->
+  <div class="modal-overlay" id="subjectModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Subject</h3>
+        <button class="close-modal" onclick="hideModal('subjectModal')">&times;</button>
+      </div>
+      <form id="formAddSubject">
+        <div class="form-group">
+          <label>Subject Name</label>
+          <input type="text" id="subjName" class="form-control" placeholder="e.g. Mathematics" required>
+        </div>
+        <div class="form-group">
+          <label>Subject Code</label>
+          <input type="text" id="subjCode" class="form-control" placeholder="e.g. MATH101">
+        </div>
+        <div class="form-group">
+          <label>Assign to Class</label>
+          <select id="subjClassId" class="form-control">
+            <option value="">All Classes / General</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-plus"></i> Add Subject</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Book Modal -->
+  <div class="modal-overlay" id="bookModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Book to Library</h3>
+        <button class="close-modal" onclick="hideModal('bookModal')">&times;</button>
+      </div>
+      <form id="formAddBook">
+        <div class="form-group">
+          <label>Book Title</label>
+          <input type="text" id="bookTitle" class="form-control" placeholder="e.g. Mathematics for Beginners" required>
+        </div>
+        <div class="form-group">
+          <label>Author</label>
+          <input type="text" id="bookAuthor" class="form-control" placeholder="e.g. John Doe" required>
+        </div>
+        <div class="form-group">
+          <label>ISBN / Book Code</label>
+          <input type="text" id="bookISBN" class="form-control" placeholder="e.g. 978-3-16-148410-0">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="bookCategory" class="form-control">
+            <option value="Textbook">Textbook</option>
+            <option value="Reference">Reference</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Non-Fiction">Non-Fiction</option>
+            <option value="Science">Science</option>
+            <option value="History">History</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Number of Copies</label>
+          <input type="number" id="bookCopies" class="form-control" value="1" min="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-plus"></i> Add to Library</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Issue Book Modal -->
+  <div class="modal-overlay" id="issueBookModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Issue Book</h3>
+        <button class="close-modal" onclick="hideModal('issueBookModal')">&times;</button>
+      </div>
+      <div style="background:#f0f4ff; padding:10px 15px; border-radius:8px; margin-bottom:15px;">
+        <strong>Book:</strong> <span id="issueBookName" style="color:var(--blue);"></span>
+      </div>
+      <form id="formIssueBook">
+        <input type="hidden" id="issueBookId">
+        <div class="form-group">
+          <label>Borrower Name</label>
+          <input type="text" id="issueBorrower" class="form-control" placeholder="Full name of borrower" required>
+        </div>
+        <div class="form-group">
+          <label>Borrower Type</label>
+          <select id="issueBorrowerType" class="form-control">
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Staff">Staff</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Due Return Date</label>
+          <input type="date" id="issueDueDate" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%"><i class="fas fa-hand-holding"></i> Issue Book</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Department Modal -->
+  <div class="modal-overlay" id="deptModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Department</h3>
+        <button class="close-modal" onclick="hideModal('deptModal')">&times;</button>
+      </div>
+      <form id="formAddDept">
+        <div class="form-group">
+          <label>Department Name</label>
+          <input type="text" id="deptName" class="form-control" placeholder="e.g. Science Department" required>
+        </div>
+        <div class="form-group">
+          <label>Head of Department (Staff Name)</label>
+          <input type="text" id="deptHead" class="form-control" placeholder="e.g. Mr. Smith">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-plus"></i> Add Department</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Academic Term Modal -->
+  <div class="modal-overlay" id="termModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Create Academic Term</h3>
+        <button class="close-modal" onclick="hideModal('termModal')">&times;</button>
+      </div>
+      <form id="formAddTerm">
+        <div class="form-group">
+          <label>Term Name</label>
+          <input type="text" id="termName" class="form-control" placeholder="e.g. First Term" required>
+        </div>
+        <div class="form-group">
+          <label>Academic Year</label>
+          <input type="text" id="termYear" class="form-control" placeholder="e.g. 2024/2025" required>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="termActive" class="form-control">
+            <option value="true">Active Term</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-plus"></i> Save Term</button>
+      </form>
+    </div>
+  </div>
 
   <script src="js/database.js"></script>
   <script src="js/admin.js"></script>
@@ -720,3 +1212,6 @@
   </script>
 </body>
 </html>
+
+
+

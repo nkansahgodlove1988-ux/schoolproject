@@ -1,9 +1,11 @@
 // js/admin.js
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Authenticate
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for server data to load
+    await DB.init();
+
     const user = DB.requireAuth('admin');
-    if (!user) return; // redirect happens in requireAuth
+    if (!user) return;
 
     document.getElementById('currentAdminName').innerText = user.name || 'Administrator';
 
@@ -98,6 +100,16 @@ window.showModal = function (id) {
                 studentSelect.add(new Option(`${s.name} (${s.studentId})`, s.studentId));
             });
         }
+    } else if (id === 'expenseModal') {
+        document.getElementById('expDate').valueAsDate = new Date();
+        document.getElementById('expId').value = '';
+        document.getElementById('formRecordExpense').reset();
+    } else if (id === 'subjectModal') {
+        const clsSel = document.getElementById('subjClassId');
+        if (clsSel) {
+            clsSel.innerHTML = '<option value="">All Classes / General</option>';
+            DB.getTable('classes').forEach(c => clsSel.add(new Option(c.name, c.id)));
+        }
     }
 
     modal.classList.add('active');
@@ -113,75 +125,78 @@ function loadSectionData(section) {
     else if (section === 'admissions') loadAdmissions();
     else if (section === 'students') loadStudents();
     else if (section === 'fees') loadFees();
+    else if (section === 'expenses') loadExpenses();
     else if (section === 'announcements') loadAnnouncements();
     else if (section === 'results') loadResults();
     else if (section === 'timetable') loadTimetables();
     else if (section === 'attendance') loadAttendance();
+    else if (section === 'communication') loadMessages();
     else if (section === 'users') loadUsers();
-    // others can be added as needed
+    else if (section === 'subjects') loadSubjects();
+    else if (section === 'library') loadLibrary();
+    else if (section === 'terms') loadTerms();
+}
+
+// ---------------- Helper Functions ---------------- //
+
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (!input || !icon) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
 }
 
 function setupForms() {
     // Add Teacher Form
     const teacherForm = document.getElementById('formAddTeacher');
     if (teacherForm) {
-        teacherForm.addEventListener('submit', (e) => {
+        teacherForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('tName').value;
             const phone = document.getElementById('tPhone').value;
             const password = document.getElementById('tPassword').value;
 
-            // Auto-generate Teacher ID
-            const teacherId = 'TCH' + Math.floor(1000 + Math.random() * 9000);
+            const teacherId = DB.generateUniqueId('TCH', 'teachers');
             const username = teacherId;
 
-            // Add to users
-            const newUser = DB.insert('users', {
-                username,
-                password,
-                role: 'teacher',
-                name,
-                status: 'active'
+            const newUser = await DB.insert('users', {
+                username, password, role: 'teacher', name, status: 'active'
             });
 
-            // Add to teachers
-            DB.insert('teachers', {
-                userId: newUser.id,
-                teacherId,
-                name,
-                phone,
-                classes: [],
-                subjects: [],
-                status: 'active'
-            });
+            if (newUser) {
+                await DB.insert('teachers', {
+                    user_id: newUser.id,
+                    teacher_id: teacherId,
+                    name, phone, status: 'active'
+                });
+            }
 
-            DB.logAction('Created Teacher', `Name: ${name}, ID: ${teacherId}, Phone: ${phone}`);
-
+            await DB.logAction('Created Teacher', `Name: ${name}, ID: ${teacherId}`);
             hideModal('teacherModal');
             document.getElementById('formAddTeacher').reset();
             loadTeachers();
-            if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
         });
     }
 
     // Add Class Form
     const classForm = document.getElementById('formAddClass');
     if (classForm) {
-        classForm.addEventListener('submit', (e) => {
+        classForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('cName').value;
-
-            DB.insert('classes', {
-                name,
-                teacherId: null
-            });
-
-            DB.logAction('Created Class', `Name: ${name}`);
-
+            await DB.insert('classes', { name });
+            await DB.logAction('Created Class', `Name: ${name}`);
             hideModal('classModal');
             document.getElementById('formAddClass').reset();
             loadClasses();
-            if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
         });
     }
 
@@ -204,10 +219,36 @@ function setupForms() {
         });
     }
 
+    // Admin Outbound Message
+    const adminMsgForm = document.getElementById('adminMsgForm');
+    if (adminMsgForm) {
+        adminMsgForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const to = document.getElementById('admMsgTo').value;
+            const subject = document.getElementById('admMsgSubject').value;
+            const body = document.getElementById('admMsgBody').value;
+            const user = DB.getCurrentUser();
+
+            DB.insert('messages', {
+                senderId: user.id,
+                senderName: user.name,
+                senderRole: 'admin',
+                receiverRole: to,
+                subject,
+                body,
+                date: new Date().toISOString()
+            });
+
+            DB.logAction('Sent System Message', `To: ${to}, Subject: ${subject}`);
+            alert('Your message has been sent to the system!');
+            adminMsgForm.reset();
+        });
+    }
+
     // Add Student Manually Form
     const studentForm = document.getElementById('formAddStudent');
     if (studentForm) {
-        studentForm.addEventListener('submit', (e) => {
+        studentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('sName').value;
             const classId = document.getElementById('sClass').value;
@@ -217,36 +258,22 @@ function setupForms() {
             const gPhone = document.getElementById('sGPhone').value;
             const arrears = document.getElementById('sArrears').value;
 
-            // Create user
-            const studentId = 'STU' + Math.floor(1000 + Math.random() * 9000);
-            const newUser = DB.insert('users', {
-                username: studentId,
-                password: 'password123',
-                role: 'student',
-                name,
-                status: 'active'
+            const studentId = DB.generateUniqueId('STU', 'students');
+            const newUser = await DB.insert('users', {
+                username: studentId, password: 'password123', role: 'student', name, status: 'active'
             });
 
-            // Create student
-            DB.insert('students', {
-                userId: newUser.id,
-                studentId,
-                name,
-                classId,
-                className,
-                gender,
-                guardianName: gName,
-                guardianPhone: gPhone,
-                arrears: parseFloat(arrears) || 0,
-                status: 'active'
-            });
+            if (newUser) {
+                await DB.insert('students', {
+                    user_id: newUser.id, student_id: studentId, name, class_id: classId, class_name: className,
+                    gender, guardian_name: gName, guardian_phone: gPhone, arrears: parseFloat(arrears) || 0, status: 'active'
+                });
+            }
 
-            DB.logAction('Registered Student', `Name: ${name}, Generated ID: ${studentId}, Arrears: ${arrears}`);
-
+            await DB.logAction('Registered Student', `Name: ${name}, ID: ${studentId}`);
             hideModal('studentModal');
             document.getElementById('formAddStudent').reset();
             loadStudents();
-            if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
         });
     }
 
@@ -372,6 +399,126 @@ function setupForms() {
     if (searchUser) searchUser.addEventListener('input', loadUsers);
     if (roleFilter) roleFilter.addEventListener('change', loadUsers);
     if (statusFilter) statusFilter.addEventListener('change', loadUsers);
+
+    // Add Department Form
+    const deptForm = document.getElementById('formAddDept');
+    if (deptForm) {
+        deptForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('deptName').value.trim();
+            const head = document.getElementById('deptHead').value.trim();
+
+            const exists = DB.find('departments', { name }).length > 0;
+            if (exists) {
+                alert(`Department "${name}" already exists.`);
+                return;
+            }
+
+            DB.insert('departments', { name, head });
+            DB.logAction('Created Dept', `Name: ${name}, Head: ${head}`);
+            alert('Department created successfully!');
+            hideModal('deptModal');
+            document.getElementById('formAddDept').reset();
+            loadDepartments();
+        });
+    }
+
+    // Subject Management Form
+    const subjectForm = document.getElementById('formAddSubject');
+    if (subjectForm) {
+        subjectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('subjName').value.trim();
+            const classId = document.getElementById('subjClassId').value;
+            const className = classId
+                ? document.getElementById('subjClassId').options[document.getElementById('subjClassId').selectedIndex].text
+                : 'General';
+            const code = document.getElementById('subjCode').value.trim();
+
+            const exists = DB.find('subjects', { name }).some(s => s.classId === classId);
+            if (exists) {
+                alert(`Subject "${name}" already exists for this class.`);
+                return;
+            }
+
+            DB.insert('subjects', { name, code, classId, className, status: 'active' });
+            DB.logAction('Added Subject', `Name: ${name}, Class: ${className}`);
+            alert('Subject added successfully!');
+            hideModal('subjectModal');
+            document.getElementById('formAddSubject').reset();
+            loadSubjects();
+        });
+    }
+
+    // Academic Term Form
+    const termForm = document.getElementById('formAddTerm');
+    if (termForm) {
+        termForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('termName').value.trim();
+            const year = document.getElementById('termYear').value.trim();
+            const isActive = document.getElementById('termActive').value === 'true';
+
+            if (isActive) {
+                // Deactivate any currently active term
+                const currentActive = DB.find('terms', { isActive: true });
+                currentActive.forEach(t => DB.update('terms', t.id, { isActive: false }));
+            }
+
+            DB.insert('terms', { name, year, isActive });
+            DB.logAction('Created Term', `Name: ${name}, Year: ${year}, Active: ${isActive}`);
+            alert(`Term "${name}" created successfully!`);
+            hideModal('termModal');
+            document.getElementById('formAddTerm').reset();
+            loadTerms();
+        });
+    }
+
+    // Library Book Form
+    const bookForm = document.getElementById('formAddBook');
+    if (bookForm) {
+        bookForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title     = document.getElementById('bookTitle').value.trim();
+            const author    = document.getElementById('bookAuthor').value.trim();
+            const isbn      = document.getElementById('bookISBN').value.trim();
+            const category  = document.getElementById('bookCategory').value;
+            const copies    = parseInt(document.getElementById('bookCopies').value) || 1;
+
+            DB.insert('library_books', { title, author, isbn, category, totalCopies: copies, availableCopies: copies, status: 'available' });
+            DB.logAction('Added Library Book', `Title: ${title}, Author: ${author}, Copies: ${copies}`);
+            alert('Book added to library!');
+            hideModal('bookModal');
+            document.getElementById('formAddBook').reset();
+            loadLibrary();
+        });
+    }
+
+    // Book Issue Form
+    const issueForm = document.getElementById('formIssueBook');
+    if (issueForm) {
+        issueForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const bookId    = document.getElementById('issueBookId').value;
+            const borrower  = document.getElementById('issueBorrower').value.trim();
+            const borrowerType = document.getElementById('issueBorrowerType').value;
+            const dueDate   = document.getElementById('issueDueDate').value;
+
+            const book = DB.findById('library_books', bookId);
+            if (!book || book.availableCopies < 1) {
+                alert('No copies available for this book.');
+                return;
+            }
+
+            DB.insert('library_issues', { bookId, bookTitle: book.title, borrower, borrowerType, issueDate: new Date().toISOString().split('T')[0], dueDate, status: 'issued' });
+            DB.update('library_books', bookId, { availableCopies: book.availableCopies - 1, status: book.availableCopies - 1 === 0 ? 'out' : 'available' });
+            DB.logAction('Issued Book', `Book: ${book.title}, To: ${borrower}`);
+            alert(`Book issued to ${borrower}!`);
+            hideModal('issueBookModal');
+            document.getElementById('formIssueBook').reset();
+            loadLibrary();
+        });
+    }
 }
 
 // ---------------- Loaders ---------------- //
@@ -664,7 +811,7 @@ window.approveAdmission = function (id) {
         DB.update('admissions', id, { status: 'approved' });
 
         // Create user
-        const studentId = 'STU' + Math.floor(1000 + Math.random() * 9000);
+        const studentId = DB.generateUniqueId('STU', 'students');
         const newUser = DB.insert('users', {
             username: studentId,
             password: 'password123', // default
@@ -736,9 +883,8 @@ function loadStudents() {
     }
 
     const filterSelect = document.getElementById('filterStudentClass');
-    if (filterSelect && filterSelect.options.length <= 1) { // Populate dynamically
-        const classes = [...new Set(DB.getTable('students').map(s => s.className || 'Unassigned'))];
-        classes.forEach(c => filterSelect.add(new Option(c, c)));
+    if (filterSelect && filterSelect.options.length <= 1) { // Populate dynamically from all school classes
+        DB.getTable('classes').forEach(c => filterSelect.add(new Option(c.name, c.name)));
     }
 
     if (students.length === 0) {
@@ -748,11 +894,7 @@ function loadStudents() {
 
     students.forEach(s => {
         // Calculate Debt
-        const cls = DB.getTable('classes').find(c => c.id === s.classId || c.name === s.className);
-        const tuition = cls ? (cls.tuitionFee || 0) : 0;
-        const payments = DB.find('payments', { studentId: s.studentId });
-        const paid = payments.reduce((acc, p) => acc + (parseFloat(p.amountPaid) || 0), 0);
-        const totalDebt = (tuition + (s.arrears || 0)) - paid;
+        const totalDebt = DB.calculateStudentDebt(s);
 
         let debtTableDisplay = '';
         if (totalDebt > 0) {
@@ -819,11 +961,7 @@ window.editStudent = function (id) {
     if (!s) return;
 
     // Calculate Real Debt
-    const cls = DB.getTable('classes').find(c => c.id === s.classId || c.name === s.className);
-    const tuition = cls ? (cls.tuitionFee || 0) : 0;
-    const payments = DB.find('payments', { studentId: s.studentId });
-    const paid = payments.reduce((acc, p) => acc + (parseFloat(p.amountPaid) || 0), 0);
-    const totalDebt = (tuition + (s.arrears || 0)) - paid;
+    const totalDebt = DB.calculateStudentDebt(s);
 
     let debtDisplay = '';
     if (totalDebt > 0) {
@@ -866,7 +1004,10 @@ function loadAnnouncements() {
         div.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <strong>${a.title}</strong>
-                <span class="badge badge-active">${a.target}</span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span class="badge badge-active">${a.target}</span>
+                    <button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="window.deleteAnnouncement('${a.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
             </div>
             <p style="margin:10px 0; font-size:0.95rem; color:#444">${a.body}</p>
             <small style="color:#888">${new Date(a.date).toLocaleString()} By ${a.author}</small>
@@ -875,11 +1016,20 @@ function loadAnnouncements() {
     });
 }
 
+window.deleteAnnouncement = function(id) {
+    if(confirm('Are you sure you want to delete this announcement?')) {
+        DB.delete('announcements', id);
+        DB.logAction('Deleted Announcement', `Announcement ID: ${id}`);
+        loadAnnouncements();
+    }
+}
+
 function loadFees() {
     const tbody = document.querySelector('#feesTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
     const payments = DB.getTable('payments').sort((a, b) => new Date(b.date) - new Date(a.date));
+    const students = DB.getTable('students');
 
     if (payments.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No payment records found.</td></tr>';
@@ -887,16 +1037,56 @@ function loadFees() {
     }
 
     payments.forEach(p => {
+        const student = students.find(s => s.studentId === p.studentId);
         const tr = document.createElement('tr');
+        
+        let statusBadge = '';
+        if (p.status === 'Paid') statusBadge = '<span class="badge badge-active">Paid</span>';
+        else if (p.status === 'Pending Verification') statusBadge = '<span class="badge badge-pending">Pending Verification</span>';
+        else statusBadge = `<span class="badge badge-inactive">${p.status || 'Pending'}</span>`;
+
+        let actionBtns = '';
+        if (p.status === 'Pending Verification') {
+            actionBtns = `
+                <div class="action-btns">
+                    <button class="btn btn-success" style="padding:4px 8px; font-size:0.8rem;" onclick="window.verifyPayment('${p.id}')" title="Approve Payment"><i class="fas fa-check"></i> Verify</button>
+                    <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="window.deletePayment('${p.id}')" title="Delete/Reject Notice"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+        } else {
+            actionBtns = `
+                <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="window.deletePayment('${p.id}')" title="Delete Record"><i class="fas fa-trash"></i></button>
+            `;
+        }
+
         tr.innerHTML = `
             <td>${new Date(p.date).toLocaleDateString()}</td>
-            <td><strong>${p.studentId}</strong></td>
+            <td><strong>${student ? student.name : p.studentId}</strong><br><small>${p.studentId}</small></td>
             <td>GHS ${parseFloat(p.amountPaid).toFixed(2)}</td>
             <td>${p.receiptNo}</td>
-            <td><span class="badge ${p.status === 'Paid' ? 'badge-active' : 'badge-pending'}">${p.status}</span></td>
+            <td>${statusBadge}</td>
+            <td>${actionBtns}</td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+window.verifyPayment = function(id) {
+    if (!confirm('Mark this payment as Verified and Paid?')) return;
+    const payment = DB.findById('payments', id);
+    if (payment) {
+        DB.update('payments', id, { status: 'Paid' });
+        DB.logAction('Verified Payment', `Ref: ${payment.receiptNo}, Student: ${payment.studentId}, Amount: ${payment.amountPaid}`);
+        loadFees();
+        alert('Payment verified successfully!');
+    }
+}
+
+window.deletePayment = function(id) {
+    if (!confirm('Are you sure you want to delete this payment record? This action cannot be undone.')) return;
+    DB.delete('payments', id);
+    DB.logAction('Deleted Payment Record', `ID: ${id}`);
+    loadFees();
 }
 
 function loadResults() {
@@ -904,10 +1094,26 @@ function loadResults() {
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    const results = DB.getTable('results').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // Populate filter classes if empty (only once or on each load)
+    const filterClass = document.getElementById('filterResultClass');
+    if (filterClass && filterClass.options.length <= 1) {
+        DB.getTable('classes').forEach(c => {
+            filterClass.add(new Option(c.name, c.name));
+        });
+    }
+
+    const classF = document.getElementById('filterResultClass')?.value || 'all';
+    const statusF = document.getElementById('filterResultStatus')?.value || 'all';
+
+    let results = DB.getTable('results');
+    
+    if (classF !== 'all') results = results.filter(r => r.classId === classF);
+    if (statusF !== 'all') results = results.filter(r => r.status === statusF);
+
+    results.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     if (results.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No results submitted for approval.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No results found for this selection.</td></tr>';
         return;
     }
 
@@ -1106,7 +1312,7 @@ function loadUsers() {
     });
 }
 
-window.deleteUser = function(id) {
+window.deleteUser = async function(id) {
     const user = DB.findById('users', id);
     if (!user) return;
 
@@ -1118,25 +1324,21 @@ window.deleteUser = function(id) {
     if (confirm(`Are you sure you want to PERMANENTLY delete the account for ${user.name}? This will also remove their student/teacher profile data.`)) {
         // If teacher, remove teacher profile
         if (user.role === 'teacher') {
-            const teacher = DB.findOne('teachers', { userId: id });
-            if (teacher) DB.delete('teachers', teacher.id);
+            const teacher = DB.findOne('teachers', { user_id: id });
+            if (teacher) await DB.delete('teachers', teacher.id);
         }
         // If student, remove student profile and update admissions
         if (user.role === 'student') {
-            const student = DB.findOne('students', { userId: id });
+            const student = DB.findOne('students', { user_id: id });
             if (student) {
-                if (student.admissionId) DB.update('admissions', student.admissionId, { status: 'removed' });
-                DB.delete('students', student.id);
+                // if (student.admissionId) await DB.update('admissions', student.admissionId, { status: 'removed' });
+                await DB.delete('students', student.id);
             }
         }
 
-        DB.delete('users', id);
-        DB.logAction('Deleted User Account', `User: ${user.username}, Name: ${user.name}`);
+        await DB.delete('users', id);
+        await DB.logAction('Deleted User Account', `User: ${user.username}, Name: ${user.name}`);
         loadUsers();
-        // Refresh other tables if they are visible
-        if (document.getElementById('teachers').classList.contains('active')) loadTeachers();
-        if (document.getElementById('students').classList.contains('active')) loadStudents();
-        if (document.getElementById('admissions').classList.contains('active')) loadAdmissions();
     }
 }
 
@@ -1150,25 +1352,25 @@ window.openResetPasswordModal = function(id) {
     }
 }
 
-window.toggleUserStatus = function(id) {
+window.toggleUserStatus = async function(id) {
     const user = DB.findById('users', id);
     if (user) {
         const newStatus = (user.status === 'inactive') ? 'active' : 'inactive';
         const msg = `Are you sure you want to ${newStatus === 'inactive' ? 'DEACTIVATE' : 'ACTIVATE'} this user account?`;
         if (confirm(msg)) {
-            DB.update('users', id, { status: newStatus });
-            DB.logAction(newStatus === 'inactive' ? 'Deactivated User' : 'Activated User', `User: ${user.username}`);
+            await DB.update('users', id, { status: newStatus });
+            await DB.logAction(newStatus === 'inactive' ? 'Deactivated User' : 'Activated User', `User: ${user.username}`);
             loadUsers();
         }
     }
 }
 
 function loadAttendance() {
-    const tbody = document.querySelector('#attendanceTable tbody');
-    if (!tbody) return;
+    const panel = document.getElementById('attendancePanel');
+    if (!panel) return;
     
     // Check if we already have the filter UI
-    let filterRow = document.querySelector('#attendance .panel .form-row');
+    let filterRow = panel.querySelector('.form-row-3');
     if(!filterRow) {
         const panel = document.querySelector('#attendance .panel');
         panel.innerHTML = `
@@ -1240,6 +1442,47 @@ function loadAttendance() {
         `;
         listBody.appendChild(tr);
     });
+}
+
+function loadMessages() {
+    const tbody = document.querySelector('#messagesTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const msgs = DB.getTable('messages').sort((a,b) => {
+        const dateA = a.date || a.createdAt || 0;
+        const dateB = b.date || b.createdAt || 0;
+        return new Date(dateB) - new Date(dateA);
+    });
+
+    if (msgs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No messages found.</td></tr>';
+        return;
+    }
+
+    msgs.forEach(m => {
+        const tr = document.createElement('tr');
+        const sender = m.senderName || m.fromName || 'System';
+        const senderRole = m.senderRole || m.fromRole || 'system';
+        const msgDate = m.date || m.createdAt || '';
+        tr.innerHTML = `
+            <td>${msgDate ? new Date(msgDate).toLocaleString() : '--'}</td>
+            <td><strong>${sender}</strong><br><small>${senderRole.toUpperCase()}</small></td>
+            <td>${m.subject}</td>
+            <td style="max-width:300px; font-size:0.9rem;">${m.body.substring(0, 100)}${m.body.length > 100 ? '...' : ''}</td>
+            <td>
+                <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="window.deleteMessage('${m.id}')">Delete</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.deleteMessage = function(id) {
+    if(confirm('Delete this message?')) {
+        DB.delete('messages', id);
+        loadMessages();
+    }
 }
 
 // ---------------- Report Generation ---------------- //
@@ -1318,18 +1561,16 @@ window.generateDefaultersReport = function() {
 
     const rows = [];
     students.forEach(s => {
-        const cls = classes.find(c => c.name === s.className);
+        const totalDebt = DB.calculateStudentDebt(s);
+        
+        // Fetch total billed for report
+        const cls = DB.getTable('classes').find(c => c.id === s.classId || c.name === s.className);
         const tuition = cls ? (cls.tuitionFee || 0) : 0;
         const totalBilled = tuition + (s.arrears || 0);
-        
-        const studPayments = payments.filter(p => p.studentId === s.studentId);
-        let totalPaid = 0;
-        studPayments.forEach(p => totalPaid += parseFloat(p.amountPaid || 0));
-        
-        const balance = totalBilled - totalPaid;
+        const totalPaid = totalBilled - totalDebt;
 
-        if (balance > 0) {
-            rows.push([s.name, s.className, totalBilled.toFixed(2), totalPaid.toFixed(2), balance.toFixed(2)]);
+        if (totalDebt > 0) {
+            rows.push([s.name, s.className, totalBilled.toFixed(2), totalPaid.toFixed(2), totalDebt.toFixed(2)]);
         }
     });
 
@@ -1362,9 +1603,11 @@ window.generateFinancialReport = function() {
     });
 
     let totalRevenue = 0;
+    const students = DB.getTable('students');
     const rows = payments.map(p => {
         totalRevenue += parseFloat(p.amountPaid);
-        return [new Date(p.date).toLocaleDateString(), p.studentName, p.receiptNo, p.amountPaid];
+        const student = students.find(s => s.studentId === p.studentId);
+        return [new Date(p.date).toLocaleDateString(), student ? student.name : p.studentId, p.receiptNo, p.amountPaid];
     });
 
     doc.autoTable({
@@ -1382,4 +1625,348 @@ window.generateFinancialReport = function() {
 
     doc.save(`Financial_Report_${start}_${end}.pdf`);
     DB.logAction('Generated Report', `Financial Summary (${start} to ${end})`);
+}
+
+// ============================================================
+//   SUBJECT MANAGEMENT
+// ============================================================
+function loadSubjects() {
+    const tbody = document.querySelector('#subjectsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const searchTerm = document.getElementById('searchSubject')?.value.toLowerCase() || '';
+    const classFilter = document.getElementById('filterSubjectClass')?.value || 'all';
+
+    // Populate class filter if empty
+    const filterSel = document.getElementById('filterSubjectClass');
+    if (filterSel && filterSel.options.length <= 1) {
+        DB.getTable('classes').forEach(c => filterSel.add(new Option(c.name, c.id)));
+    }
+
+    let subjects = DB.getTable('subjects');
+    if (searchTerm) subjects = subjects.filter(s => s.name.toLowerCase().includes(searchTerm) || (s.code || '').toLowerCase().includes(searchTerm));
+    if (classFilter !== 'all') subjects = subjects.filter(s => s.classId === classFilter);
+
+    if (subjects.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">No subjects found. Add your first subject!</td></tr>';
+        return;
+    }
+
+    subjects.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${s.name}</strong></td>
+            <td><span style="font-family:monospace; font-size:0.85rem; background:#f0f0f0; padding:2px 8px; border-radius:4px;">${s.code || '--'}</span></td>
+            <td>${s.className || 'All Classes'}</td>
+            <td><span class="badge badge-${s.status === 'active' ? 'active' : 'inactive'}">${s.status || 'active'}</span></td>
+            <td>
+                <div class="action-btns">
+                    <button class="btn btn-primary" onclick="window.editSubject('${s.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger" onclick="window.deleteSubject('${s.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.editSubject = function(id) {
+    const s = DB.findById('subjects', id);
+    if (!s) return;
+    const newName = prompt('Subject Name:', s.name);
+    if (newName === null) return;
+    const newCode = prompt('Subject Code (e.g. MATH):', s.code || '');
+    if (newCode === null) return;
+    DB.update('subjects', id, { name: newName.trim(), code: newCode.trim() });
+    DB.logAction('Updated Subject', `Name: ${newName}`);
+    loadSubjects();
+}
+
+window.deleteSubject = function(id) {
+    if (!confirm('Delete this subject? This cannot be undone.')) return;
+    const s = DB.findById('subjects', id);
+    if (s) {
+        DB.delete('subjects', id);
+        DB.logAction('Deleted Subject', `Name: ${s.name}`);
+        loadSubjects();
+    }
+}
+
+// ============================================================
+//   ACADEMIC TERMS MANAGEMENT
+// ============================================================
+function loadTerms() {
+    const tbody = document.querySelector('#termsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const terms = DB.getTable('terms').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Show active term badge at top
+    const activeTerm = terms.find(t => t.isActive);
+    const activeDisplay = document.getElementById('activeTermDisplay');
+    if (activeDisplay) {
+        activeDisplay.innerHTML = activeTerm
+            ? `<span style="background:#e8f5e9; color:#2e7d32; padding:8px 16px; border-radius:8px; font-weight:700; display:inline-block;"><i class="fas fa-check-circle"></i> Active Term: ${activeTerm.name} &mdash; ${activeTerm.year}</span>`
+            : `<span style="color:#888;">No active term set.</span>`;
+    }
+
+    if (terms.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">No academic terms created yet.</td></tr>';
+        return;
+    }
+
+    terms.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${t.name}</strong></td>
+            <td>${t.year || '--'}</td>
+            <td>${t.startDate || '--'}</td>
+            <td>${t.endDate || '--'}</td>
+            <td>${t.isActive ? '<span class="badge badge-active">ACTIVE</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
+            <td>
+                <div class="action-btns">
+                    ${!t.isActive ? `<button class="btn btn-success" onclick="window.setActiveTerm('${t.id}')"><i class="fas fa-check"></i> Set Active</button>` : ''}
+                    <button class="btn btn-danger" onclick="window.deleteTerm('${t.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.setActiveTerm = function(id) {
+    if (!confirm('Set this as the current active term? The previous active term will be deactivated.')) return;
+    const allTerms = DB.getTable('terms');
+    allTerms.forEach(t => DB.update('terms', t.id, { isActive: false }));
+    DB.update('terms', id, { isActive: true });
+    const term = DB.findById('terms', id);
+    DB.logAction('Set Active Term', `Term: ${term.name}, Year: ${term.year}`);
+    loadTerms();
+    alert(`"${term.name}" is now the active academic term.`);
+}
+
+window.deleteTerm = function(id) {
+    if (!confirm('Delete this term? This action cannot be undone.')) return;
+    const t = DB.findById('terms', id);
+    if (t) {
+        DB.delete('terms', id);
+        DB.logAction('Deleted Term', `Term: ${t.name}`);
+        loadTerms();
+    }
+}
+
+// ============================================================
+//   LIBRARY MODULE
+// ============================================================
+function loadLibrary() {
+    loadBookCatalogue();
+    loadActiveIssues();
+}
+
+function loadBookCatalogue() {
+    const tbody = document.querySelector('#booksTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const searchTerm = document.getElementById('searchBook')?.value.toLowerCase() || '';
+    let books = DB.getTable('library_books');
+    if (searchTerm) books = books.filter(b => b.title.toLowerCase().includes(searchTerm) || (b.author || '').toLowerCase().includes(searchTerm));
+
+    // Stats
+    const totalBooks = books.reduce((a, b) => a + (b.totalCopies || 1), 0);
+    const available  = books.reduce((a, b) => a + (b.availableCopies || 0), 0);
+    const issued     = totalBooks - available;
+    document.getElementById('libStatTotal') && (document.getElementById('libStatTotal').textContent = totalBooks);
+    document.getElementById('libStatAvail') && (document.getElementById('libStatAvail').textContent = available);
+    document.getElementById('libStatIssued') && (document.getElementById('libStatIssued').textContent = issued);
+
+    if (books.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">No books in library. Add your first book!</td></tr>';
+        return;
+    }
+
+    books.forEach(b => {
+        const avail = b.availableCopies || 0;
+        const statusBadge = avail > 0
+            ? `<span class="badge badge-active">${avail} Available</span>`
+            : `<span class="badge badge-rejected">Out of Stock</span>`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${b.title}</strong></td>
+            <td>${b.author || '--'}</td>
+            <td><span style="font-family:monospace; font-size:0.8rem;">${b.isbn || '--'}</span></td>
+            <td>${b.category || '--'}</td>
+            <td>${b.totalCopies || 1}</td>
+            <td>${statusBadge}</td>
+            <td>
+                <div class="action-btns">
+                    <button class="btn btn-success" onclick="window.openIssueModal('${b.id}')" ${avail < 1 ? 'disabled' : ''}><i class="fas fa-hand-holding"></i> Issue</button>
+                    <button class="btn btn-danger" onclick="window.deleteBook('${b.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function loadDepartments() {
+    const tbody = document.querySelector('#deptsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const depts = DB.getTable('departments');
+
+    if (depts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No departments recorded.</td></tr>';
+        return;
+    }
+
+    depts.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${d.name}</strong></td>
+            <td>${d.head || 'N/A'}</td>
+            <td><button class="btn btn-danger" onclick="DB.delete('departments', '${d.id}'); loadDepartments();"><i class="fas fa-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ---------------- SYSTEM BACKUP & RESTORE ---------------- //
+window.exportSystemBackup = function() {
+    const backupData = {};
+    const tables = [
+        'users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'attendance', 
+        'results', 'announcements', 'payments', 'learning_materials', 'timetables', 'messages',
+        'audit_logs', 'library_books', 'library_issues', 'expenses'
+    ];
+
+    tables.forEach(table => {
+        backupData[table] = DB.getTable(table);
+    });
+
+    const dataStr = JSON.stringify(backupData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = 'EMS_Backup_' + new Date().toISOString().split('T')[0] + '.json';
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    DB.logAction('System Backup', `Exported all data to ${exportFileDefaultName}`);
+}
+
+window.triggerImport = function() {
+    document.getElementById('importFile').click();
+}
+
+window.importSystemBackup = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!confirm('WARNING: Restoring data will overwrite all current school records. Are you absolutely sure?')) {
+        input.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            const tables = Object.keys(importedData);
+            
+            tables.forEach(table => {
+                DB.saveTable(table, importedData[table]);
+            });
+
+            alert('System Data Restored Successfully! The page will now reload.');
+            DB.logAction('System Restore', `Imported data from ${file.name}`);
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert('Error: Failed to parse backup file. Please ensure it is a valid JSON export.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Update loadSectionData to support 'system' and 'classes' dept loading
+const originalLoadSectionData = loadSectionData;
+loadSectionData = function(section) {
+    originalLoadSectionData(section);
+    if (section === 'classes') loadDepartments();
+}
+
+
+function loadActiveIssues() {
+    const tbody = document.querySelector('#issuesTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const issues = DB.getTable('library_issues')
+        .filter(i => i.status === 'issued')
+        .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+    if (issues.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">No active book issues.</td></tr>';
+        return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    issues.forEach(i => {
+        const overdue = i.dueDate && i.dueDate < today;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${i.bookTitle}</strong></td>
+            <td>${i.borrower}</td>
+            <td><span class="badge badge-pending">${i.borrowerType}</span></td>
+            <td>${i.issueDate}</td>
+            <td style="${overdue ? 'color:var(--danger); font-weight:700;' : ''}">${i.dueDate} ${overdue ? '<span class="badge badge-rejected">Overdue</span>' : ''}</td>
+            <td>
+                <button class="btn btn-success" onclick="window.returnBook('${i.id}')"><i class="fas fa-undo"></i> Return</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.openIssueModal = function(bookId) {
+    const book = DB.findById('library_books', bookId);
+    if (!book) return;
+    document.getElementById('issueBookId').value = bookId;
+    document.getElementById('issueBookName').textContent = book.title;
+    document.getElementById('issueDueDate').valueAsDate = new Date(Date.now() + 14 * 86400000); // 2 weeks default
+    document.getElementById('formIssueBook').reset();
+    document.getElementById('issueBookId').value = bookId; // re-set after reset
+    showModal('issueBookModal');
+}
+
+window.returnBook = function(issueId) {
+    if (!confirm('Confirm book return?')) return;
+    const issue = DB.findById('library_issues', issueId);
+    if (issue) {
+        DB.update('library_issues', issueId, { status: 'returned', returnDate: new Date().toISOString().split('T')[0] });
+        const book = DB.findById('library_books', issue.bookId);
+        if (book) {
+            const newAvail = (book.availableCopies || 0) + 1;
+            DB.update('library_books', issue.bookId, { availableCopies: newAvail, status: newAvail > 0 ? 'available' : 'out' });
+        }
+        DB.logAction('Book Returned', `Book: ${issue.bookTitle}, Borrower: ${issue.borrower}`);
+        loadLibrary();
+        alert('Book returned successfully!');
+    }
+}
+
+window.deleteBook = function(id) {
+    if (!confirm('Remove this book from the library catalogue?')) return;
+    const book = DB.findById('library_books', id);
+    if (book) {
+        DB.delete('library_books', id);
+        DB.logAction('Deleted Book', `Title: ${book.title}`);
+        loadBookCatalogue();
+    }
 }

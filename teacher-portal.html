@@ -31,6 +31,7 @@
       <li><a class="menu-item" data-target="assignments"><i class="fas fa-book"></i> Materials Upload</a></li>
       <li><a class="menu-item" data-target="timetable"><i class="fas fa-clock"></i> Timetable</a></li>
       <li><a class="menu-item" data-target="communication"><i class="fas fa-comments"></i> Communication</a></li>
+      <li><a class="menu-item" data-target="salary"><i class="fas fa-wallet"></i> My Salary</a></li>
     </ul>
   </aside>
 
@@ -80,6 +81,13 @@
               <h2 id="statStudents">0</h2>
             </div>
           </div>
+          <div class="card blue">
+            <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+            <div class="card-info">
+              <h4>Today's Attendance</h4>
+              <h2 id="statAttToday">0 / 0</h2>
+            </div>
+          </div>
         </div>
 
         <div class="form-row">
@@ -100,8 +108,46 @@
           <h2 class="section-title">My Profile</h2>
           <p class="section-subtitle">View and update your contact info.</p>
         </div>
-        <div class="panel">
-          <p>Profile update forms (email/phone/password) will go here.</p>
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Personal Information</h3>
+            <div class="profile-info">
+              <div style="margin-bottom:15px;">
+                <label style="color:#888; display:block; font-size:0.85rem;">Full Name</label>
+                <strong id="profName" style="font-size:1.1rem;">Teacher Name</strong>
+              </div>
+              <div style="margin-bottom:15px;">
+                <label style="color:#888; display:block; font-size:0.85rem;">Teacher ID</label>
+                <strong id="profId">TCH0000</strong>
+              </div>
+              <div style="margin-bottom:15px;">
+                <label style="color:#888; display:block; font-size:0.85rem;">My Classes</label>
+                <span id="profClasses" class="badge badge-active">None</span>
+              </div>
+              <div>
+                <label style="color:#888; display:block; font-size:0.85rem;">My Subjects</label>
+                <span id="profSubjects">None</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3 class="panel-title">Update Security & Contact</h3>
+            <form id="profileUpdateForm">
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="profPhone" class="form-control" placeholder="Update your contact phone">
+              </div>
+              <div class="form-group">
+                <label>New Password</label>
+                <div class="password-box">
+                  <input type="password" id="profNewPass" class="form-control" placeholder="Leave blank to keep current">
+                  <i class="fas fa-eye" id="togglePPass" onclick="togglePassword('profNewPass', 'togglePPass')"></i>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%">Save Profile Changes</button>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -285,43 +331,156 @@
         </div>
       </section>
 
+      <!-- SALARY -->
+      <section id="salary" class="section">
+        <div class="section-header">
+          <h2 class="section-title">My Salary & Payments</h2>
+          <p class="section-subtitle">View your monthly salary history and payment status.</p>
+        </div>
+        <div class="panel">
+          <h3 class="panel-title">Payroll Status</h3>
+          <div class="dashboard-cards" style="margin-bottom:20px;">
+            <div class="card green">
+              <div class="card-icon"><i class="fas fa-hand-holding-usd"></i></div>
+              <div class="card-info">
+                <h4>Monthly Base Salary</h4>
+                <h2>GHS 1,500.00</h2>
+              </div>
+            </div>
+            <div class="card gold">
+              <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+              <div class="card-info">
+                <h4>Last Paid Month</h4>
+                <h2 id="lastPaidMonth">October 2024</h2>
+              </div>
+            </div>
+          </div>
+          <div class="table-container">
+            <h3 class="panel-title" style="border:none;">Payment Log</h3>
+            <table class="table" id="teacherSalaryLog">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Month/Year</th>
+                  <th>Amount (GHS)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>28/10/2024</td>
+                  <td>October 2024</td>
+                  <td>1,500.00</td>
+                  <td><span class="badge badge-active">Paid</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- COMMUNICATION -->
       <section id="communication" class="section">
         <div class="section-header">
           <h2 class="section-title">Communication</h2>
           <p class="section-subtitle">Send messages directly to students/parents or administration.</p>
         </div>
-        <div class="panel">
-          <form id="msgForm">
-            <div class="form-row">
-              <div class="form-group">
-                <label>To</label>
-                <select id="msgTo" class="form-control">
-                  <option value="admin">School Administration</option>
-                  <option value="parents">Parents of My Class</option>
-                </select>
+        <div class="form-row">
+          <div class="panel">
+            <h3 class="panel-title">Send New Message</h3>
+            <form id="msgForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>To</label>
+                  <select id="msgTo" class="form-control">
+                    <option value="admin">School Administration</option>
+                    <option value="parents">Parents of My Class</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Subject</label>
+                  <input type="text" id="msgSubject" class="form-control" placeholder="Message subject" required>
+                </div>
               </div>
               <div class="form-group">
-                <label>Subject</label>
-                <input type="text" id="msgSubject" class="form-control" required>
+                <label>Message Content</label>
+                <textarea id="msgBody" class="form-control" style="height: 100px;" placeholder="Type your message here..." required></textarea>
               </div>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <h3 class="panel-title">Official Inbound Messages</h3>
+            <div class="table-container">
+              <table class="table" id="teacherMessagesTable">
+                <thead>
+                  <tr>
+                    <th>From</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
-            <div class="form-group">
-              <label>Message</label>
-              <textarea id="msgBody" class="form-control" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button>
-          </form>
+          </div>
         </div>
       </section>
 
-      <!-- PLUGINS -->
+      <!-- MATERIALS -->
       <section id="assignments" class="section">
-        <h2 class="section-title">Materials Upload</h2>
+        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 class="section-title">Class Materials Upload</h2>
+          <button class="btn btn-primary" onclick="showUploadModal()"><i class="fas fa-plus"></i> Upload New Material</button>
+        </div>
         <div class="panel">
-          <p>Upload PDFs/Notes for your classes. (Module placeholder)</p>
+          <div class="table-container">
+            <table class="table" id="teacherMaterialsTable">
+              <thead>
+                <tr>
+                  <th>Title / File</th>
+                  <th>Class</th>
+                  <th>Upload Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </section>
+
+      <!-- Upload Modal -->
+      <div id="uploadMaterialModal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Upload Learning Material</h3>
+            <button class="close-modal" onclick="hideModal('uploadMaterialModal')">&times;</button>
+          </div>
+          <form id="materialUploadForm">
+            <div class="form-group">
+              <label>Material Title</label>
+              <input type="text" id="mTitle" class="form-control" placeholder="e.g. Week 1 Mathematics Notes" required>
+            </div>
+            <div class="form-group">
+              <label>Target Class</label>
+              <select id="mClass" class="form-control" required>
+                <!-- Filled by JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Select PDF File</label>
+              <input type="file" id="mFile" class="form-control" accept=".pdf" required>
+            </div>
+            <div style="margin-top:20px; text-align:right;">
+              <button type="button" class="btn btn-gray" onclick="hideModal('uploadMaterialModal')">Cancel</button>
+              <button type="submit" class="btn btn-primary">Upload Now</button>
+            </div>
+          </form>
+        </div>
+      </div>
       <section id="timetable" class="section">
         <div class="section-header">
           <h2 class="section-title">Class & Exam Timetables</h2>
