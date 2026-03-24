@@ -6,7 +6,7 @@ $password = "";
 $dbname = "elyon_school_db";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password);
+$conn = new mysqli($servername, $username, $password, $dbname, 3307);
 
 // Check connection
 if ($conn->connect_error) {
@@ -14,8 +14,6 @@ if ($conn->connect_error) {
 }
 
 // Create database if not exists
-$conn->query("CREATE DATABASE IF NOT EXISTS $dbname");
-$conn->select_db($dbname);
 
 // Note: You should import database.sql into phpMyAdmin for the table structures.
 ?>

@@ -803,16 +803,16 @@ function loadAdmissions() {
     });
 }
 
-window.approveAdmission = function (id) {
+window.approveAdmission = async function (id) {
     if (!confirm('Approve this applicant and create student record?')) return;
 
     const adm = DB.findById('admissions', id);
     if (adm) {
-        DB.update('admissions', id, { status: 'approved' });
+        await DB.update('admissions', id, { status: 'approved' });
 
         // Create user
         const studentId = DB.generateUniqueId('STU', 'students');
-        const newUser = DB.insert('users', {
+        const newUser = await DB.insert('users', {
             username: studentId,
             password: 'password123', // default
             role: 'student',
@@ -821,20 +821,22 @@ window.approveAdmission = function (id) {
         });
 
         // Create student
-        DB.insert('students', {
-            userId: newUser.id,
-            admissionId: adm.id,
-            studentId,
-            name: adm.childName,
-            classId: adm.classApplying, // Just saving string mapping for now
-            className: adm.classApplying,
-            gender: adm.gender || '-',
-            guardianName: adm.pname || adm.guardianName,
-            guardianPhone: adm.pnumber || adm.guardianPhone,
-            status: 'active'
-        });
+        if (newUser) {
+            await DB.insert('students', {
+                userId: newUser.id,
+                admissionId: adm.id,
+                studentId,
+                name: adm.childName,
+                classId: adm.classApplying, // Just saving string mapping for now
+                className: adm.classApplying,
+                gender: adm.gender || '-',
+                guardianName: adm.pname || adm.guardianName,
+                guardianPhone: adm.pnumber || adm.guardianPhone,
+                status: 'active'
+            });
+        }
 
-        DB.logAction('Approved Admission', `Applicant: ${adm.childName}, Assigned ID: ${studentId}`);
+        await DB.logAction('Approved Admission', `Applicant: ${adm.childName}, Assigned ID: ${studentId}`);
 
         loadAdmissions();
         if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
@@ -842,24 +844,24 @@ window.approveAdmission = function (id) {
     }
 }
 
-window.rejectAdmission = function (id) {
+window.rejectAdmission = async function (id) {
     if (!confirm('Are you sure you want to reject this applicant?')) return;
     const adm = DB.findById('admissions', id);
     if (adm) {
-        DB.update('admissions', id, { status: 'rejected' });
-        DB.logAction('Rejected Admission', `Applicant: ${adm.childName}`);
+        await DB.update('admissions', id, { status: 'rejected' });
+        await DB.logAction('Rejected Admission', `Applicant: ${adm.childName}`);
         loadAdmissions();
         if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
     }
 }
 
-window.deleteAdmission = function (id) {
+window.deleteAdmission = async function (id) {
     if (!confirm('Are you sure you want to PERMANENTLY delete this admission record from the system?')) return;
     
     const adm = DB.findById('admissions', id);
     if (adm) {
-        DB.delete('admissions', id);
-        DB.logAction('Deleted Admission Record', `Applicant: ${adm.childName}`);
+        await DB.delete('admissions', id);
+        await DB.logAction('Deleted Admission Record', `Applicant: ${adm.childName}`);
         loadAdmissions();
         if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
         alert('Admission record removed permanently.');
@@ -923,22 +925,22 @@ function loadStudents() {
     });
 }
 
-window.deleteStudent = function (id) {
+window.deleteStudent = async function (id) {
     if (confirm('Are you sure you want to permanently REMOVE this student? This will also delete their login account and history.')) {
         const student = DB.findById('students', id);
         if (student) {
             // Update admission status if linked
             if (student.admissionId) {
-                DB.update('admissions', student.admissionId, { status: 'removed' });
+                await DB.update('admissions', student.admissionId, { status: 'removed' });
             } else {
                 // Try to find admission by name if ID link is missing (for older records)
                 const adm = DB.findOne('admissions', { childName: student.name, status: 'approved' });
-                if (adm) DB.update('admissions', adm.id, { status: 'removed' });
+                if (adm) await DB.update('admissions', adm.id, { status: 'removed' });
             }
 
-            DB.delete('users', student.userId);
-            DB.delete('students', id);
-            DB.logAction('Deleted Student', `Name: ${student.name}, ID: ${student.studentId}`);
+            await DB.delete('users', student.userId);
+            await DB.delete('students', id);
+            await DB.logAction('Deleted Student', `Name: ${student.name}, ID: ${student.studentId}`);
             loadStudents();
             loadUsers(); // Refresh Users Master List
             if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
@@ -1016,10 +1018,10 @@ function loadAnnouncements() {
     });
 }
 
-window.deleteAnnouncement = function(id) {
+window.deleteAnnouncement = async function(id) {
     if(confirm('Are you sure you want to delete this announcement?')) {
-        DB.delete('announcements', id);
-        DB.logAction('Deleted Announcement', `Announcement ID: ${id}`);
+        await DB.delete('announcements', id);
+        await DB.logAction('Deleted Announcement', `Announcement ID: ${id}`);
         loadAnnouncements();
     }
 }
@@ -1071,21 +1073,21 @@ function loadFees() {
     });
 }
 
-window.verifyPayment = function(id) {
+window.verifyPayment = async function(id) {
     if (!confirm('Mark this payment as Verified and Paid?')) return;
     const payment = DB.findById('payments', id);
     if (payment) {
-        DB.update('payments', id, { status: 'Paid' });
-        DB.logAction('Verified Payment', `Ref: ${payment.receiptNo}, Student: ${payment.studentId}, Amount: ${payment.amountPaid}`);
+        await DB.update('payments', id, { status: 'Paid' });
+        await DB.logAction('Verified Payment', `Ref: ${payment.receiptNo}, Student: ${payment.studentId}, Amount: ${payment.amountPaid}`);
         loadFees();
         alert('Payment verified successfully!');
     }
 }
 
-window.deletePayment = function(id) {
+window.deletePayment = async function(id) {
     if (!confirm('Are you sure you want to delete this payment record? This action cannot be undone.')) return;
-    DB.delete('payments', id);
-    DB.logAction('Deleted Payment Record', `ID: ${id}`);
+    await DB.delete('payments', id);
+    await DB.logAction('Deleted Payment Record', `ID: ${id}`);
     loadFees();
 }
 
@@ -1194,26 +1196,26 @@ window.viewResult = function(id) {
     showModal('viewResultModal');
 }
 
-window.approveResult = function(id) {
+window.approveResult = async function(id) {
     if (!confirm('Approve and publish this result? It will be visible to parents/students.')) return;
     
     const res = DB.findById('results', id);
     if (res) {
-        DB.update('results', id, { status: 'published' });
-        DB.logAction('Approved Result', `Student: ${res.studentName}, Subject: ${res.subject}, Term: ${res.term}`);
+        await DB.update('results', id, { status: 'published' });
+        await DB.logAction('Approved Result', `Student: ${res.studentName}, Subject: ${res.subject}, Term: ${res.term}`);
         loadResults();
         alert('Result approved and published successfully!');
     }
 }
 
-window.rejectResult = function(id) {
+window.rejectResult = async function(id) {
     const reason = prompt('Reason for rejection:');
     if (reason === null) return; // Cancelled
 
     const res = DB.findById('results', id);
     if (res) {
-        DB.update('results', id, { status: 'rejected', rejectionReason: reason });
-        DB.logAction('Rejected Result', `Student: ${res.studentName}, Subject: ${res.subject}, Reason: ${reason}`);
+        await DB.update('results', id, { status: 'rejected', rejectionReason: reason });
+        await DB.logAction('Rejected Result', `Student: ${res.studentName}, Subject: ${res.subject}, Reason: ${reason}`);
         loadResults();
         alert('Result rejected.');
     }
@@ -1248,12 +1250,12 @@ function loadTimetables() {
     });
 }
 
-window.deleteTimetable = function(id) {
+window.deleteTimetable = async function(id) {
     if (confirm('Are you sure you want to delete this timetable?')) {
         const tt = DB.findById('timetables', id);
         if (tt) {
-            DB.delete('timetables', id);
-            DB.logAction('Deleted Timetable', `Title: ${tt.title}`);
+            await DB.delete('timetables', id);
+            await DB.logAction('Deleted Timetable', `Title: ${tt.title}`);
             loadTimetables();
         }
     }
@@ -1478,9 +1480,9 @@ function loadMessages() {
     });
 }
 
-window.deleteMessage = function(id) {
+window.deleteMessage = async function(id) {
     if(confirm('Delete this message?')) {
-        DB.delete('messages', id);
+        await DB.delete('messages', id);
         loadMessages();
     }
 }
@@ -1671,24 +1673,24 @@ function loadSubjects() {
     });
 }
 
-window.editSubject = function(id) {
+window.editSubject = async function(id) {
     const s = DB.findById('subjects', id);
     if (!s) return;
     const newName = prompt('Subject Name:', s.name);
     if (newName === null) return;
     const newCode = prompt('Subject Code (e.g. MATH):', s.code || '');
     if (newCode === null) return;
-    DB.update('subjects', id, { name: newName.trim(), code: newCode.trim() });
-    DB.logAction('Updated Subject', `Name: ${newName}`);
+    await DB.update('subjects', id, { name: newName.trim(), code: newCode.trim() });
+    await DB.logAction('Updated Subject', `Name: ${newName}`);
     loadSubjects();
 }
 
-window.deleteSubject = function(id) {
+window.deleteSubject = async function(id) {
     if (!confirm('Delete this subject? This cannot be undone.')) return;
     const s = DB.findById('subjects', id);
     if (s) {
-        DB.delete('subjects', id);
-        DB.logAction('Deleted Subject', `Name: ${s.name}`);
+        await DB.delete('subjects', id);
+        await DB.logAction('Deleted Subject', `Name: ${s.name}`);
         loadSubjects();
     }
 }
@@ -1736,23 +1738,25 @@ function loadTerms() {
     });
 }
 
-window.setActiveTerm = function(id) {
+window.setActiveTerm = async function(id) {
     if (!confirm('Set this as the current active term? The previous active term will be deactivated.')) return;
     const allTerms = DB.getTable('terms');
-    allTerms.forEach(t => DB.update('terms', t.id, { isActive: false }));
-    DB.update('terms', id, { isActive: true });
+    for (const t of allTerms) {
+        await DB.update('terms', t.id, { isActive: false });
+    }
+    await DB.update('terms', id, { isActive: true });
     const term = DB.findById('terms', id);
-    DB.logAction('Set Active Term', `Term: ${term.name}, Year: ${term.year}`);
+    await DB.logAction('Set Active Term', `Term: ${term.name}, Year: ${term.year}`);
     loadTerms();
     alert(`"${term.name}" is now the active academic term.`);
 }
 
-window.deleteTerm = function(id) {
+window.deleteTerm = async function(id) {
     if (!confirm('Delete this term? This action cannot be undone.')) return;
     const t = DB.findById('terms', id);
     if (t) {
-        DB.delete('terms', id);
-        DB.logAction('Deleted Term', `Term: ${t.name}`);
+        await DB.delete('terms', id);
+        await DB.logAction('Deleted Term', `Term: ${t.name}`);
         loadTerms();
     }
 }
@@ -1945,28 +1949,28 @@ window.openIssueModal = function(bookId) {
     showModal('issueBookModal');
 }
 
-window.returnBook = function(issueId) {
+window.returnBook = async function(issueId) {
     if (!confirm('Confirm book return?')) return;
     const issue = DB.findById('library_issues', issueId);
     if (issue) {
-        DB.update('library_issues', issueId, { status: 'returned', returnDate: new Date().toISOString().split('T')[0] });
+        await DB.update('library_issues', issueId, { status: 'returned', returnDate: new Date().toISOString().split('T')[0] });
         const book = DB.findById('library_books', issue.bookId);
         if (book) {
             const newAvail = (book.availableCopies || 0) + 1;
-            DB.update('library_books', issue.bookId, { availableCopies: newAvail, status: newAvail > 0 ? 'available' : 'out' });
+            await DB.update('library_books', issue.bookId, { availableCopies: newAvail, status: newAvail > 0 ? 'available' : 'out' });
         }
-        DB.logAction('Book Returned', `Book: ${issue.bookTitle}, Borrower: ${issue.borrower}`);
+        await DB.logAction('Book Returned', `Book: ${issue.bookTitle}, Borrower: ${issue.borrower}`);
         loadLibrary();
         alert('Book returned successfully!');
     }
 }
 
-window.deleteBook = function(id) {
+window.deleteBook = async function(id) {
     if (!confirm('Remove this book from the library catalogue?')) return;
     const book = DB.findById('library_books', id);
     if (book) {
-        DB.delete('library_books', id);
-        DB.logAction('Deleted Book', `Title: ${book.title}`);
+        await DB.delete('library_books', id);
+        await DB.logAction('Deleted Book', `Title: ${book.title}`);
         loadBookCatalogue();
     }
 }

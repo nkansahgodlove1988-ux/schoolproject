@@ -180,9 +180,15 @@ const DB = {
         let newId;
         let isUnique = false;
         while (!isUnique) {
-            newId = prefix + Math.floor(1000 + Math.random() * 8999);
-            // Check studentId or teacherId field
-            isUnique = !records.some(r => r.student_id === newId || r.teacher_id === newId || r.studentId === newId || r.teacherId === newId);
+            // Generate a 5-digit random number (10000 to 99999)
+            newId = prefix + Math.floor(10000 + Math.random() * 89999);
+            // Check studentId or teacherId field for collision
+            isUnique = !records.some(r => 
+                r.student_id === newId || 
+                r.teacher_id === newId || 
+                r.studentId === newId || 
+                r.teacherId === newId
+            );
         }
         return newId;
     }
