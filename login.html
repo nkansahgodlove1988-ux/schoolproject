@@ -498,7 +498,6 @@
       const user = document.getElementById('resetUsername').value;
       const role = document.getElementById('loginRole').value;
 
-      // Simulate reset logic
       let users = DB.getTable('users');
       let foundUser = users.find(u => u.username === user && u.role === role);
 
@@ -528,11 +527,10 @@
       const user = document.getElementById('username').value;
       const pass = document.getElementById('password').value;
 
-      // Attempt login via server-side API
       const loggedInUser = await DB.login(user, pass);
 
       if (loggedInUser) {
-        // Simple role validation
+        
         let targetPage = '';
         if (role === 'admin' && loggedInUser.role === 'admin') targetPage = 'admin-portal.html';
         else if (role === 'teacher' && loggedInUser.role === 'teacher') targetPage = 'teacher-portal.html';
@@ -552,7 +550,6 @@
       document.getElementById('errorMsg').style.display = 'block';
     }
 
-    // Auto-login check
     window.onload = function () {
       const user = DB.getCurrentUser();
       if (user) {

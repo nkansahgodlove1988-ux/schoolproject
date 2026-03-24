@@ -1,4 +1,4 @@
-// js/finance.js
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     await DB.init();
@@ -6,11 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!user) return;
     
     document.getElementById('currentFinanceName').innerText = user.name || 'Accountant';
-    
-    // Initial Load
+
     loadFinanceDashboard();
-    
-    // Sidebar Navigation
+
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
     const sidebar = document.getElementById('sidebar');
@@ -33,8 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 else sec.classList.remove('active');
             });
             if(window.innerWidth <= 768) closeSidebar();
-            
-            // Section specific loaders
+
             if (target === 'dashboard') loadFinanceDashboard();
             else if (target === 'fees') loadFees();
             else if (target === 'arrears') loadArrears();
@@ -52,11 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if(overlay) overlay.addEventListener('click', closeSidebar);
 
-    // Setup Form Listeners
     setupFinanceForms();
 });
 
-// ---------------- DASHBOARD ---------------- //
 let financeChart = null;
 
 function loadFinanceDashboard() {
@@ -65,7 +60,6 @@ function loadFinanceDashboard() {
     const students = DB.getTable('students');
     const classes = DB.getTable('classes');
 
-    // Stats
     let totalRevenue = payments.reduce((sum, p) => sum + (parseFloat(p.amountPaid) || 0), 0);
     let totalExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
     
@@ -84,10 +78,8 @@ function loadFinanceDashboard() {
     document.getElementById('statNet').innerText = `GHS ${(totalRevenue - totalExpenses).toFixed(2)}`;
     document.getElementById('statArrears').innerText = `GHS ${totalArrears.toFixed(2)}`;
 
-    // Build Chart (Simplified Mockup Data for visualization)
     buildFinanceChart(payments, expenses);
 
-    // Recent Transactions
     const combined = [
         ...payments.map(p => ({ date: p.date, ref: p.receiptNo, type: 'Income', amount: p.amountPaid, color: 'var(--success)' })),
         ...expenses.map(e => ({ date: e.createdAt, ref: e.reference || 'EXP', type: 'Expense', amount: e.amount, color: 'var(--danger)' }))
@@ -113,7 +105,6 @@ function buildFinanceChart(payments, expenses) {
 
     if (financeChart) financeChart.destroy();
 
-    // Grouping by Month (Past 6 months)
     const months = [];
     const revData = [];
     const expData = [];
@@ -174,7 +165,6 @@ function buildFinanceChart(payments, expenses) {
     });
 }
 
-// ---------------- STUDENT FEES ---------------- //
 function loadFees() {
     const tbody = document.querySelector('#feesTable tbody');
     if (!tbody) return;
@@ -187,7 +177,6 @@ function loadFees() {
     const payments = DB.getTable('payments');
     const classes = DB.getTable('classes');
 
-    // Init Class Filter
     const filterSel = document.getElementById('filterFeeClass');
     if (filterSel.options.length === 1) {
         classes.forEach(c => filterSel.add(new Option(c.name, c.id)));
@@ -243,7 +232,6 @@ window.recordDirectPayment = function(studId) {
     showModal('paymentModal');
 }
 
-// ---------------- ARREARS ---------------- //
 function loadArrears() {
     const tbody = document.querySelector('#debtorsTable tbody');
     if (!tbody) return;
@@ -285,7 +273,6 @@ function loadArrears() {
     });
 }
 
-// ---------------- OPERATIONAL EXPENSES ---------------- //
 function loadExpenses() {
     const tbody = document.querySelector('#expensesTable tbody');
     if (!tbody) return;
@@ -320,7 +307,6 @@ window.deleteExpense = async function(id) {
     }
 }
 
-// ---------------- SALARIES ---------------- //
 function loadSalaries() {
     const tbody = document.querySelector('#salaryTable tbody');
     if (!tbody) return;
@@ -345,7 +331,6 @@ function loadSalaries() {
     });
 }
 
-// ---------------- MESSAGES ---------------- //
 function loadMessages() {
     const tbody = document.querySelector('#inboxTable tbody');
     if (!tbody) return;
@@ -372,12 +357,11 @@ function loadMessages() {
     });
 }
 
-// ---------------- FORMS SETUP ---------------- //
 function setupFinanceForms() {
-    // Payment Form
+    
     const payForm = document.getElementById('formRecordPayment');
     if (payForm) {
-        // Build Student Dropdown
+        
         const sSel = document.getElementById('pStudent');
         DB.getTable('students').forEach(s => sSel.add(new Option(`${s.name} (${s.studentId})`, s.studentId)));
 
@@ -405,7 +389,6 @@ function setupFinanceForms() {
         });
     }
 
-    // Expense Form
     const expForm = document.getElementById('formRecordExpense');
     if (expForm) {
         expForm.addEventListener('submit', async (e) => {
@@ -432,11 +415,9 @@ function setupFinanceForms() {
     }
 }
 
-// ---------------- MODAL HELPERS ---------------- //
 window.showModal = (id) => document.getElementById(id).classList.add('active');
 window.hideModal = (id) => document.getElementById(id).classList.remove('active');
 
-// ---------------- REPORT GENERATION ---------------- //
 window.exportDebtorsPDF = function() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();

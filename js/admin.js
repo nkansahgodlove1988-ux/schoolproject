@@ -1,7 +1,7 @@
-// js/admin.js
+
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Wait for server data to load
+    
     await DB.init();
 
     const user = DB.requireAuth('admin');
@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('currentAdminName').innerText = user.name || 'Administrator';
 
-    // 2. Sidebar Navigation
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
     const sidebar = document.getElementById('sidebar');
@@ -25,23 +24,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
 
-            // Update active menu
             menuItems.forEach(mi => mi.classList.remove('active'));
             item.classList.add('active');
 
-            // Update active section
             const target = item.getAttribute('data-target');
             sections.forEach(sec => {
                 if (sec.id === target) sec.classList.add('active');
                 else sec.classList.remove('active');
             });
 
-            // Close sidebar on mobile
             if (window.innerWidth <= 768) {
                 closeSidebar();
             }
 
-            // Load data for the section
             loadSectionData(target);
         });
     });
@@ -57,10 +52,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         overlay.addEventListener('click', closeSidebar);
     }
 
-    // Forms Setup
     setupForms();
 
-    // Initial Load
     document.getElementById('searchStudent')?.addEventListener('input', () => loadStudents());
     document.getElementById('filterStudentClass')?.addEventListener('change', () => loadStudents());
     document.getElementById('searchAdmissions')?.addEventListener('input', () => loadAdmissions());
@@ -69,12 +62,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadSectionData('dashboard');
 });
 
-// Exposed Globally for HTML Buttons
 window.showModal = function (id) {
     const modal = document.getElementById(id);
     if (!modal) return;
 
-    // Dynamic population for specific modals
     if (id === 'studentModal') {
         const classSelect = document.getElementById('sClass');
         if (classSelect) {
@@ -137,8 +128,6 @@ function loadSectionData(section) {
     else if (section === 'terms') loadTerms();
 }
 
-// ---------------- Helper Functions ---------------- //
-
 function togglePassword(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -155,7 +144,7 @@ function togglePassword(inputId, iconId) {
 }
 
 function setupForms() {
-    // Add Teacher Form
+    
     const teacherForm = document.getElementById('formAddTeacher');
     if (teacherForm) {
         teacherForm.addEventListener('submit', async (e) => {
@@ -186,7 +175,6 @@ function setupForms() {
         });
     }
 
-    // Add Class Form
     const classForm = document.getElementById('formAddClass');
     if (classForm) {
         classForm.addEventListener('submit', async (e) => {
@@ -200,7 +188,6 @@ function setupForms() {
         });
     }
 
-    // Add Announcement
     const annForm = document.getElementById('announcementForm');
     if (annForm) {
         annForm.addEventListener('submit', async (e) => {
@@ -219,7 +206,6 @@ function setupForms() {
         });
     }
 
-    // Admin Outbound Message
     const adminMsgForm = document.getElementById('adminMsgForm');
     if (adminMsgForm) {
         adminMsgForm.addEventListener('submit', async (e) => {
@@ -245,7 +231,6 @@ function setupForms() {
         });
     }
 
-    // Add Student Manually Form
     const studentForm = document.getElementById('formAddStudent');
     if (studentForm) {
         studentForm.addEventListener('submit', async (e) => {
@@ -277,7 +262,6 @@ function setupForms() {
         });
     }
 
-    // Record Payment Form
     const paymentForm = document.getElementById('formRecordPayment');
     if (paymentForm) {
         paymentForm.addEventListener('submit', async (e) => {
@@ -303,7 +287,6 @@ function setupForms() {
         });
     }
 
-    // Set Class Fees Form
     const setFeesForm = document.getElementById('formSetFees');
     if (setFeesForm) {
         setFeesForm.addEventListener('submit', async (e) => {
@@ -320,7 +303,6 @@ function setupForms() {
         });
     }
 
-    // Update Arrears Form
     const arrearsForm = document.getElementById('formUpdateArrears');
     if (arrearsForm) {
         arrearsForm.addEventListener('submit', async (e) => {
@@ -337,7 +319,6 @@ function setupForms() {
         });
     }
 
-    // Timetable Upload Form
     const ttForm = document.getElementById('timetableForm');
     if (ttForm) {
         ttForm.addEventListener('submit', (e) => {
@@ -370,7 +351,6 @@ function setupForms() {
         });
     }
 
-    // Reset Password Form
     const resetPassForm = document.getElementById('formResetPassword');
     if (resetPassForm) {
         resetPassForm.addEventListener('submit', async (e) => {
@@ -391,7 +371,6 @@ function setupForms() {
         });
     }
 
-    // User Filters
     const searchUser = document.getElementById('searchUserInput');
     const roleFilter = document.getElementById('filterUserRole');
     const statusFilter = document.getElementById('filterUserStatus');
@@ -400,7 +379,6 @@ function setupForms() {
     if (roleFilter) roleFilter.addEventListener('change', loadUsers);
     if (statusFilter) statusFilter.addEventListener('change', loadUsers);
 
-    // Add Department Form
     const deptForm = document.getElementById('formAddDept');
     if (deptForm) {
         deptForm.addEventListener('submit', (e) => {
@@ -423,7 +401,6 @@ function setupForms() {
         });
     }
 
-    // Subject Management Form
     const subjectForm = document.getElementById('formAddSubject');
     if (subjectForm) {
         subjectForm.addEventListener('submit', (e) => {
@@ -450,7 +427,6 @@ function setupForms() {
         });
     }
 
-    // Academic Term Form
     const termForm = document.getElementById('formAddTerm');
     if (termForm) {
         termForm.addEventListener('submit', (e) => {
@@ -460,7 +436,7 @@ function setupForms() {
             const isActive = document.getElementById('termActive').value === 'true';
 
             if (isActive) {
-                // Deactivate any currently active term
+                
                 const currentActive = DB.find('terms', { isActive: true });
                 currentActive.forEach(t => DB.update('terms', t.id, { isActive: false }));
             }
@@ -474,7 +450,6 @@ function setupForms() {
         });
     }
 
-    // Library Book Form
     const bookForm = document.getElementById('formAddBook');
     if (bookForm) {
         bookForm.addEventListener('submit', (e) => {
@@ -494,7 +469,6 @@ function setupForms() {
         });
     }
 
-    // Book Issue Form
     const issueForm = document.getElementById('formIssueBook');
     if (issueForm) {
         issueForm.addEventListener('submit', (e) => {
@@ -521,22 +495,19 @@ function setupForms() {
     }
 }
 
-// ---------------- Loaders ---------------- //
-
 function loadDashboard() {
     document.getElementById('statStudents').innerText = DB.getTable('students').length;
     document.getElementById('statTeachers').innerText = DB.getTable('teachers').length;
     document.getElementById('statApplicants').innerText = DB.find('admissions', { status: 'pending' }).length;
     document.getElementById('statClasses').innerText = DB.getTable('classes').length;
 
-    // Load Fees Chart
     const ctx = document.getElementById('feesChart');
     if (ctx) {
-        // Destroy existing chart if any
+        
         if (window.myFeesChart) window.myFeesChart.destroy();
 
         const payments = DB.getTable('payments');
-        // Group by month (very simple)
+        
         const data = {
             'Jan': 0, 'Feb': 0, 'Mar': 0, 'Apr': 0, 'May': 0, 'Jun': 0,
             'Jul': 0, 'Aug': 0, 'Sep': 0, 'Oct': 0, 'Nov': 0, 'Dec': 0
@@ -565,7 +536,6 @@ function loadDashboard() {
         });
     }
 
-    // Load Audit Logs
     const tbody = document.getElementById('auditLogsTableBody');
     if (tbody) {
         tbody.innerHTML = '';
@@ -633,7 +603,7 @@ window.deleteTeacher = function (id) {
             DB.delete('teachers', id);
             DB.logAction('Deleted Teacher', `Name: ${teacher.name}`);
             loadTeachers();
-            loadUsers(); // Refresh Users Master List
+            loadUsers(); 
         }
     }
 }
@@ -659,7 +629,6 @@ window.editTeacher = function (id) {
         subjects: subjectsArr 
     });
 
-    // Also update the user's name if they have a userId
     if (teacher.userId) {
         DB.update('users', teacher.userId, { name: newName });
     }
@@ -721,11 +690,9 @@ window.assignClassTeacher = function (classId) {
 
     const selectedTeacher = teachers[index];
     const cls = DB.findById('classes', classId);
-    
-    // Update class
+
     DB.update('classes', classId, { teacherId: selectedTeacher.id });
 
-    // Update teacher's classes list if not already there
     if (!selectedTeacher.classes.includes(cls.name)) {
         const updatedClasses = [...selectedTeacher.classes, cls.name];
         DB.update('teachers', selectedTeacher.id, { classes: updatedClasses });
@@ -743,13 +710,12 @@ function loadAdmissions() {
     let admissions = DB.getTable('admissions').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const students = DB.getTable('students');
 
-    // Auto-sync: If an admission is 'approved' but no student exists, mark as removed
     admissions.forEach(adm => {
         if (adm.status === 'approved') {
             const studentExists = students.some(s => s.admissionId === adm.id || s.name === adm.childName);
             if (!studentExists) {
                 DB.update('admissions', adm.id, { status: 'removed' });
-                adm.status = 'removed'; // update local reference for immediate display
+                adm.status = 'removed'; 
             }
         }
     });
@@ -810,24 +776,22 @@ window.approveAdmission = async function (id) {
     if (adm) {
         await DB.update('admissions', id, { status: 'approved' });
 
-        // Create user
         const studentId = DB.generateUniqueId('STU', 'students');
         const newUser = await DB.insert('users', {
             username: studentId,
-            password: 'password123', // default
+            password: 'password123', 
             role: 'student',
             name: adm.childName,
             status: 'active'
         });
 
-        // Create student
         if (newUser) {
             await DB.insert('students', {
                 userId: newUser.id,
                 admissionId: adm.id,
                 studentId,
                 name: adm.childName,
-                classId: adm.classApplying, // Just saving string mapping for now
+                classId: adm.classApplying, 
                 className: adm.classApplying,
                 gender: adm.gender || '-',
                 guardianName: adm.pname || adm.guardianName,
@@ -885,7 +849,7 @@ function loadStudents() {
     }
 
     const filterSelect = document.getElementById('filterStudentClass');
-    if (filterSelect && filterSelect.options.length <= 1) { // Populate dynamically from all school classes
+    if (filterSelect && filterSelect.options.length <= 1) { 
         DB.getTable('classes').forEach(c => filterSelect.add(new Option(c.name, c.name)));
     }
 
@@ -895,7 +859,7 @@ function loadStudents() {
     }
 
     students.forEach(s => {
-        // Calculate Debt
+        
         const totalDebt = DB.calculateStudentDebt(s);
 
         let debtTableDisplay = '';
@@ -929,11 +893,11 @@ window.deleteStudent = async function (id) {
     if (confirm('Are you sure you want to permanently REMOVE this student? This will also delete their login account and history.')) {
         const student = DB.findById('students', id);
         if (student) {
-            // Update admission status if linked
+            
             if (student.admissionId) {
                 await DB.update('admissions', student.admissionId, { status: 'removed' });
             } else {
-                // Try to find admission by name if ID link is missing (for older records)
+                
                 const adm = DB.findOne('admissions', { childName: student.name, status: 'approved' });
                 if (adm) await DB.update('admissions', adm.id, { status: 'removed' });
             }
@@ -942,7 +906,7 @@ window.deleteStudent = async function (id) {
             await DB.delete('students', id);
             await DB.logAction('Deleted Student', `Name: ${student.name}, ID: ${student.studentId}`);
             loadStudents();
-            loadUsers(); // Refresh Users Master List
+            loadUsers(); 
             if (document.getElementById('dashboard').classList.contains('active')) loadDashboard();
         }
     }
@@ -962,7 +926,6 @@ window.editStudent = function (id) {
     const s = DB.findById('students', id);
     if (!s) return;
 
-    // Calculate Real Debt
     const totalDebt = DB.calculateStudentDebt(s);
 
     let debtDisplay = '';
@@ -1096,7 +1059,6 @@ function loadResults() {
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    // Populate filter classes if empty (only once or on each load)
     const filterClass = document.getElementById('filterResultClass');
     if (filterClass && filterClass.options.length <= 1) {
         DB.getTable('classes').forEach(c => {
@@ -1210,7 +1172,7 @@ window.approveResult = async function(id) {
 
 window.rejectResult = async function(id) {
     const reason = prompt('Reason for rejection:');
-    if (reason === null) return; // Cancelled
+    if (reason === null) return; 
 
     const res = DB.findById('results', id);
     if (res) {
@@ -1271,7 +1233,6 @@ function loadUsers() {
 
     let users = DB.getTable('users');
 
-    // Filtering
     if (query) {
         users = users.filter(u => 
             u.name.toLowerCase().includes(query) || 
@@ -1324,16 +1285,16 @@ window.deleteUser = async function(id) {
     }
 
     if (confirm(`Are you sure you want to PERMANENTLY delete the account for ${user.name}? This will also remove their student/teacher profile data.`)) {
-        // If teacher, remove teacher profile
+        
         if (user.role === 'teacher') {
             const teacher = DB.findOne('teachers', { user_id: id });
             if (teacher) await DB.delete('teachers', teacher.id);
         }
-        // If student, remove student profile and update admissions
+        
         if (user.role === 'student') {
             const student = DB.findOne('students', { user_id: id });
             if (student) {
-                // if (student.admissionId) await DB.update('admissions', student.admissionId, { status: 'removed' });
+                
                 await DB.delete('students', student.id);
             }
         }
@@ -1370,8 +1331,7 @@ window.toggleUserStatus = async function(id) {
 function loadAttendance() {
     const panel = document.getElementById('attendancePanel');
     if (!panel) return;
-    
-    // Check if we already have the filter UI
+
     let filterRow = panel.querySelector('.form-row-3');
     if(!filterRow) {
         const panel = document.querySelector('#attendance .panel');
@@ -1406,8 +1366,7 @@ function loadAttendance() {
                 </table>
             </div>
         `;
-        
-        // Populate classes
+
         const classSelect = document.getElementById('admAttClass');
         DB.getTable('classes').forEach(c => classSelect.add(new Option(c.name, c.name)));
         document.getElementById('admAttDate').valueAsDate = new Date();
@@ -1487,8 +1446,6 @@ window.deleteMessage = async function(id) {
     }
 }
 
-// ---------------- Report Generation ---------------- //
-
 function getPDFHeader(doc, title) {
     const { jsPDF } = window.jspdf;
     doc.setFontSize(22);
@@ -1511,7 +1468,7 @@ window.generateStudentReport = function() {
     getPDFHeader(doc, "Master Student Registry");
 
     const students = DB.getTable('students').sort((a, b) => {
-        // Sort by class first, then by name
+        
         if (a.className !== b.className) {
             return a.className.localeCompare(b.className);
         }
@@ -1564,8 +1521,7 @@ window.generateDefaultersReport = function() {
     const rows = [];
     students.forEach(s => {
         const totalDebt = DB.calculateStudentDebt(s);
-        
-        // Fetch total billed for report
+
         const cls = DB.getTable('classes').find(c => c.id === s.classId || c.name === s.className);
         const tuition = cls ? (cls.tuitionFee || 0) : 0;
         const totalBilled = tuition + (s.arrears || 0);
@@ -1580,7 +1536,7 @@ window.generateDefaultersReport = function() {
         head: [['Student Name', 'Class', 'Billed (GHS)', 'Paid (GHS)', 'Balance (GHS)']],
         body: rows,
         startY: 50,
-        headStyles: { fillColor: [231, 76, 60] } // Red for defaulters
+        headStyles: { fillColor: [231, 76, 60] } 
     });
 
     doc.save("Fee_Defaulters.pdf");
@@ -1629,9 +1585,6 @@ window.generateFinancialReport = function() {
     DB.logAction('Generated Report', `Financial Summary (${start} to ${end})`);
 }
 
-// ============================================================
-//   SUBJECT MANAGEMENT
-// ============================================================
 function loadSubjects() {
     const tbody = document.querySelector('#subjectsTable tbody');
     if (!tbody) return;
@@ -1640,7 +1593,6 @@ function loadSubjects() {
     const searchTerm = document.getElementById('searchSubject')?.value.toLowerCase() || '';
     const classFilter = document.getElementById('filterSubjectClass')?.value || 'all';
 
-    // Populate class filter if empty
     const filterSel = document.getElementById('filterSubjectClass');
     if (filterSel && filterSel.options.length <= 1) {
         DB.getTable('classes').forEach(c => filterSel.add(new Option(c.name, c.id)));
@@ -1695,9 +1647,6 @@ window.deleteSubject = async function(id) {
     }
 }
 
-// ============================================================
-//   ACADEMIC TERMS MANAGEMENT
-// ============================================================
 function loadTerms() {
     const tbody = document.querySelector('#termsTable tbody');
     if (!tbody) return;
@@ -1705,7 +1654,6 @@ function loadTerms() {
 
     const terms = DB.getTable('terms').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    // Show active term badge at top
     const activeTerm = terms.find(t => t.isActive);
     const activeDisplay = document.getElementById('activeTermDisplay');
     if (activeDisplay) {
@@ -1761,9 +1709,6 @@ window.deleteTerm = async function(id) {
     }
 }
 
-// ============================================================
-//   LIBRARY MODULE
-// ============================================================
 function loadLibrary() {
     loadBookCatalogue();
     loadActiveIssues();
@@ -1778,7 +1723,6 @@ function loadBookCatalogue() {
     let books = DB.getTable('library_books');
     if (searchTerm) books = books.filter(b => b.title.toLowerCase().includes(searchTerm) || (b.author || '').toLowerCase().includes(searchTerm));
 
-    // Stats
     const totalBooks = books.reduce((a, b) => a + (b.totalCopies || 1), 0);
     const available  = books.reduce((a, b) => a + (b.availableCopies || 0), 0);
     const issued     = totalBooks - available;
@@ -1838,7 +1782,6 @@ function loadDepartments() {
     });
 }
 
-// ---------------- SYSTEM BACKUP & RESTORE ---------------- //
 window.exportSystemBackup = function() {
     const backupData = {};
     const tables = [
@@ -1898,13 +1841,11 @@ window.importSystemBackup = function(input) {
     reader.readAsText(file);
 }
 
-// Update loadSectionData to support 'system' and 'classes' dept loading
 const originalLoadSectionData = loadSectionData;
 loadSectionData = function(section) {
     originalLoadSectionData(section);
     if (section === 'classes') loadDepartments();
 }
-
 
 function loadActiveIssues() {
     const tbody = document.querySelector('#issuesTable tbody');
@@ -1943,9 +1884,9 @@ window.openIssueModal = function(bookId) {
     if (!book) return;
     document.getElementById('issueBookId').value = bookId;
     document.getElementById('issueBookName').textContent = book.title;
-    document.getElementById('issueDueDate').valueAsDate = new Date(Date.now() + 14 * 86400000); // 2 weeks default
+    document.getElementById('issueDueDate').valueAsDate = new Date(Date.now() + 14 * 86400000); 
     document.getElementById('formIssueBook').reset();
-    document.getElementById('issueBookId').value = bookId; // re-set after reset
+    document.getElementById('issueBookId').value = bookId; 
     showModal('issueBookModal');
 }
 

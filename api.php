@@ -1,9 +1,8 @@
 <?php
-// api.php
+
 header('Content-Type: application/json');
 require_once 'db_connect.php';
 
-// Handle CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -11,7 +10,6 @@ header("Access-Control-Allow-Headers: Content-Type");
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
-// Simple Router
 switch ($action) {
     case 'login':
         handleLogin($conn);
@@ -40,7 +38,7 @@ switch ($action) {
 }
 
 function handleLogin($conn) {
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(file_get_contents('php:
     $user = $data['username'];
     $pass = $data['password'];
 
@@ -59,7 +57,7 @@ function handleLogin($conn) {
 
 function handleFetchAll($conn) {
     $table = $_GET['table'];
-    // Dangerous: In production, whitelist tables
+    
     $result = $conn->query("SELECT * FROM $table");
     $data = [];
     while ($row = $result->fetch_assoc()) {
@@ -70,7 +68,7 @@ function handleFetchAll($conn) {
 
 function handleInsert($conn) {
     $table = $_GET['table'];
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(file_get_contents('php:
     
     $keys = array_keys($data);
     $values = array_values($data);
@@ -98,7 +96,7 @@ function handleInsert($conn) {
 function handleUpdate($conn) {
     $table = $_GET['table'];
     $id = $_GET['id'];
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(file_get_contents('php:
     
     if (isset($data['id'])) unset($data['id']);
     
@@ -141,7 +139,7 @@ function handleDelete($conn) {
 
 function handleQuery($conn) {
     $table = $_GET['table'];
-    $criteria = json_decode(file_get_contents('php://input'), true);
+    $criteria = json_decode(file_get_contents('php:
     
     $where = [];
     $values = [];
@@ -171,7 +169,7 @@ function handleQuery($conn) {
 }
 
 function handleLogAction($conn) {
-    $data = json_decode(file_get_contents('php://input'), true);
+    $data = json_decode(file_get_contents('php:
     $actor = $data['actor'];
     $action = $data['action'];
     $details = $data['details'];

@@ -8,16 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="portal.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- jsPDF & AutoTable -->
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
-  <!-- Sidebar Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header" style="background:#0a3a40;">
       <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
@@ -34,10 +32,8 @@
     </ul>
   </aside>
 
-  <!-- Main Content -->
   <main class="main-content">
-    
-    <!-- Topbar -->
+
     <header class="topbar">
       <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
       <div style="flex:1;"></div>
@@ -50,10 +46,8 @@
       </div>
     </header>
 
-    <!-- Sections Area -->
     <div class="content-area">
 
-      <!-- DASHBOARD -->
       <section id="dashboard" class="section active">
         <div class="section-header">
           <h2 class="section-title">Financial Dashboard</h2>
@@ -109,7 +103,7 @@
                   </tr>
                 </thead>
                 <tbody id="recentTransactions">
-                  <!-- JS filled -->
+                  
                 </tbody>
               </table>
             </div>
@@ -117,7 +111,6 @@
         </div>
       </section>
 
-      <!-- STUDENT FEES -->
       <section id="fees" class="section">
         <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
@@ -153,7 +146,6 @@
         </div>
       </section>
 
-      <!-- ARREARS / DEBTORS -->
       <section id="arrears" class="section">
         <div class="section-header">
           <h2 class="section-title">Arrears & Debt Management</h2>
@@ -182,7 +174,6 @@
         </div>
       </section>
 
-      <!-- EXPENSES -->
       <section id="expenses" class="section">
         <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
@@ -210,7 +201,6 @@
         </div>
       </section>
 
-      <!-- SALARIES -->
       <section id="salaries" class="section">
         <div class="section-header">
           <h2 class="section-title">Staff Salaries</h2>
@@ -235,7 +225,6 @@
         </div>
       </section>
 
-      <!-- REPORTS -->
       <section id="reports" class="section">
         <div class="section-header">
           <h2 class="section-title">Financial Reports</h2>
@@ -261,7 +250,6 @@
         </div>
       </section>
 
-      <!-- MESSAGES -->
       <section id="messages" class="section">
         <div class="section-header">
           <h2 class="section-title">System Messages</h2>
@@ -288,9 +276,6 @@
     </div>
   </main>
 
-  <!-- Modals -->
-  
-  <!-- Payment Modal -->
   <div class="modal-overlay" id="paymentModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -326,7 +311,6 @@
     </div>
   </div>
 
-  <!-- Expense Modal -->
   <div class="modal-overlay" id="expenseModal">
     <div class="modal-content">
       <div class="modal-header">

@@ -1,4 +1,4 @@
-// js/teacher.js
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     await DB.init();
@@ -10,8 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     loadTeacherDashboard();
     loadAnnouncements();
-    
-    // Sidebar Navigation
+
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
     const sidebar = document.getElementById('sidebar');
@@ -41,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (target === 'timetable') loadTimetables();
             if (target === 'communication') loadTeacherMessages();
             if (target === 'salary') {
-                // Future: loadSalaryRecords();
+                
             }
             if(target === 'fees') {
                 document.getElementById('feeResultArea').style.display = 'none';
@@ -71,8 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     loadAnnouncements();
-    
-    // Communication form
+
     const msgForm = document.getElementById('msgForm');
     if(msgForm) {
         msgForm.addEventListener('submit', async (e) => {
@@ -97,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Material Upload Setup
     const matForm = document.getElementById('materialUploadForm');
     if(matForm) {
         matForm.addEventListener('submit', function(e) {
@@ -132,7 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Profile Form
     const profForm = document.getElementById('profileUpdateForm');
     if(profForm) {
         profForm.addEventListener('submit', async function(e) {
@@ -178,7 +174,6 @@ function loadTeacherDashboard() {
     document.getElementById('statClasses').innerText = teacherRec.classes.length;
     document.getElementById('statSubjects').innerText = teacherRec.subjects.length;
 
-    // Calculate total students across classes
     const allStudents = DB.getTable('students');
     let totalStudents = 0;
     teacherRec.classes.forEach(c => {
@@ -186,13 +181,11 @@ function loadTeacherDashboard() {
     });
     document.getElementById('statStudents').innerText = totalStudents;
 
-    // Attendance Today
     const today = new Date().toISOString().split('T')[0];
     const allAttendance = DB.getTable('attendance');
     const todayAttendance = allAttendance.filter(a => a.teacherId === user.id && a.date === today);
     document.getElementById('statAttToday').innerText = `${todayAttendance.length} / ${totalStudents}`;
 
-    // Populate dropdowns once
     const classSelect = document.getElementById('classSelect');
     if (classSelect && classSelect.options.length <= 1) {
         const gradeClassSelect = document.getElementById('gradeClassSelect');
@@ -214,7 +207,7 @@ function loadTeacherDashboard() {
         });
 
         if (gradeSubjectSelect && gradeSubjectSelect.options.length <= 1) {
-            // Pull from DB subjects table first (filtered by teacher's classes)
+            
             const dbSubjects = DB.getTable('subjects');
             const teacherClasses = teacherRec.classes;
             const relevantSubjects = dbSubjects.filter(s =>
@@ -224,17 +217,16 @@ function loadTeacherDashboard() {
             if (relevantSubjects.length > 0) {
                 relevantSubjects.forEach(s => gradeSubjectSelect.add(new Option(s.name, s.name)));
             } else if (teacherRec.subjects.length > 0) {
-                // Fallback: teacher's own subjects
+                
                 teacherRec.subjects.forEach(s => gradeSubjectSelect.add(new Option(s, s)));
             } else {
-                // Final fallback
+                
                 ['Mathematics', 'English Language', 'Science', 'R.M.E', 'Social Studies', 'ICT', 'French'].forEach(s => {
                     gradeSubjectSelect.add(new Option(s, s));
                 });
             }
         }
 
-        // Populate term dropdown from DB terms
         const gradeTermSelect = document.getElementById('gradeTermSelect');
         if (gradeTermSelect && gradeTermSelect.options.length <= 1) {
             const dbTerms = DB.getTable('terms');
@@ -245,7 +237,7 @@ function loadTeacherDashboard() {
                     if (t.isActive) gradeTermSelect.value = opt.value;
                 });
             } else {
-                // Fallback static terms
+                
                 ['1st Term 2024/25', '2nd Term 2024/25', '3rd Term 2024/25'].forEach(t => {
                     gradeTermSelect.add(new Option(t, t));
                 });
@@ -260,8 +252,7 @@ function loadTeacherMessages() {
     tbody.innerHTML = '';
 
     const user = DB.getCurrentUser();
-    
-    // Admin broadcasts to teachers OR direct messages (role: 'teachers' or 'all')
+
     const msgs = DB.getTable('messages').filter(m => 
         m.receiverRole === 'teachers' || 
         m.receiverRole === 'all'
@@ -410,7 +401,7 @@ window.loadGradeEntryGrid = function() {
     document.getElementById('gradeEntryArea').style.display = 'block';
 
     students.forEach(s => {
-        // Try to find existing grade
+        
         let existing = DB.findOne('results', { studentId: s.studentId, subject: sub, term });
         const isPublished = existing && existing.status === 'published';
         const isSubmitted = existing && existing.status === 'submitted';
@@ -441,7 +432,6 @@ window.loadGradeEntryGrid = function() {
         `;
         tbody.appendChild(tr);
 
-        // Add auto-calc
         const cInp = tr.querySelector('.g-class');
         const eInp = tr.querySelector('.g-exam');
         const totalSp = tr.querySelector('.g-total');
@@ -452,8 +442,7 @@ window.loadGradeEntryGrid = function() {
             const calc = () => {
                 const classV = parseFloat(cInp.value) || 0;
                 const examV = parseFloat(eInp.value) || 0;
-                
-                // Max caps
+
                 if(classV > 40) cInp.value = 40;
                 if(examV > 60) eInp.value = 60;
 
@@ -491,28 +480,27 @@ window.submitGrades = async function() {
 
     for (const tr of rows) {
         const classInp = tr.querySelector('.g-class');
-        if(classInp.disabled) continue; // Skip published results
+        if(classInp.disabled) continue; 
 
         const studentId = tr.querySelector('.g-studId').value;
         const studentName = tr.querySelector('.g-studName').value;
         const classScoreStr = classInp.value;
         const examScoreStr = tr.querySelector('.g-exam').value;
         
-        if(!classScoreStr && !examScoreStr) continue; // skip empty
+        if(!classScoreStr && !examScoreStr) continue; 
 
         const classScore = parseFloat(classScoreStr) || 0;
         const examScore = parseFloat(examScoreStr) || 0;
         const total = classScore + examScore;
         const remark = tr.querySelector('.g-remark').value;
 
-        // Find existing to preserve ID if updating
         const existing = DB.findOne('results', { studentId, subject: sub, term });
         
         const data = {
             studentId, studentName, classId: cls, subject: sub, term,
             classScore, examScore, total, remark,
             teacherId: user.id, teacherName: user.name,
-            status: 'submitted' // Reset to submitted for admin review
+            status: 'submitted' 
         };
 
         if(existing) {
@@ -525,7 +513,7 @@ window.submitGrades = async function() {
 
     await DB.logAction('Submitted Grades', `Class: ${cls}, Subject: ${sub}, Students: ${savedCount}`);
     alert(`Successfully submitted ${savedCount} student grades to Administration for approval.`);
-    window.loadGradeEntryGrid(); // Refresh UI
+    window.loadGradeEntryGrid(); 
 }
 
 function loadAnnouncements() {
@@ -595,7 +583,6 @@ window.checkStudentFees = function() {
     resArea.style.display = 'block';
     document.getElementById('feeResName').innerText = student.name;
 
-    // Get tuition fee from class
     let tuitionFee = 0;
     const cls = DB.getTable('classes').find(c => c.id === student.classId || c.name === student.className);
     if (cls && cls.tuitionFee) {
@@ -634,8 +621,7 @@ function loadTimetables() {
     const tbody = document.querySelector('#teacherTimetableTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
-    // Filter for all users or teachers only
+
     const tts = DB.getTable('timetables').filter(tt => tt.target === 'all' || tt.target === 'teachers').sort((a,b) => new Date(b.date) - new Date(a.date));
 
     if(tts.length === 0) {
@@ -675,7 +661,7 @@ window.loadAttendanceGrid = function() {
     }
 
     students.forEach(s => {
-        // Try to find existing attendance
+        
         const existing = DB.findOne('attendance', { studentId: s.studentId, date: date });
         
         const tr = document.createElement('tr');
@@ -714,7 +700,6 @@ window.saveAttendance = async function() {
         const status = tr.querySelector('.att-status').value;
         const remark = tr.querySelector('.att-remark').value;
 
-        // Get active term
         const activeTerm = DB.getTable('terms').find(t => t.isActive);
         const termName = activeTerm ? `${activeTerm.name} - ${activeTerm.year}` : new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 

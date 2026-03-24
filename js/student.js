@@ -1,4 +1,4 @@
-// js/student.js
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     await DB.init();
@@ -7,14 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('currentStudentName').innerText = user.name || 'Student';
 
-    // Fetch student profile
     const studentRec = DB.findOne('students', { userId: user.id });
     if (studentRec) {
         document.getElementById('dashName').innerText = user.name;
         document.getElementById('dashStudId').innerText = studentRec.studentId;
         document.getElementById('dashClass').innerText = studentRec.className;
 
-        // Populate profile page
         document.getElementById('profName').value = studentRec.name;
         document.getElementById('profId').value = studentRec.studentId;
         document.getElementById('profClass').value = studentRec.className;
@@ -22,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('profPhone').value = studentRec.guardianPhone || '';
     }
 
-    // Sidebar Navigation
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
     const sidebar = document.getElementById('sidebar');
@@ -75,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(overlay) overlay.addEventListener('click', closeSidebar);
 
     loadDashboardData();
-    loadFeesData(); // Initial load for dashboard stats
+    loadFeesData(); 
     loadAttendanceStats();
 
     function loadMaterials() {
@@ -104,7 +101,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Support Form
     const supportForm = document.getElementById('studentSupportForm');
     if(supportForm) {
         supportForm.addEventListener('submit', async function(e) {
@@ -130,7 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Profile Password Update
     const profForm = document.getElementById('profileForm');
     if(profForm) {
         profForm.addEventListener('submit', async function(e) {
@@ -148,7 +143,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Payment Notice Form
     const payForm = document.getElementById('paymentNoticeForm');
     if (payForm) {
         payForm.addEventListener('submit', async function(e) {
@@ -203,7 +197,7 @@ window.togglePassword = function(inputId, iconId) {
 }
 
 function loadDashboardData() {
-    // Announcements
+    
     const list = document.getElementById('announcementList');
     if (!list) return;
     list.innerHTML = '';
@@ -236,7 +230,7 @@ function loadAttendanceStats() {
 
     const records = DB.getTable('attendance').filter(r => r.studentId === studentRec.studentId);
     if (records.length === 0) {
-        document.getElementById('statAttendance').innerText = '100.0%'; // Default for new students
+        document.getElementById('statAttendance').innerText = '100.0%'; 
         return;
     }
 
@@ -295,7 +289,6 @@ window.loadResults = function(term) {
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    // Only show results that have been approved and published by Admin
     let results = DB.find('results', { 
         studentId: studentRec.studentId, 
         term: term, 
@@ -347,16 +340,14 @@ window.downloadPDF = function () {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Header
     doc.setFontSize(18);
-    doc.setTextColor(0, 34, 68); // Brand blue
+    doc.setTextColor(0, 34, 68); 
     doc.text("Elyon Montessori School", 105, 20, { align: "center" });
 
     doc.setFontSize(14);
     doc.setTextColor(50, 50, 50);
     doc.text("Terminal Academic Report", 105, 28, { align: "center" });
 
-    // Details
     doc.setFontSize(11);
     const name = document.getElementById('resName').innerText;
     const cls = document.getElementById('resClass').innerText;
@@ -366,7 +357,6 @@ window.downloadPDF = function () {
     doc.text(`Class: ${cls}`, 105, 45);
     doc.text(`Term: ${term}`, 160, 45);
 
-    // Table
     doc.autoTable({
         html: '#studentResultsTable',
         startY: 55,
@@ -378,7 +368,6 @@ window.downloadPDF = function () {
     const finalY = doc.lastAutoTable.finalY + 20;
     doc.text("Headmaster's Signature: _______________________", 15, finalY);
 
-    // Save
     doc.save(`${name.replace(/\s+/g, '_')}_${term.replace(/\s+/g, '')}_Result.pdf`);
 }
 
@@ -387,7 +376,6 @@ function loadFeesData() {
     const studentRec = DB.findOne('students', { userId: user.id });
     if (!studentRec) return;
 
-    // Get tuition fee from class
     let tuitionFee = 0;
     const cls = DB.getTable('classes').find(c => c.id === studentRec.classId || c.name === studentRec.className);
     if (cls && cls.tuitionFee) {
@@ -396,8 +384,7 @@ function loadFeesData() {
 
     const payments = DB.find('payments', { studentId: studentRec.studentId });
     const tbody = document.querySelector('#studentPaymentsTable tbody');
-    
-    // Summary
+
     const totalBilled = tuitionFee + (studentRec.arrears || 0);
     let totalPaid = 0;
     payments.forEach(p => totalPaid += parseFloat(p.amountPaid));
@@ -406,8 +393,7 @@ function loadFeesData() {
     if(document.getElementById('studTotalBilled')) document.getElementById('studTotalBilled').innerText = `GHS ${totalBilled.toFixed(2)}`;
     if(document.getElementById('studTotalPaid')) document.getElementById('studTotalPaid').innerText = `GHS ${totalPaid.toFixed(2)}`;
     if(document.getElementById('studBalance')) document.getElementById('studBalance').innerText = `GHS ${balance.toFixed(2)}`;
-    
-    // Dashboard Stat
+
     if(document.getElementById('statBalance')) document.getElementById('statBalance').innerText = `GHS ${balance.toFixed(2)}`;
 
     if(!tbody) return;
@@ -435,8 +421,7 @@ function loadTimetables() {
     const tbody = document.querySelector('#studentTimetableTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    
-    // Filter for all users or students only
+
     const tts = DB.getTable('timetables').filter(tt => tt.target === 'all' || tt.target === 'students').sort((a,b) => new Date(b.date) - new Date(a.date));
 
     if(tts.length === 0) {
@@ -490,8 +475,7 @@ function loadMyBorrowedBooks() {
     if (!tbody) return;
     tbody.innerHTML = '';
     const user = DB.getCurrentUser();
-    
-    // In our library system, borrower name is used (could be improved by ID)
+
     const issues = DB.getTable('library_issues').filter(i => 
         (i.borrower === user.name || i.borrowerId === user.id) && i.status === 'issued'
     );

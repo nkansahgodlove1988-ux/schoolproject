@@ -1,5 +1,4 @@
-// js/database.js
-// Transitioned from LocalStorage to PHP/MySQL API
+
 
 const API_URL = 'api.php';
 
@@ -7,7 +6,6 @@ const DB = {
     cache: {},
     isInitialized: false,
 
-    // NEW: Async Initialization to fetch all data from server
     init: async function() {
         const tables = [
             'users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'admissions', 
@@ -16,7 +14,7 @@ const DB = {
         ];
 
         try {
-            // Pre-fetch all tables to maintain sync-like behavior for getters
+            
             for (const table of tables) {
                 const response = await fetch(`${API_URL}?action=fetch_all&table=${table}`);
                 this.cache[table] = await response.json();
@@ -25,24 +23,20 @@ const DB = {
             console.log("DB Initialized from Server Cache");
         } catch (err) {
             console.error("Failed to initialize DB from server:", err);
-            // Fallback to empty arrays if server is unreachable
+            
             tables.forEach(t => this.cache[t] = []);
         }
     },
 
-    // Sync Getter (uses cache)
     getTable: function(table) {
         return this.cache[table] || [];
     },
 
-    // Save Table (server update) - usually internal
     saveTable: async function(table, data) {
         this.cache[table] = data;
-        // In this hybrid model, we usually update per-record, 
-        // but if we need a bulk save, we'd need an api action for it.
+
     },
 
-    // Async Insert
     insert: async function(table, record) {
         try {
             const response = await fetch(`${API_URL}?action=insert&table=${table}`, {
@@ -62,7 +56,6 @@ const DB = {
         return null;
     },
 
-    // Async Update
     update: async function(table, id, updates) {
         try {
             const response = await fetch(`${API_URL}?action=update&table=${table}&id=${id}`, {
@@ -84,7 +77,6 @@ const DB = {
         return false;
     },
 
-    // Async Delete
     delete: async function(table, id) {
         try {
             const response = await fetch(`${API_URL}?action=delete&table=${table}&id=${id}`);
@@ -99,7 +91,6 @@ const DB = {
         return false;
     },
 
-    // Sync Find (works on cache)
     findById: function(table, id) {
         return this.getTable(table).find(item => item.id == id);
     },
@@ -116,7 +107,6 @@ const DB = {
         return results.length > 0 ? results[0] : null;
     },
 
-    // Authentication
     login: async function(username, password) {
         try {
             const response = await fetch(`${API_URL}?action=login`, {
@@ -174,15 +164,14 @@ const DB = {
         } catch (e) {}
     },
 
-    // ---------------- System Helpers ---------------- //
     generateUniqueId: function(prefix, table) {
         const records = this.getTable(table);
         let newId;
         let isUnique = false;
         while (!isUnique) {
-            // Generate a 5-digit random number (10000 to 99999)
+            
             newId = prefix + Math.floor(10000 + Math.random() * 89999);
-            // Check studentId or teacherId field for collision
+            
             isUnique = !records.some(r => 
                 r.student_id === newId || 
                 r.teacher_id === newId || 

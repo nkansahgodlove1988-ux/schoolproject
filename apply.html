@@ -610,7 +610,6 @@
             });
         });
 
-        // Scroll reveal
         const revealEls = document.querySelectorAll('.reveal');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -627,13 +626,11 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Check if user already exists
             if (DB.findOne('users', { username: email })) {
                 alert("An account with this email already exists. Please track your status via login.");
                 return;
             }
 
-            // Create applicant user
             const newUser = await DB.insert('users', {
                 username: email,
                 password: password,
@@ -643,7 +640,7 @@
             });
 
             if (newUser) {
-                // Insert admission
+                
                 await DB.insert('admissions', {
                     userId: newUser.id,
                     childName: document.getElementById('childName').value,

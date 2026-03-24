@@ -12,10 +12,8 @@
 
 <body>
 
-  <!-- Sidebar Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
@@ -29,7 +27,6 @@
     </ul>
   </aside>
 
-  <!-- Main Content -->
   <main class="main-content">
 
     <header class="topbar">
@@ -46,7 +43,6 @@
 
     <div class="content-area">
 
-      <!-- DASHBOARD -->
       <section id="dashboard" class="section active">
         <div class="section-header">
           <h2 class="section-title">Welcome to Elyon Montessori</h2>
@@ -64,7 +60,6 @@
         </div>
       </section>
 
-      <!-- STATUS -->
       <section id="status" class="section">
         <div class="section-header">
           <h2 class="section-title">Application Details</h2>
@@ -75,7 +70,6 @@
         </div>
       </section>
 
-      <!-- LETTER -->
       <section id="letter" class="section">
         <div class="section-header">
           <h2 class="section-title">Admission Letter</h2>
@@ -85,8 +79,7 @@
           <p>Your admission letter is not available yet. Please wait for your application to be approved.</p>
         </div>
       </section>
-      
-      <!-- SECURITY -->
+
       <section id="security" class="section">
         <div class="section-header">
           <h2 class="section-title">Security Settings</h2>
@@ -117,7 +110,6 @@
       if (!user) return;
       document.getElementById('currentApplicantName').innerText = user.name || 'Applicant';
 
-      // Sidebar logic
       const menuItems = document.querySelectorAll('.menu-item');
       const sections = document.querySelectorAll('.section');
       const sidebar = document.getElementById('sidebar');
@@ -154,10 +146,9 @@
         overlay.addEventListener('click', closeSidebar);
       }
 
-      // Fetch admission data
       const admission = DB.findOne('admissions', { userId: user.id });
       if (admission) {
-        // Status updates
+        
         const icon = document.getElementById('statusIcon');
         const text = document.getElementById('statusText');
 
@@ -193,7 +184,6 @@
           text.innerText = 'We regret to inform you that your application was declined.';
         }
 
-        // Details
         document.getElementById('applicationDetails').innerHTML = `
           <div class="form-row">
             <div>
@@ -213,7 +203,6 @@
         document.getElementById('statusText').innerText = "No application found. Please ensure you submitted the form properly.";
       }
 
-      // Password Update
       const passForm = document.getElementById('passForm');
       if (passForm) {
         passForm.addEventListener('submit', async (e) => {
