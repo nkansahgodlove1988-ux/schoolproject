@@ -75,13 +75,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Communication form
     const msgForm = document.getElementById('msgForm');
     if(msgForm) {
-        msgForm.addEventListener('submit', (e) => {
+        msgForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const to = document.getElementById('msgTo').value;
             const subject = document.getElementById('msgSubject').value;
             const body = document.getElementById('msgBody').value;
             
-            DB.insert('messages', {
+            await DB.insert('messages', {
                 senderId: user.id,
                 senderName: user.name,
                 senderRole: 'teacher',
@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 date: new Date().toISOString()
             });
 
+            await DB.logAction('Teacher: Message Sent', `To: ${to}, Subject: ${subject}`);
             alert("Message sent successfully and logged in system!");
             msgForm.reset();
         });
@@ -109,9 +110,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(!file) return;
 
             const reader = new FileReader();
-            reader.onload = function() {
+            reader.onload = async function() {
                 const base64Content = reader.result;
-                DB.insert('learning_materials', {
+                await DB.insert('learning_materials', {
                     teacherId: user.id,
                     teacherName: user.name,
                     title,
@@ -121,6 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     date: new Date().toISOString()
                 });
 
+                await DB.logAction('Teacher: Material Uploaded', `Title: ${title}, Class: ${targetClass}`);
                 alert("Material uploaded successfully!");
                 window.hideModal('uploadMaterialModal');
                 matForm.reset();
@@ -133,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Profile Form
     const profForm = document.getElementById('profileUpdateForm');
     if(profForm) {
-        profForm.addEventListener('submit', function(e) {
+        profForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const phone = document.getElementById('profPhone').value;
             const newPass = document.getElementById('profNewPass').value;
@@ -141,13 +143,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const teacherRec = DB.findOne('teachers', { userId: user.id });
 
             if(teacherRec) {
-                DB.update('teachers', teacherRec.id, { phone });
+                await DB.update('teachers', teacherRec.id, { phone });
                 if(newPass) {
-                    DB.update('users', user.id, { password: newPass });
+                    await DB.update('users', user.id, { password: newPass });
                     alert("Profile and password updated successfully!");
                 } else {
                     alert("Profile updated successfully!");
                 }
+                await DB.logAction('Teacher: Profile Updated', `User: ${user.name}`);
                 loadProfile();
                 profForm.reset();
             }
@@ -348,9 +351,10 @@ function loadMaterials() {
     });
 }
 
-window.deleteMaterial = function(id) {
+window.deleteMaterial = async function(id) {
     if(confirm('Delete this material?')) {
-        DB.delete('learning_materials', id);
+        await DB.delete('learning_materials', id);
+        await DB.logAction('Teacher: Material Deleted', `ID: ${id}`);
         loadMaterials();
     }
 }
@@ -469,7 +473,7 @@ window.loadGradeEntryGrid = function() {
     });
 }
 
-window.submitGrades = function() {
+window.submitGrades = async function() {
     const cls = document.getElementById('gradeClassSelect').value;
     const sub = document.getElementById('gradeSubjectSelect').value;
     const term = document.getElementById('gradeTermSelect').value;
@@ -485,16 +489,16 @@ window.submitGrades = function() {
     const rows = document.querySelectorAll('#gradeTable tbody tr');
     let savedCount = 0;
 
-    rows.forEach(tr => {
+    for (const tr of rows) {
         const classInp = tr.querySelector('.g-class');
-        if(classInp.disabled) return; // Skip published results
+        if(classInp.disabled) continue; // Skip published results
 
         const studentId = tr.querySelector('.g-studId').value;
         const studentName = tr.querySelector('.g-studName').value;
         const classScoreStr = classInp.value;
         const examScoreStr = tr.querySelector('.g-exam').value;
         
-        if(!classScoreStr && !examScoreStr) return; // skip empty
+        if(!classScoreStr && !examScoreStr) continue; // skip empty
 
         const classScore = parseFloat(classScoreStr) || 0;
         const examScore = parseFloat(examScoreStr) || 0;
@@ -512,14 +516,14 @@ window.submitGrades = function() {
         };
 
         if(existing) {
-            DB.update('results', existing.id, data);
+            await DB.update('results', existing.id, data);
         } else {
-            DB.insert('results', data);
+            await DB.insert('results', data);
         }
         savedCount++;
-    });
+    }
 
-    DB.logAction('Submitted Grades', `Class: ${cls}, Subject: ${sub}, Students: ${savedCount}`);
+    await DB.logAction('Submitted Grades', `Class: ${cls}, Subject: ${sub}, Students: ${savedCount}`);
     alert(`Successfully submitted ${savedCount} student grades to Administration for approval.`);
     window.loadGradeEntryGrid(); // Refresh UI
 }
@@ -694,7 +698,7 @@ window.loadAttendanceGrid = function() {
     });
 }
 
-window.saveAttendance = function() {
+window.saveAttendance = async function() {
     const cls = document.getElementById('attClassSelect').value;
     const date = document.getElementById('attDate').value;
     const user = DB.getCurrentUser();
@@ -704,7 +708,7 @@ window.saveAttendance = function() {
     const rows = document.querySelectorAll('#attendanceTable tbody tr');
     let count = 0;
 
-    rows.forEach(tr => {
+    for (const tr of rows) {
         const studentId = tr.querySelector('.att-studId').value;
         const studentName = tr.querySelector('.att-studName').value;
         const status = tr.querySelector('.att-status').value;
@@ -723,13 +727,13 @@ window.saveAttendance = function() {
 
         const existing = DB.findOne('attendance', { studentId, date });
         if(existing) {
-            DB.update('attendance', existing.id, data);
+            await DB.update('attendance', existing.id, data);
         } else {
-            DB.insert('attendance', data);
+            await DB.insert('attendance', data);
         }
         count++;
-    });
+    }
 
-    DB.logAction('Marked Attendance', `Class: ${cls}, Date: ${date}, Students: ${count}`);
+    await DB.logAction('Marked Attendance', `Class: ${cls}, Date: ${date}, Students: ${count}`);
     alert(`Attendance for ${count} students saved successfully!`);
 }

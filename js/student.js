@@ -107,13 +107,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Support Form
     const supportForm = document.getElementById('studentSupportForm');
     if(supportForm) {
-        supportForm.addEventListener('submit', function(e) {
+        supportForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const subject = document.getElementById('supSubject').value;
             const body = document.getElementById('supBody').value;
             const studentRec = DB.findOne('students', { userId: user.id });
 
-            DB.insert('messages', {
+            await DB.insert('messages', {
                 senderId: user.id,
                 senderName: user.name,
                 senderRole: 'student',
@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 date: new Date().toISOString()
             });
 
+            await DB.logAction('Student: Support Request sent', `Subject: ${subject}`);
             alert("Your request has been sent to administration. We will get back to you soon!");
             supportForm.reset();
         });
@@ -132,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Profile Password Update
     const profForm = document.getElementById('profileForm');
     if(profForm) {
-        profForm.addEventListener('submit', function(e) {
+        profForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const newPass = document.getElementById('studNewPass').value;
             if(!newPass) {
@@ -140,7 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            DB.update('users', user.id, { password: newPass });
+            await DB.update('users', user.id, { password: newPass });
+            await DB.logAction('Student: Password Changed', `User: ${user.name}`);
             alert("Password updated successfully!");
             document.getElementById('studNewPass').value = '';
         });
@@ -149,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Payment Notice Form
     const payForm = document.getElementById('paymentNoticeForm');
     if (payForm) {
-        payForm.addEventListener('submit', function(e) {
+        payForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const amount = document.getElementById('payAmount').value;
             const ref = document.getElementById('payRef').value;
@@ -157,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const studentRec = DB.findOne('students', { userId: user.id });
 
             if (studentRec) {
-                DB.insert('payments', {
+                await DB.insert('payments', {
                     studentId: studentRec.studentId,
                     amountPaid: parseFloat(amount),
                     date: new Date(date).toISOString(),
@@ -166,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     recordedBy: 'Student'
                 });
 
-                DB.logAction('Submitted Payment Notice', `Amount: ${amount}, Ref: ${ref}`);
+                await DB.logAction('Submitted Payment Notice', `Amount: ${amount}, Ref: ${ref}`);
                 alert("Payment notice submitted successfully! Admin will verify and update your balance.");
                 payForm.reset();
                 hideModal('paymentModal');

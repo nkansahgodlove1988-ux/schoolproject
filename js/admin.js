@@ -203,14 +203,14 @@ function setupForms() {
     // Add Announcement
     const annForm = document.getElementById('announcementForm');
     if (annForm) {
-        annForm.addEventListener('submit', (e) => {
+        annForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const title = document.getElementById('annTitle').value;
             const target = document.getElementById('annTarget').value;
             const body = document.getElementById('annBody').value;
             const user = DB.getCurrentUser();
 
-            DB.insert('announcements', {
+            await DB.insert('announcements', {
                 title, target, body, author: user.name, date: new Date().toISOString()
             });
 
@@ -222,14 +222,14 @@ function setupForms() {
     // Admin Outbound Message
     const adminMsgForm = document.getElementById('adminMsgForm');
     if (adminMsgForm) {
-        adminMsgForm.addEventListener('submit', (e) => {
+        adminMsgForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const to = document.getElementById('admMsgTo').value;
             const subject = document.getElementById('admMsgSubject').value;
             const body = document.getElementById('admMsgBody').value;
             const user = DB.getCurrentUser();
 
-            DB.insert('messages', {
+            await DB.insert('messages', {
                 senderId: user.id,
                 senderName: user.name,
                 senderRole: 'admin',
@@ -239,7 +239,7 @@ function setupForms() {
                 date: new Date().toISOString()
             });
 
-            DB.logAction('Sent System Message', `To: ${to}, Subject: ${subject}`);
+            await DB.logAction('Sent System Message', `To: ${to}, Subject: ${subject}`);
             alert('Your message has been sent to the system!');
             adminMsgForm.reset();
         });
@@ -280,14 +280,14 @@ function setupForms() {
     // Record Payment Form
     const paymentForm = document.getElementById('formRecordPayment');
     if (paymentForm) {
-        paymentForm.addEventListener('submit', (e) => {
+        paymentForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const studentId = document.getElementById('pStudent').value;
             const amount = document.getElementById('pAmount').value;
             const receipt = document.getElementById('pReceipt').value;
             const status = document.getElementById('pStatus').value;
 
-            DB.insert('payments', {
+            await DB.insert('payments', {
                 studentId,
                 amountPaid: amount,
                 receiptNo: receipt,
@@ -295,7 +295,7 @@ function setupForms() {
                 date: new Date().toISOString()
             });
 
-            DB.logAction('Recorded Payment', `Student ID: ${studentId}, Amount: ${amount}`);
+            await DB.logAction('Recorded Payment', `Student ID: ${studentId}, Amount: ${amount}`);
 
             hideModal('paymentModal');
             document.getElementById('formRecordPayment').reset();
@@ -306,13 +306,13 @@ function setupForms() {
     // Set Class Fees Form
     const setFeesForm = document.getElementById('formSetFees');
     if (setFeesForm) {
-        setFeesForm.addEventListener('submit', (e) => {
+        setFeesForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const classId = document.getElementById('feeClassId').value;
             const amount = document.getElementById('feeAmount').value;
 
-            DB.update('classes', classId, { tuitionFee: parseFloat(amount) });
-            DB.logAction('Updated Class Fees', `Class ID: ${classId}, New Fee: ${amount}`);
+            await DB.update('classes', classId, { tuitionFee: parseFloat(amount) });
+            await DB.logAction('Updated Class Fees', `Class ID: ${classId}, New Fee: ${amount}`);
 
             alert('Tuition fee updated successfully for this class!');
             hideModal('setFeesModal');
@@ -323,13 +323,13 @@ function setupForms() {
     // Update Arrears Form
     const arrearsForm = document.getElementById('formUpdateArrears');
     if (arrearsForm) {
-        arrearsForm.addEventListener('submit', (e) => {
+        arrearsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('adjStudId').value;
             const amount = document.getElementById('adjAmount').value;
 
-            DB.update('students', id, { arrears: parseFloat(amount) || 0 });
-            DB.logAction('Updated Arrears', `Student ID: ${id}, New Arrears: ${amount}`);
+            await DB.update('students', id, { arrears: parseFloat(amount) || 0 });
+            await DB.logAction('Updated Arrears', `Student ID: ${id}, New Arrears: ${amount}`);
 
             alert('Student arrears updated successfully!');
             hideModal('updateArrearsModal');
@@ -350,10 +350,10 @@ function setupForms() {
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = async function(event) {
                 const base64Content = event.target.result;
                 
-                DB.insert('timetables', {
+                await DB.insert('timetables', {
                     title,
                     target,
                     fileName: file.name,
@@ -361,7 +361,7 @@ function setupForms() {
                     date: new Date().toISOString()
                 });
 
-                DB.logAction('Uploaded Timetable', `Title: ${title}, Target: ${target}`);
+                await DB.logAction('Uploaded Timetable', `Title: ${title}, Target: ${target}`);
                 alert('Timetable uploaded and published successfully!');
                 ttForm.reset();
                 loadTimetables();
@@ -373,7 +373,7 @@ function setupForms() {
     // Reset Password Form
     const resetPassForm = document.getElementById('formResetPassword');
     if (resetPassForm) {
-        resetPassForm.addEventListener('submit', (e) => {
+        resetPassForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('resetUserId').value;
             const newPass = document.getElementById('newPassword').value;
@@ -382,8 +382,8 @@ function setupForms() {
 
             const user = DB.findById('users', id);
             if (user) {
-                DB.update('users', id, { password: newPass });
-                DB.logAction('Reset Password', `User: ${user.username} (${user.role})`);
+                await DB.update('users', id, { password: newPass });
+                await DB.logAction('Reset Password', `User: ${user.username} (${user.role})`);
                 alert('Password reset successfully!');
                 hideModal('resetPasswordModal');
                 loadUsers();

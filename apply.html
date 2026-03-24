@@ -582,6 +582,10 @@
 
     <script src="js/database.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await DB.init();
+        });
+
         function toggleMenu() {
             document.getElementById("navLinks").classList.toggle("show");
         }
@@ -617,7 +621,7 @@
         }, { threshold: 0.1 });
         revealEls.forEach(el => observer.observe(el));
 
-        document.getElementById('applyForm').addEventListener('submit', function (e) {
+        document.getElementById('applyForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value;
@@ -630,7 +634,7 @@
             }
 
             // Create applicant user
-            const newUser = DB.insert('users', {
+            const newUser = await DB.insert('users', {
                 username: email,
                 password: password,
                 role: 'applicant',
@@ -638,26 +642,31 @@
                 status: 'active'
             });
 
-            // Insert admission
-            DB.insert('admissions', {
-                userId: newUser.id,
-                childName: document.getElementById('childName').value,
-                age: document.getElementById('age').value,
-                dob: document.getElementById('dob').value,
-                gender: document.getElementById('gender').value,
-                previousSchool: document.getElementById('previousSchool').value,
-                classApplying: document.getElementById('classApplying').value,
-                pname: document.getElementById('pname').value,
-                rchild: document.getElementById('rchild').value,
-                pnumber: document.getElementById('pnumber').value,
-                email: email,
-                occupation: document.getElementById('occupation').value,
-                residentialAddress: document.getElementById('residentialAddress').value,
-                status: 'pending'
-            });
+            if (newUser) {
+                // Insert admission
+                await DB.insert('admissions', {
+                    userId: newUser.id,
+                    childName: document.getElementById('childName').value,
+                    age: document.getElementById('age').value,
+                    dob: document.getElementById('dob').value,
+                    gender: document.getElementById('gender').value,
+                    previousSchool: document.getElementById('previousSchool').value,
+                    classApplying: document.getElementById('classApplying').value,
+                    pname: document.getElementById('pname').value,
+                    rchild: document.getElementById('rchild').value,
+                    pnumber: document.getElementById('pnumber').value,
+                    email: email,
+                    occupation: document.getElementById('occupation').value,
+                    residentialAddress: document.getElementById('residentialAddress').value,
+                    status: 'pending'
+                });
 
-            alert("Application submitted successfully! You can now log into the Applicant Portal using your email to track your status.");
-            window.location.href = 'login.html';
+                await DB.logAction('New Admission Application', `Child: ${document.getElementById('childName').value}, Email: ${email}`);
+                alert("Application submitted successfully! You can now log into the Applicant Portal using your email to track your status.");
+                window.location.href = 'login.html';
+            } else {
+                alert("Failed to create account. Please try again later.");
+            }
         });
     </script>
 

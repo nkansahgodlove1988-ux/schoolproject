@@ -306,10 +306,18 @@ function loadExpenses() {
             <td>${e.description}</td>
             <td>${e.reference || '--'}</td>
             <td style="font-weight:bold;">${parseFloat(e.amount).toFixed(2)}</td>
-            <td><button class="btn btn-danger" onclick="DB.delete('expenses', '${e.id}'); loadExpenses();"><i class="fas fa-trash"></i></button></td>
+            <td><button class="btn btn-danger" onclick="deleteExpense('${e.id}')"><i class="fas fa-trash"></i></button></td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+window.deleteExpense = async function(id) {
+    if (confirm('Are you sure you want to delete this expense record?')) {
+        await DB.delete('expenses', id);
+        await DB.logAction('Finance: Expense Deleted', `ID: ${id}`);
+        loadExpenses();
+    }
 }
 
 // ---------------- SALARIES ---------------- //
@@ -373,14 +381,14 @@ function setupFinanceForms() {
         const sSel = document.getElementById('pStudent');
         DB.getTable('students').forEach(s => sSel.add(new Option(`${s.name} (${s.studentId})`, s.studentId)));
 
-        payForm.addEventListener('submit', (e) => {
+        payForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const studId = document.getElementById('pStudent').value;
             const amount = document.getElementById('pAmount').value;
             const receipt = document.getElementById('pReceipt').value;
             const status = document.getElementById('pStatus').value;
 
-            DB.insert('payments', {
+            await DB.insert('payments', {
                 studentId: studId,
                 amountPaid: amount,
                 receiptNo: receipt,
@@ -388,7 +396,7 @@ function setupFinanceForms() {
                 date: new Date().toISOString()
             });
 
-            DB.logAction('Finance: Payment Recorded', `Student: ${studId}, Amount: ${amount}`);
+            await DB.logAction('Finance: Payment Recorded', `Student: ${studId}, Amount: ${amount}`);
             alert('Student payment recorded successfully!');
             hideModal('paymentModal');
             payForm.reset();
@@ -400,21 +408,21 @@ function setupFinanceForms() {
     // Expense Form
     const expForm = document.getElementById('formRecordExpense');
     if (expForm) {
-        expForm.addEventListener('submit', (e) => {
+        expForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const cat = document.getElementById('expCategory').value;
             const desc = document.getElementById('expDesc').value;
             const amt = document.getElementById('expAmount').value;
             const ref = document.getElementById('expRef').value;
 
-            DB.insert('expenses', {
+            await DB.insert('expenses', {
                 category: cat,
                 description: desc,
                 amount: amt,
                 reference: ref
             });
 
-            DB.logAction('Finance: Expense Recorded', `Category: ${cat}, Amount: ${amt}`);
+            await DB.logAction('Finance: Expense Recorded', `Category: ${cat}, Amount: ${amt}`);
             alert('School expense logged successfully!');
             hideModal('expenseModal');
             expForm.reset();
