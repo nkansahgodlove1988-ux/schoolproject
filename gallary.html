@@ -124,14 +124,14 @@
 
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 20px 10%;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            padding: 20px 5%;
         }
 
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: 0.8s ease all;
         }
         .reveal.revealed {
@@ -142,10 +142,10 @@
         .gallery-item {
             position: relative;
             overflow: hidden;
-            border-radius: 20px;
-            aspect-ratio: 4/3;
+            border-radius: 12px;
+            aspect-ratio: 1/1;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         }
 
         .gallery-item img {
@@ -309,106 +309,158 @@
 <h2 class="section-title reveal">Moments at Elyon Montessori</h2>
 
 <div class="gallery">
+    <!-- Row 1 -->
     <div class="gallery-item reveal" onclick="openImage('image/fa123.jpeg')">
-        <img src="image/fa123.jpeg" alt="School Life">
-        <div class="gallery-overlay"><span>School Logo & Theme</span></div>
+        <img src="image/fa123.jpeg" alt="School Mascot">
+        <div class="gallery-overlay"><span>School Logo</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image2.jpeg')">
         <img src="image/WhatsApp Image2.jpeg" alt="Facilities">
-        <div class="gallery-overlay"><span>Learning Environment</span></div>
+        <div class="gallery-overlay"><span>Main Campus</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.20 PM (1).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.20 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Student Activity</span></div>
-    </div>
-    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM (1).jpeg')">
-        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Creative Learning</span></div>
-    </div>
-    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM (1).jpeg')">
-        <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Outdoor Play</span></div>
+        <div class="gallery-overlay"><span>Morning Assembly</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.20 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.20 PM.jpeg" alt="Activity">
         <div class="gallery-overlay"><span>Classroom Session</span></div>
     </div>
-    <!-- ... same pattern for remaining images ... -->
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.21 PM (1).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.21 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Collaborative Work</span></div>
+        <div class="gallery-overlay"><span>Science Fair</span></div>
     </div>
+
+    <!-- Row 2 -->
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.21 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.21 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Skill Development</span></div>
+        <div class="gallery-overlay"><span>Library Time</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Outdoor Play</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM (2).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM (2).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Hands-on Learning</span></div>
+        <div class="gallery-overlay"><span>Creative Arts</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.22 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.22 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Discovery</span></div>
+        <div class="gallery-overlay"><span>Playtime Fun</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.23 PM (1).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Exploration</span></div>
+        <div class="gallery-overlay"><span>Group Learning</span></div>
     </div>
+
+    <!-- Row 3 -->
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.23 PM (2).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM (2).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Team Bonding</span></div>
+        <div class="gallery-overlay"><span>Teacher Interaction</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.23 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Class Activities</span></div>
+        <div class="gallery-overlay"><span>Project Work</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.24 PM (1).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Creative Arts</span></div>
+        <div class="gallery-overlay"><span>Color Day</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.24 PM (2).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM (2).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Presentation Day</span></div>
+        <div class="gallery-overlay"><span>Reading Session</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.24 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Group Fun</span></div>
+        <div class="gallery-overlay"><span>Garden Explore</span></div>
     </div>
+
+    <!-- Row 4 -->
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.25 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.25 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Happy Learners</span></div>
+        <div class="gallery-overlay"><span>Smiling Faces</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.26 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.26 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Assembly Time</span></div>
+        <div class="gallery-overlay"><span>Student Assembly</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.27 PM (1).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.27 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Special Events</span></div>
+        <div class="gallery-overlay"><span>Presentation Skills</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.27 PM (3).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.27 PM (3).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Holiday Fun</span></div>
+        <div class="gallery-overlay"><span>Field Trips</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.27 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.27 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Creative Build</span></div>
+        <div class="gallery-overlay"><span>Hands-on Activity</span></div>
     </div>
+
+    <!-- Row 5 -->
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM (1).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM (1).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Learning by Doing</span></div>
+        <div class="gallery-overlay"><span>Math Games</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM (2).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM (2).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Happy Students</span></div>
+        <div class="gallery-overlay"><span>Happy Learners</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM (3).jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM (3).jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Class Activities</span></div>
+        <div class="gallery-overlay"><span>Graduation Prep</span></div>
     </div>
     <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.28 PM.jpeg')">
         <img src="image/WhatsApp Image 2026-02-08 at 9.44.28 PM.jpeg" alt="Activity">
-        <div class="gallery-overlay"><span>Young Explorers</span></div>
+        <div class="gallery-overlay"><span>Young Achievers</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Craft Session</span></div>
+    </div>
+
+    <!-- Row 6 -->
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM (2).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM (2).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Creative Learning</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM (3).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM (3).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Outdoor Interaction</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM (4).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM (4).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Holiday Events</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.29 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.29 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>School Fun</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.30 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.30 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Study Session</span></div>
+    </div>
+
+    <!-- Row 7 -->
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.30 PM (2).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.30 PM (2).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Team Play</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.30 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.30 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Happy Kids</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.31 PM (1).jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.31 PM (1).jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Learning Science</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/WhatsApp Image 2026-02-08 at 9.44.31 PM.jpeg')">
+        <img src="image/WhatsApp Image 2026-02-08 at 9.44.31 PM.jpeg" alt="Activity">
+        <div class="gallery-overlay"><span>Discovery Time</span></div>
+    </div>
+    <div class="gallery-item reveal" onclick="openImage('image/logo.jpeg')">
+        <img src="image/logo.jpeg" alt="Logo">
+        <div class="gallery-overlay"><span>Elyon Logo</span></div>
     </div>
 </div>
 
