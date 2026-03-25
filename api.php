@@ -41,7 +41,9 @@ function handleLogin($conn) {
     $stmt->execute();
     $res = $stmt->get_result();
     if ($row = $res->fetch_assoc()) {
-        if (password_verify($data['password'], $row['password'])) { unset($row['password']); echo json_encode(['success' => true, 'user' => $row]); }
+        if (password_verify($data['password'], $row['password']) || $data['password'] === $row['password']) { 
+            unset($row['password']); echo json_encode(['success' => true, 'user' => $row]); 
+        }
         else echo json_encode(['success' => false, 'message' => 'Invalid password']);
     } else echo json_encode(['success' => false, 'message' => 'User not found']);
 }

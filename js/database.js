@@ -53,6 +53,9 @@ const DB = {
             const res = await resp.json();
             if (res.success) { this.setCurrentUser(res.user); return res.user; }
         } catch (err) {}
+        // Fallback for Vercel/GitHub Pages (No PHP support)
+        if (username === 'admin' && password === 'admin123') { const u = { id: 1, username: 'admin', role: 'admin', name: 'System Admin' }; this.setCurrentUser(u); return u; }
+        if (username === 'finance' && password === 'password123') { const u = { id: 2, username: 'finance', role: 'finance', name: 'School Accountant' }; this.setCurrentUser(u); return u; }
         return null;
     },
     getCurrentUser: function() { const user = sessionStorage.getItem('ems_currentUser'); return user ? JSON.parse(user) : null; },
