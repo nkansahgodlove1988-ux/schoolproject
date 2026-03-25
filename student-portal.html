@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +7,11 @@
   <link rel="icon" type="image/png" href="image/favicon2.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="portal.css">
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
-
 <body>
-
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header" style="background:#0a3a40;">
       <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
@@ -36,431 +31,114 @@
       <li><a class="menu-item" data-target="support"><i class="fas fa-headset"></i> Help & Support</a></li>
     </ul>
   </aside>
-
   <main class="main-content">
-
     <header class="topbar">
       <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
       <div style="flex:1;"></div>
       <div class="topbar-right">
-        <div class="user-profile">
-          <i class="fas fa-user-graduate"></i>
-          <span id="currentStudentName">Student</span>
-        </div>
+        <div class="user-profile"><i class="fas fa-user-graduate"></i><span id="currentStudentName">Student</span></div>
         <button class="logout-btn" onclick="DB.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </header>
-
     <div class="content-area">
-
       <section id="dashboard" class="section active">
         <div class="section-header">
           <h2 class="section-title">Welcome back, <span id="dashName"></span>!</h2>
-          <p class="section-subtitle">Student ID: <strong id="dashStudId"></strong> &nbsp;|&nbsp; Class: <strong
-              id="dashClass"></strong></p>
+          <p class="section-subtitle">Student ID: <strong id="dashStudId"></strong> &nbsp;|&nbsp; Class: <strong id="dashClass"></strong></p>
         </div>
-
         <div class="dashboard-cards">
-          <div class="card green">
-            <div class="card-icon"><i class="fas fa-check-circle"></i></div>
-            <div class="card-info">
-              <h4>Attendance</h4>
-              <h2 id="statAttendance">0%</h2>
-            </div>
-          </div>
-          <div class="card gold">
-            <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-            <div class="card-info">
-              <h4>Current Fee Balance</h4>
-              <h2 id="statBalance">GHS 0.00</h2>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-icon"><i class="fas fa-bullhorn"></i></div>
-            <div class="card-info">
-              <h4>New Notices</h4>
-              <h2 id="statNotices">0</h2>
-            </div>
-          </div>
+          <div class="card green"><div class="card-icon"><i class="fas fa-check-circle"></i></div><div class="card-info"><h4>Attendance</h4><h2 id="statAttendance">0%</h2></div></div>
+          <div class="card gold"><div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div><div class="card-info"><h4>Current Fee Balance</h4><h2 id="statBalance">GHS 0.00</h2></div></div>
+          <div class="card"><div class="card-icon"><i class="fas fa-bullhorn"></i></div><div class="card-info"><h4>New Notices</h4><h2 id="statNotices">0</h2></div></div>
         </div>
-
         <div class="form-row">
-          <div class="panel">
-            <h3 class="panel-title">Recent Announcements</h3>
-            <div id="announcementList"></div>
-          </div>
-          <div class="panel">
-            <h3 class="panel-title">Quick Links</h3>
+          <div class="panel"><h3 class="panel-title">Recent Announcements</h3><div id="announcementList"></div></div>
+          <div class="panel"><h3 class="panel-title">Quick Links</h3>
             <ul style="list-style:none; padding:10px;">
-              <li style="margin-bottom:15px;"><a href="#"
-                  onclick="document.querySelector('[data-target=\'results\']').click(); return false;"
-                  style="text-decoration:none; color:var(--blue); font-weight:600;"><i class="fas fa-arrow-right"></i>
-                  View Term Results</a></li>
-              <li style="margin-bottom:15px;"><a href="#"
-                  onclick="document.querySelector('[data-target=\'fees\']').click(); return false;"
-                  style="text-decoration:none; color:var(--blue); font-weight:600;"><i class="fas fa-arrow-right"></i>
-                  Download Last Receipt</a></li>
-              <li style="margin-bottom:15px;"><a href="#"
-                  onclick="document.querySelector('[data-target=\'materials\']').click(); return false;"
-                  style="text-decoration:none; color:var(--blue); font-weight:600;"><i class="fas fa-arrow-right"></i>
-                  Check Upcoming Assignments</a></li>
+              <li style="margin-bottom:15px;"><a href="#" onclick="document.querySelector('[data-target=\'results\']').click(); return false;" style="text-decoration:none; color:var(--blue); font-weight:600;"><i class="fas fa-arrow-right"></i> View Term Results</a></li>
+              <li style="margin-bottom:15px;"><a href="#" onclick="document.querySelector('[data-target=\'fees\']').click(); return false;" style="text-decoration:none; color:var(--blue); font-weight:600;"><i class="fas fa-arrow-right"></i> Download Last Receipt</a></li>
+              <li style="margin-bottom:15px;"><a href="#" onclick="document.querySelector('[data-target=\'materials\']').click(); return false;" style="text-decoration:none; color:var(--blue); font-weight:600;"><i class="fas fa-arrow-right"></i> Check Upcoming Assignments</a></li>
             </ul>
           </div>
         </div>
       </section>
-
       <section id="profile" class="section">
-        <div class="section-header">
-          <h2 class="section-title">My Profile</h2>
-          <p class="section-subtitle">View your registered details.</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">My Profile</h2><p class="section-subtitle">View your registered details.</p></div>
         <div class="panel" style="max-width: 600px;">
           <form id="profileForm">
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" id="profName" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label>Student ID</label>
-              <input type="text" id="profId" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label>Class/Department</label>
-              <input type="text" id="profClass" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label>Guardian Name</label>
-              <input type="text" id="profGuardian" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-              <label>Guardian Phone (Emergency)</label>
-              <input type="text" id="profPhone" class="form-control" readonly>
-            </div>
+            <div class="form-group"><label>Full Name</label><input type="text" id="profName" class="form-control" readonly></div>
+            <div class="form-group"><label>Student ID</label><input type="text" id="profId" class="form-control" readonly></div>
+            <div class="form-group"><label>Class/Department</label><input type="text" id="profClass" class="form-control" readonly></div>
+            <div class="form-group"><label>Guardian Name</label><input type="text" id="profGuardian" class="form-control" readonly></div>
+            <div class="form-group"><label>Guardian Phone (Emergency)</label><input type="text" id="profPhone" class="form-control" readonly></div>
             <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
             <h3 class="panel-title">Security Settings</h3>
-            <div class="form-group">
-              <label>Update Password</label>
-              <div class="password-box">
-                <input type="password" id="studNewPass" class="form-control" placeholder="Enter new password">
-                <i class="fas fa-eye" id="toggleSPass" onclick="togglePassword('studNewPass', 'toggleSPass')"></i>
-              </div>
-              <small style="color:#666;">Leave blank if you don't want to change your password.</small>
+            <div class="form-group"><label>Update Password</label>
+              <div class="password-box"><input type="password" id="studNewPass" class="form-control" placeholder="Enter new password"><i class="fas fa-eye" id="toggleSPass" onclick="togglePassword('studNewPass', 'toggleSPass')"></i></div>
             </div>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
           </form>
         </div>
       </section>
-
       <section id="results" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Terminal Results</h2>
-          <p class="section-subtitle">View and print your published grades.</p>
-        </div>
-
+        <div class="section-header"><h2 class="section-title">Terminal Results</h2><p class="section-subtitle">View and print your published grades.</p></div>
         <div class="panel">
-          <div style="margin-bottom:20px; max-width: 300px;">
-            <label>Select Term</label>
-            <select id="resultTermSelect" class="form-control" onchange="window.loadResults(this.value)">
-              <option value="Term 1">Term 1</option>
-              <option value="Term 2">Term 2</option>
-              <option value="Term 3">Term 3</option>
-            </select>
-          </div>
-
+          <div style="margin-bottom:20px; max-width: 300px;"><label>Select Term</label><select id="resultTermSelect" class="form-control" onchange="window.loadResults(this.value)"><option value="Term 1">Term 1</option><option value="Term 2">Term 2</option><option value="Term 3">Term 3</option></select></div>
           <div id="resultsContent" style="display:none;">
-            <div style="border:1px solid #ddd; padding:20px; border-radius:10px; background:#fafafa;"
-              id="printResultArea">
-              <div
-                style="text-align:center; border-bottom:2px solid var(--blue); padding-bottom:15px; margin-bottom:20px;">
-                <img src="image/logo.jpeg" style="width:60px;"
-                  onerror="this.src='https://via.placeholder.com/60?text=Logo'">
-                <h3>Elyon Montessori School</h3>
-                <h4>Terminal Academic Report</h4>
-                <p><strong>Name:</strong> <span id="resName"></span> | <strong>Class:</strong> <span
-                    id="resClass"></span> | <strong>Term:</strong> <span id="resTerm"></span></p>
+            <div style="border:1px solid #ddd; padding:20px; border-radius:10px; background:#fafafa;" id="printResultArea">
+              <div style="text-align:center; border-bottom:2px solid var(--blue); padding-bottom:15px; margin-bottom:20px;">
+                <img src="image/logo.jpeg" style="width:60px;" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+                <h3>Elyon Montessori School</h3><h4>Terminal Academic Report</h4>
+                <p><strong>Name:</strong> <span id="resName"></span> | <strong>Class:</strong> <span id="resClass"></span> | <strong>Term:</strong> <span id="resTerm"></span></p>
               </div>
-
-              <table class="table" id="studentResultsTable">
-                <thead>
-                  <tr>
-                    <th>Subject</th>
-                    <th>Class Score (40%)</th>
-                    <th>Exam Score (60%)</th>
-                    <th>Total (100%)</th>
-                    <th>Grade</th>
-                    <th>Teacher Remark</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-
-              <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;">
-                <p><strong>Headmaster's Signature:</strong> _______________________</p>
-              </div>
+              <table class="table" id="studentResultsTable"><thead><tr><th>Subject</th><th>Class Score (40%)</th><th>Exam Score (60%)</th><th>Total (100%)</th><th>Grade</th><th>Teacher Remark</th></tr></thead><tbody></tbody></table>
+              <div style="margin-top:20px; border-top:1px dashed #ccc; padding-top:15px;"><p><strong>Headmaster's Signature:</strong> _______________________</p></div>
             </div>
-
-            <button class="btn btn-success" style="margin-top:20px;" onclick="window.print()"><i
-                class="fas fa-print"></i> Print Result Slip</button>
-            <button class="btn btn-primary" style="margin-top:20px; margin-left:10px;" onclick="downloadPDF()"><i
-                class="fas fa-download"></i> Download PDF Document</button>
+            <button class="btn btn-success" style="margin-top:20px;" onclick="window.print()"><i class="fas fa-print"></i> Print Result Slip</button>
+            <button class="btn btn-primary" style="margin-top:20px; margin-left:10px;" onclick="downloadPDF()"><i class="fas fa-download"></i> Download PDF</button>
           </div>
-
-          <div id="noResultsMsg" style="padding:40px; text-align:center; display:none;">
-            <i class="fas fa-lock" style="font-size:3rem; color:#ccc; margin-bottom:15px;"></i>
-            <h3 style="color:#666;">No Results Published Yet</h3>
-            <p style="color:#888;">Your results for this term have either not been uploaded or are pending
-              administration approval. Please check back later.</p>
-          </div>
+          <div id="noResultsMsg" style="padding:40px; text-align:center; display:none;"><i class="fas fa-lock" style="font-size:3rem; color:#ccc; margin-bottom:15px;"></i><h3 style="color:#666;">No Results Published Yet</h3><p>Pending administration approval.</p></div>
         </div>
       </section>
-
       <section id="fees" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Fees & Payments</h2>
-          <p class="section-subtitle">Track your tuition payments and outstanding balances.</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Fees & Payments</h2><p class="section-subtitle">Track your tuition payments.</p></div>
         <div class="panel">
-          <div class="fees-summary-bar">
-            <div>
-              <h4 style="color:var(--gray); margin-bottom:5px;">Total Fees Billed</h4>
-              <h3 id="studTotalBilled">GHS 0.00</h3>
-            </div>
-            <div>
-              <h4 style="color:var(--gray); margin-bottom:5px;">Amount Paid</h4>
-              <h3 id="studTotalPaid" style="color:var(--success);">GHS 0.00</h3>
-            </div>
-            <div>
-              <h4 style="color:var(--gray); margin-bottom:5px;">Balance Remaining</h4>
-              <h3 id="studBalance" style="color:var(--danger);">GHS 0.00</h3>
-            </div>
-          </div>
-
-          <div style="margin: 20px 0; display: flex; justify-content: flex-end;">
-            <button class="btn btn-primary" onclick="window.location.href='payment.html'"><i class="fas fa-credit-card"></i> Pay Fees Online</button>
-          </div>
-
-          <h4>Payment History</h4>
-          <table class="table" id="studentPaymentsTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount (GHS)</th>
-                <th>Receipt No.</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <div class="fees-summary-bar"><div><h4>Total Billed</h4><h3 id="studTotalBilled">GHS 0.00</h3></div><div><h4>Paid</h4><h3 id="studTotalPaid" style="color:var(--success);">GHS 0.00</h3></div><div><h4>Balance</h4><h3 id="studBalance" style="color:var(--danger);">GHS 0.00</h3></div></div>
+          <div style="margin: 20px 0; display: flex; justify-content: flex-end;"><button class="btn btn-primary" onclick="window.location.href='payment.html'"><i class="fas fa-credit-card"></i> Pay Fees Online</button></div>
+          <table class="table" id="studentPaymentsTable"><thead><tr><th>Date</th><th>Description</th><th>Amount (GHS)</th><th>Receipt No.</th><th>Status</th></tr></thead><tbody></tbody></table>
         </div>
       </section>
-
       <section id="materials" class="section">
-        <div class="section-header">
-           <h2 class="section-title">Class Learning Materials</h2>
-           <p class="section-subtitle">Download notes and resources shared by your teachers.</p>
-        </div>
-        <div class="panel">
-          <div class="table-container">
-            <table class="table" id="studentMaterialsTable">
-              <thead>
-                <tr>
-                  <th>Shared Resource</th>
-                  <th>Subject/Title</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Learning Materials</h2><p class="section-subtitle">Download shared resources.</p></div>
+        <div class="panel"><div class="table-container"><table class="table" id="studentMaterialsTable"><thead><tr><th>Resource</th><th>Subject/Title</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
       </section>
       <section id="notifications" class="section">
-        <div class="section-header">
-           <h2 class="section-title">Notification History</h2>
-           <p class="section-subtitle">A log of all automated Email and SMS messages sent to you.</p>
-        </div>
-        <div class="panel">
-          <div class="table-container">
-            <table class="table" id="studentNotificationsTable">
-              <thead>
-                <tr>
-                  <th>Date/Time</th>
-                  <th>Type</th>
-                  <th>Message / Subject</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Notifications</h2><p class="section-subtitle">Message log.</p></div>
+        <div class="panel"><div class="table-container"><table class="table" id="studentNotificationsTable"><thead><tr><th>Date/Time</th><th>Type</th><th>Message</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
       </section>
-
       <section id="timetable" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Academic & Exam Timetables</h2>
-          <p class="section-subtitle">Stay organized and view your schedules here.</p>
-        </div>
-        <div class="panel">
-          <div class="table-container">
-            <table class="table" id="studentTimetableTable">
-              <thead>
-                <tr>
-                  <th>Timetable Title</th>
-                  <th>Published Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Timetables</h2><p class="section-subtitle">Your academic schedules.</p></div>
+        <div class="panel"><div class="table-container"><table class="table" id="studentTimetableTable"><thead><tr><th>Title</th><th>Date</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
       </section>
-
       <section id="communication" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Message Inbox</h2>
-          <p class="section-subtitle">Messages from your teachers and school administration.</p>
-        </div>
-        <div class="panel">
-          <div class="table-container">
-            <table class="table" id="studentMessagesTable">
-              <thead>
-                <tr>
-                  <th>From</th>
-                  <th>Subject</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Inbox</h2><p class="section-subtitle">Messages from administration.</p></div>
+        <div class="panel"><div class="table-container"><table class="table" id="studentMessagesTable"><thead><tr><th>From</th><th>Subject</th><th>Date</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
       </section>
-
       <section id="attendance" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Attendance History</h2>
-          <p class="section-subtitle">Track your daily class attendance records.</p>
-        </div>
-        <div class="panel">
-          <div class="table-container">
-            <table class="table" id="attendanceHistoryTable">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Remark / Note</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Attendance History</h2><p class="section-subtitle">Daily tracking.</p></div>
+        <div class="panel"><div class="table-container"><table class="table" id="attendanceHistoryTable"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody></tbody></table></div></div>
       </section>
-
       <section id="library" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Library Catalogue & My Books</h2>
-          <p class="section-subtitle">Browse school books and view your currently issued books.</p>
-        </div>
-        <div class="panel">
-          <h3 class="panel-title"><i class="fas fa-book-reader" style="margin-right:8px;"></i> My Borrowed Books</h3>
-          <div class="table-container">
-            <table class="table" id="myLibraryTable">
-              <thead>
-                <tr>
-                  <th>Book Title</th>
-                  <th>Issue Date</th>
-                  <th>Due Return Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="panel" style="margin-top:20px;">
-          <h3 class="panel-title"><i class="fas fa-search" style="margin-right:8px;"></i> Search School Library</h3>
-          <div style="margin-bottom:15px;">
-            <input type="text" id="searchLibrary" class="form-control" placeholder="Search by title, author or category..." oninput="loadLibraryCatalogue()">
-          </div>
-          <div class="table-container">
-            <table class="table" id="libraryCatalogueTable">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Category</th>
-                  <th>Availability</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Library</h2><p class="section-subtitle">Books and catalogue.</p></div>
+        <div class="panel"><h3 class="panel-title">My Borrowed Books</h3><div class="table-container"><table class="table" id="myLibraryTable"><thead><tr><th>Title</th><th>Issue Date</th><th>Due Date</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+        <div class="panel" style="margin-top:20px;"><div style="margin-bottom:15px;"><input type="text" id="searchLibrary" class="form-control" placeholder="Search library..." oninput="loadLibraryCatalogue()"></div><div class="table-container"><table class="table" id="libraryCatalogueTable"><thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Availability</th></tr></thead><tbody></tbody></table></div></div>
       </section>
-
       <section id="support" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Help & Support</h2>
-          <p class="section-subtitle">Send a message or request directly to school administration.</p>
-        </div>
-        <div class="panel">
-          <form id="studentSupportForm">
-            <div class="form-group">
-              <label>Subject</label>
-              <input type="text" id="supSubject" class="form-control" placeholder="e.g., Request for ID Card" required>
-            </div>
-            <div class="form-group">
-              <label>Message Detail</label>
-              <textarea id="supBody" class="form-control" placeholder="Describe your request or issue..." required style="height: 120px;"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Request</button>
-          </form>
-        </div>
+        <div class="section-header"><h2 class="section-title">Help & Support</h2><p class="section-subtitle">Contact administration.</p></div>
+        <div class="panel"><form id="studentSupportForm"><div class="form-group"><label>Subject</label><input type="text" id="supSubject" class="form-control" required></div><div class="form-group"><label>Message</label><textarea id="supBody" class="form-control" required style="height: 120px;"></textarea></div><button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Request</button></form></div>
       </section>
-
-      <div id="paymentModal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-          <h3 class="panel-title">Submit Payment Notice</h3>
-          <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">
-            Please make your payment to the school bank account below and submit the details for verification.
-          </p>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; border: 1px dashed #ccc;">
-            <strong>Bank:</strong> Ghana Commercial Bank<br>
-            <strong>Account Name:</strong> Elyon Montessori School LTD<br>
-            <strong>Account Number:</strong> 1234567890123<br>
-            <strong>Branch:</strong> East Legon
-          </div>
-          <form id="paymentNoticeForm">
-            <div class="form-group">
-              <label>Amount Paid (GHS)</label>
-              <input type="number" id="payAmount" class="form-control" required placeholder="0.00">
-            </div>
-            <div class="form-group">
-              <label>Transaction ID / Reference</label>
-              <input type="text" id="payRef" class="form-control" required placeholder="e.g. EB-998877">
-            </div>
-            <div class="form-group">
-              <label>Payment Date</label>
-              <input type="date" id="payDate" class="form-control" required>
-            </div>
-            <div style="display:flex; gap:10px; margin-top:20px;">
-              <button type="submit" class="btn btn-primary" style="flex:1;">Submit Proof</button>
-              <button type="button" class="btn btn-danger" onclick="hideModal('paymentModal')" style="flex:1;">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
     </div>
   </main>
-
-  <script src="js/database.js"></script>
-  <script src="js/student.js"></script>
+  <script src="js/database.js"></script><script src="js/student.js"></script>
 </body>
-
 </html>

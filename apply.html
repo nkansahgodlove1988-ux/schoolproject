@@ -479,6 +479,12 @@
                                 <input type="text" placeholder="e.g. Nursery, KG2, Primary 1" id="classApplying"
                                     name="classApplying" required>
                             </div>
+
+                            <div class="full-width">
+                                <label for="reportCard">Previous Results / Report Card (PDF or Image)</label>
+                                <input type="file" id="reportCard" name="reportCard" accept=".pdf,image/*" required>
+                                <small style="color: #666; display: block; margin-top: 5px;">Upload a copy of your child's most recent terminal report from their previous school.</small>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -631,6 +637,18 @@
                 return;
             }
 
+            const reportInput = document.getElementById('reportCard');
+            const file = reportInput.files[0];
+            let reportData = '';
+
+            if (file) {
+                const reader = new FileReader();
+                reportData = await new Promise((resolve) => {
+                    reader.onload = (ev) => resolve(ev.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+
             const newUser = await DB.insert('users', {
                 username: email,
                 password: password,
@@ -640,7 +658,6 @@
             });
 
             if (newUser) {
-                
                 await DB.insert('admissions', {
                     userId: newUser.id,
                     childName: document.getElementById('childName').value,
@@ -649,13 +666,15 @@
                     gender: document.getElementById('gender').value,
                     previousSchool: document.getElementById('previousSchool').value,
                     classApplying: document.getElementById('classApplying').value,
+                    reportCard: reportData,
                     pname: document.getElementById('pname').value,
                     rchild: document.getElementById('rchild').value,
                     pnumber: document.getElementById('pnumber').value,
                     email: email,
                     occupation: document.getElementById('occupation').value,
                     residentialAddress: document.getElementById('residentialAddress').value,
-                    status: 'pending'
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
                 });
 
                 await DB.logAction('New Admission Application', `Child: ${document.getElementById('childName').value}, Email: ${email}`);

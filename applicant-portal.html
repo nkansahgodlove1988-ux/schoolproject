@@ -1,24 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Applicant Portal | Elyon Montessori</title>
   <link rel="icon" type="image/png" href="image/favicon2.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="portal.css">
 </head>
-
 <body>
-
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
-      <h2>Applicant Portal</h2>
-    </div>
+    <div class="sidebar-header"><img src="image/logo.jpeg" alt="Logo"><h2>Applicant Portal</h2></div>
     <ul class="sidebar-menu">
       <li><a class="menu-item active" data-target="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
       <li><a class="menu-item" data-target="status"><i class="fas fa-search"></i> Check Status</a></li>
@@ -26,208 +18,77 @@
       <li><a class="menu-item" data-target="security"><i class="fas fa-lock"></i> Security</a></li>
     </ul>
   </aside>
-
   <main class="main-content">
-
     <header class="topbar">
       <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
       <div style="flex:1;"></div>
       <div class="topbar-right">
-        <div class="user-profile">
-          <i class="fas fa-user"></i>
-          <span id="currentApplicantName">Applicant</span>
-        </div>
-        <button class="logout-btn" onclick="DB.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <div class="user-profile"><i class="fas fa-user"></i><span id="currentApplicantName">Applicant</span></div>
+        <button class="logout-btn" onclick="DB.logout()">Logout</button>
       </div>
     </header>
-
     <div class="content-area">
-
       <section id="dashboard" class="section active">
-        <div class="section-header">
-          <h2 class="section-title">Welcome to Elyon Montessori</h2>
-          <p class="section-subtitle">Track your application and prepare for admission.</p>
-        </div>
-
+        <div class="section-header"><h2 class="section-title">Welcome to Elyon Montessori</h2><p class="section-subtitle">Track your application.</p></div>
         <div class="panel">
-          <h3 class="panel-title">Application Status Overview</h3>
           <div style="text-align:center; padding: 40px;">
             <i id="statusIcon" class="fas fa-clock" style="font-size: 4rem; color: #f39c12; margin-bottom: 20px;"></i>
-            <h2 id="statusText" style="color: #333; margin-bottom: 15px;">Your application is under review.</h2>
-            <p style="color: #666; max-width: 600px; margin: 0 auto;">We have received your details and our admission
-              board is currently reviewing your file. You will be notified of any updates.</p>
+            <h2 id="statusText">Under Review</h2>
+            <p>We are reviewing your application. You will be notified of any updates.</p>
           </div>
         </div>
       </section>
-
       <section id="status" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Application Details</h2>
-          <p class="section-subtitle">A copy of the information you submitted.</p>
-        </div>
-        <div class="panel">
-          <div id="applicationDetails" style="font-size: 1rem; line-height: 1.8; color: #444;"></div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Application Details</h2></div>
+        <div class="panel"><div id="applicationDetails"></div></div>
       </section>
-
       <section id="letter" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Admission Letter</h2>
-          <p class="section-subtitle">Download your official admission letter.</p>
-        </div>
-        <div class="panel" id="letterPanel">
-          <p>Your admission letter is not available yet. Please wait for your application to be approved.</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Admission Letter</h2></div>
+        <div class="panel" id="letterPanel"><p>Your admission letter is not available yet.</p></div>
       </section>
-
       <section id="security" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Security Settings</h2>
-          <p class="section-subtitle">Manage your account password.</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Security</h2></div>
         <div class="panel" style="max-width: 500px;">
           <form id="passForm">
-            <div class="form-group">
-              <label>Update Password</label>
-              <div class="password-box">
-                <input type="password" id="appNewPass" class="form-control" placeholder="Enter new password" required>
-                <i class="fas fa-eye" id="toggleP" onclick="togglePassword('appNewPass', 'toggleP')"></i>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            <div class="form-group"><label>New Password</label><div class="password-box"><input type="password" id="appNewPass" class="form-control" required><i class="fas fa-eye" id="toggleP" onclick="togglePassword('appNewPass', 'toggleP')"></i></div></div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
         </div>
       </section>
-
     </div>
   </main>
-
   <script src="js/database.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      await DB.init();
-      const user = DB.requireAuth('applicant');
-      if (!user) return;
+      await DB.init(); const user = DB.requireAuth('applicant'); if (!user) return;
       document.getElementById('currentApplicantName').innerText = user.name || 'Applicant';
-
-      const menuItems = document.querySelectorAll('.menu-item');
-      const sections = document.querySelectorAll('.section');
-      const sidebar = document.getElementById('sidebar');
-      const toggleBtn = document.getElementById('toggleSidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-
-      function closeSidebar() {
-        sidebar.classList.remove('show');
-        if (overlay) overlay.classList.remove('active');
-      }
-
+      const menuItems = document.querySelectorAll('.menu-item'); const sections = document.querySelectorAll('.section'); const sidebar = document.getElementById('sidebar');
       menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
-          e.preventDefault();
-          menuItems.forEach(mi => mi.classList.remove('active'));
-          item.classList.add('active');
-          const target = item.getAttribute('data-target');
-          sections.forEach(sec => {
-            if (sec.id === target) sec.classList.add('active');
-            else sec.classList.remove('active');
-          });
-          if (window.innerWidth <= 768) closeSidebar();
+          e.preventDefault(); menuItems.forEach(mi => mi.classList.remove('active')); item.classList.add('active'); const target = item.getAttribute('data-target');
+          sections.forEach(sec => { if (sec.id === target) sec.classList.add('active'); else sec.classList.remove('active'); });
+          if (window.innerWidth <= 768) sidebar.classList.remove('show');
         });
       });
-
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-          sidebar.classList.toggle('show');
-          if (overlay) overlay.classList.toggle('active');
-        });
-      }
-
-      if (overlay) {
-        overlay.addEventListener('click', closeSidebar);
-      }
-
+      document.getElementById('toggleSidebar').addEventListener('click', () => { sidebar.classList.toggle('show'); });
       const admission = DB.findOne('admissions', { userId: user.id });
       if (admission) {
-        
-        const icon = document.getElementById('statusIcon');
-        const text = document.getElementById('statusText');
-
+        const icon = document.getElementById('statusIcon'); const text = document.getElementById('statusText');
         if (admission.status === 'approved') {
-          icon.className = 'fas fa-check-circle';
-          icon.style.color = '#28a745';
-          text.innerText = 'Congratulations! Your application is Approved.';
-
+          icon.className = 'fas fa-check-circle'; icon.style.color = '#28a745'; text.innerText = 'Approved';
           const student = DB.findOne('students', { admissionId: admission.id });
-          const studentMsg = student ? 
-            `<div style="margin-top:20px; padding:15px; background:rgba(0,51,102,0.05); border-radius:8px; border-left:4px solid var(--blue);">
-              <p style="margin:0; font-weight:700; color:var(--blue);">Your New Portal Credentials:</p>
-              <p style="margin:5px 0 0;"><strong>Username (Student ID):</strong> ${student.studentId}</p>
-              <p style="margin:2px 0 0;"><strong>Default Password:</strong> password123</p>
-              <p style="margin:10px 0 0; font-size:0.85rem; color:#666;">Use these to log in to the Student Portal from the main login page.</p>
-            </div>` : '';
-
-          document.getElementById('letterPanel').innerHTML = `
-            <div style="border: 2px solid #eee; padding: 40px; border-radius: 10px; background: #fafafa; text-align: center;">
-              <img src="image/logo.jpeg" alt="Logo" style="width: 80px; margin-bottom: 20px;">
-              <h2>OFFICIAL ADMISSION LETTER</h2>
-              <p style="margin-top: 20px; font-size: 1.1rem;">Dear Guardian of <strong>${admission.childName}</strong>,</p>
-              <p style="margin-top: 15px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-                We are pleased to inform you that your ward has been offered admission into <strong>${admission.classApplying}</strong> at Elyon Montessori School.
-              </p>
-              ${studentMsg}
-              <button class="btn btn-primary" style="margin-top: 30px;" onclick="window.print()"><i class="fas fa-print"></i> Print Letter</button>
-            </div>
-          `;
-        } else if (admission.status === 'rejected') {
-          icon.className = 'fas fa-times-circle';
-          icon.style.color = '#e74c3c';
-          text.innerText = 'We regret to inform you that your application was declined.';
-        }
-
-        document.getElementById('applicationDetails').innerHTML = `
-          <div class="form-row">
-            <div>
-              <strong>Child's Name:</strong> ${admission.childName}<br>
-              <strong>Class Applied:</strong> ${admission.classApplying}<br>
-              <strong>Date of Birth:</strong> ${admission.dob}<br>
-              <strong>Gender:</strong> ${admission.gender}
-            </div>
-            <div>
-              <strong>Guardian Name:</strong> ${admission.pname || admission.guardianName || 'N/A'}<br>
-              <strong>Contact Phone:</strong> ${admission.pnumber || admission.guardianPhone || 'N/A'}<br>
-              <strong>Email:</strong> ${admission.email || 'N/A'}
-            </div>
-          </div>
-        `;
-      } else {
-        document.getElementById('statusText').innerText = "No application found. Please ensure you submitted the form properly.";
+          const sm = student ? `<p><strong>ID:</strong> ${student.studentId}<br><strong>Pass:</strong> password123</p>` : '';
+          document.getElementById('letterPanel').innerHTML = `<div style="text-align:center;"><h2>Admission Letter</h2><p>Dear ${admission.childName}, you are admitted to ${admission.classApplying}.</p>${sm}<button class="btn btn-primary" onclick="window.print()">Print</button></div>`;
+        } else if (admission.status === 'rejected') { icon.className = 'fas fa-times-circle'; icon.style.color = '#e74c3c'; text.innerText = 'Declined'; }
+        document.getElementById('applicationDetails').innerHTML = `<p>Child: ${admission.childName}<br>Class: ${admission.classApplying}<br>Guardian: ${admission.pname || admission.guardianName}</p>`;
       }
-
-      const passForm = document.getElementById('passForm');
-      if (passForm) {
-        passForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const newPass = document.getElementById('appNewPass').value;
-          await DB.update('users', user.id, { password: newPass });
-          await DB.logAction('Applicant: Password Updated', `User: ${user.name}`);
-          alert('Password updated successfully!');
-          passForm.reset();
-        });
-      }
+      document.getElementById('passForm').addEventListener('submit', async (e) => { e.preventDefault(); await DB.update('users', user.id, { password: document.getElementById('appNewPass').value }); alert('Updated!'); });
     });
-
-    function togglePassword(inputId, iconId) {
-      const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
+    function togglePassword(i, c) {
+      const input = document.getElementById(i); const icon = document.getElementById(c);
+      if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+      else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
     }
   </script>
 </body>
-
 </html>

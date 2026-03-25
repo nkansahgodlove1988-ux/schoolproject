@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', async () => {
     await DB.init();
     const user = DB.requireAuth('teacher');
@@ -39,15 +37,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (target === 'materials') loadMaterials();
             if (target === 'timetable') loadTimetables();
             if (target === 'communication') loadTeacherMessages();
-            if (target === 'salary') {
-                
-            }
-            if(target === 'fees') {
+            if (target === 'fees') {
                 document.getElementById('feeResultArea').style.display = 'none';
                 document.getElementById('feeNotFound').style.display = 'none';
                 document.getElementById('searchFeeStudId').value = '';
             }
-            if(target === 'timetable') loadTimetables();
             if(target === 'attendance') {
                 document.getElementById('attDate').valueAsDate = new Date();
                 loadAttendanceGrid();
@@ -68,8 +62,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const classSelect = document.getElementById('classSelect').value;
         window.loadStudentsForClass(classSelect);
     });
-
-    loadAnnouncements();
 
     const msgForm = document.getElementById('msgForm');
     if(msgForm) {
@@ -207,7 +199,6 @@ function loadTeacherDashboard() {
         });
 
         if (gradeSubjectSelect && gradeSubjectSelect.options.length <= 1) {
-            
             const dbSubjects = DB.getTable('subjects');
             const teacherClasses = teacherRec.classes;
             const relevantSubjects = dbSubjects.filter(s =>
@@ -217,10 +208,8 @@ function loadTeacherDashboard() {
             if (relevantSubjects.length > 0) {
                 relevantSubjects.forEach(s => gradeSubjectSelect.add(new Option(s.name, s.name)));
             } else if (teacherRec.subjects.length > 0) {
-                
                 teacherRec.subjects.forEach(s => gradeSubjectSelect.add(new Option(s, s)));
             } else {
-                
                 ['Mathematics', 'English Language', 'Science', 'R.M.E', 'Social Studies', 'ICT', 'French'].forEach(s => {
                     gradeSubjectSelect.add(new Option(s, s));
                 });
@@ -237,7 +226,6 @@ function loadTeacherDashboard() {
                     if (t.isActive) gradeTermSelect.value = opt.value;
                 });
             } else {
-                
                 ['1st Term 2024/25', '2nd Term 2024/25', '3rd Term 2024/25'].forEach(t => {
                     gradeTermSelect.add(new Option(t, t));
                 });
@@ -252,7 +240,6 @@ function loadTeacherMessages() {
     tbody.innerHTML = '';
 
     const user = DB.getCurrentUser();
-
     const msgs = DB.getTable('messages').filter(m => 
         m.receiverRole === 'teachers' || 
         m.receiverRole === 'all'
@@ -401,7 +388,6 @@ window.loadGradeEntryGrid = function() {
     document.getElementById('gradeEntryArea').style.display = 'block';
 
     students.forEach(s => {
-        
         let existing = DB.findOne('results', { studentId: s.studentId, subject: sub, term });
         const isPublished = existing && existing.status === 'published';
         const isSubmitted = existing && existing.status === 'submitted';
@@ -442,10 +428,8 @@ window.loadGradeEntryGrid = function() {
             const calc = () => {
                 const classV = parseFloat(cInp.value) || 0;
                 const examV = parseFloat(eInp.value) || 0;
-
                 if(classV > 40) cInp.value = 40;
                 if(examV > 60) eInp.value = 60;
-
                 const t = (parseFloat(cInp.value)||0) + (parseFloat(eInp.value)||0);
                 totalSp.innerText = t;
                 const grade = getGrade(t);
@@ -481,36 +465,26 @@ window.submitGrades = async function() {
     for (const tr of rows) {
         const classInp = tr.querySelector('.g-class');
         if(classInp.disabled) continue; 
-
         const studentId = tr.querySelector('.g-studId').value;
         const studentName = tr.querySelector('.g-studName').value;
         const classScoreStr = classInp.value;
         const examScoreStr = tr.querySelector('.g-exam').value;
-        
         if(!classScoreStr && !examScoreStr) continue; 
-
         const classScore = parseFloat(classScoreStr) || 0;
         const examScore = parseFloat(examScoreStr) || 0;
         const total = classScore + examScore;
         const remark = tr.querySelector('.g-remark').value;
-
         const existing = DB.findOne('results', { studentId, subject: sub, term });
-        
         const data = {
             studentId, studentName, classId: cls, subject: sub, term,
             classScore, examScore, total, remark,
             teacherId: user.id, teacherName: user.name,
             status: 'submitted' 
         };
-
-        if(existing) {
-            await DB.update('results', existing.id, data);
-        } else {
-            await DB.insert('results', data);
-        }
+        if(existing) { await DB.update('results', existing.id, data); }
+        else { await DB.insert('results', data); }
         savedCount++;
     }
-
     await DB.logAction('Submitted Grades', `Class: ${cls}, Subject: ${sub}, Students: ${savedCount}`);
     alert(`Successfully submitted ${savedCount} student grades to Administration for approval.`);
     window.loadGradeEntryGrid(); 
@@ -521,12 +495,10 @@ function loadAnnouncements() {
     if(!list) return;
     list.innerHTML = '';
     const anns = DB.getTable('announcements').filter(a => a.target === 'all' || a.target === 'teachers').sort((a,b) => new Date(b.date) - new Date(a.date));
-    
     if(anns.length === 0) {
         list.innerHTML = '<p style="color:#666; padding: 10px 0;">No new announcements.</p>';
         return;
     }
-
     anns.slice(0, 5).forEach(a => {
         const div = document.createElement('div');
         div.style.padding = '12px 0';
@@ -566,32 +538,17 @@ window.checkStudentFees = function() {
     const resArea = document.getElementById('feeResultArea');
     const notFound = document.getElementById('feeNotFound');
     const tbody = document.querySelector('#teacherFeeTable tbody');
-
-    if(!studId) {
-        alert("Please enter a Student ID.");
-        return;
-    }
-
+    if(!studId) { alert("Please enter a Student ID."); return; }
     const student = DB.findOne('students', { studentId: studId });
-    if(!student) {
-        resArea.style.display = 'none';
-        notFound.style.display = 'block';
-        return;
-    }
-
+    if(!student) { resArea.style.display = 'none'; notFound.style.display = 'block'; return; }
     notFound.style.display = 'none';
     resArea.style.display = 'block';
     document.getElementById('feeResName').innerText = student.name;
-
     let tuitionFee = 0;
     const cls = DB.getTable('classes').find(c => c.id === student.classId || c.name === student.className);
-    if (cls && cls.tuitionFee) {
-        tuitionFee = cls.tuitionFee;
-    }
-
+    if (cls && cls.tuitionFee) { tuitionFee = cls.tuitionFee; }
     const payments = DB.find('payments', { studentId: studId });
     let totalPaid = 0;
-    
     tbody.innerHTML = '';
     if(payments.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No payments recorded for this student.</td></tr>';
@@ -608,7 +565,6 @@ window.checkStudentFees = function() {
             tbody.appendChild(tr);
         });
     }
-
     const balance = (tuitionFee + (student.arrears || 0)) - totalPaid;
     document.getElementById('feeResPaid').innerHTML = `
         <span style="color:var(--success)">Paid: GHS ${totalPaid.toFixed(2)}</span><br>
@@ -621,14 +577,11 @@ function loadTimetables() {
     const tbody = document.querySelector('#teacherTimetableTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-
     const tts = DB.getTable('timetables').filter(tt => tt.target === 'all' || tt.target === 'teachers').sort((a,b) => new Date(b.date) - new Date(a.date));
-
     if(tts.length === 0) {
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No timetables published for teachers yet.</td></tr>';
         return;
     }
-
     tts.forEach(tt => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -647,23 +600,16 @@ window.loadAttendanceGrid = function() {
     const cls = document.getElementById('attClassSelect').value;
     const date = document.getElementById('attDate').value;
     const tbody = document.querySelector('#attendanceTable tbody');
-    
     if(!cls || !date) return;
-
     tbody.innerHTML = '';
     document.getElementById('attendanceGridArea').style.display = 'block';
-
     const students = DB.find('students', { className: cls });
-    
     if(students.length === 0) {
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No students found in this class.</td></tr>';
         return;
     }
-
     students.forEach(s => {
-        
         const existing = DB.findOne('attendance', { studentId: s.studentId, date: date });
-        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
@@ -688,37 +634,27 @@ window.saveAttendance = async function() {
     const cls = document.getElementById('attClassSelect').value;
     const date = document.getElementById('attDate').value;
     const user = DB.getCurrentUser();
-
     if(!cls || !date) return;
-
     const rows = document.querySelectorAll('#attendanceTable tbody tr');
     let count = 0;
-
     for (const tr of rows) {
         const studentId = tr.querySelector('.att-studId').value;
         const studentName = tr.querySelector('.att-studName').value;
         const status = tr.querySelector('.att-status').value;
         const remark = tr.querySelector('.att-remark').value;
-
         const activeTerm = DB.getTable('terms').find(t => t.isActive);
         const termName = activeTerm ? `${activeTerm.name} - ${activeTerm.year}` : new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
-
         const data = {
             studentId, studentName, className: cls,
             date, status, remark,
             teacherId: user.id,
             term: termName
         };
-
         const existing = DB.findOne('attendance', { studentId, date });
-        if(existing) {
-            await DB.update('attendance', existing.id, data);
-        } else {
-            await DB.insert('attendance', data);
-        }
+        if(existing) { await DB.update('attendance', existing.id, data); }
+        else { await DB.insert('attendance', data); }
         count++;
     }
-
     await DB.logAction('Marked Attendance', `Class: ${cls}, Date: ${date}, Students: ${count}`);
     alert(`Attendance for ${count} students saved successfully!`);
 }

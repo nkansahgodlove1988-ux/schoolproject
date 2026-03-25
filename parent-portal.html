@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="portal.css">
 </head>
-
 <body>
-
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header" style="background:#8B0000;">
       <img src="image/logo.jpeg" alt="Logo" onerror="this.src='https://via.placeholder.com/45?text=Logo'">
@@ -28,165 +24,58 @@
       <li><a class="menu-item" data-target="communication"><i class="fas fa-comments"></i> Admin & Teachers</a></li>
     </ul>
   </aside>
-
   <main class="main-content">
-
     <header class="topbar">
       <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
       <div style="flex:1;"></div>
       <div class="topbar-right">
-        <div class="user-profile">
-          <i class="fas fa-user-circle"></i>
-          <span id="currentParentName">Parent Name</span>
-        </div>
+        <div class="user-profile"><i class="fas fa-user-circle"></i><span id="currentParentName">Parent Name</span></div>
         <button class="logout-btn" onclick="DB.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </header>
-
     <div class="content-area">
-
       <section id="dashboard" class="section active">
         <div class="section-header">
           <h2 class="section-title">Welcome, <span id="dashParentName"></span>!</h2>
-          <p class="section-subtitle">Overseeing the progress of <strong id="wardName">Child Name</strong></p>
+          <p class="section-subtitle">Overseeing <strong id="wardName">Child Name</strong></p>
         </div>
-
         <div class="dashboard-cards">
-            <div class="card gold">
-              <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-              <div class="card-info">
-                <h4>Ward Fee Balance</h4>
-                <h2 id="wardBalance">GHS 0.00</h2>
-              </div>
-            </div>
-          <div class="card green">
-            <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
-            <div class="card-info">
-              <h4>Last Attendance</h4>
-              <h2 id="lastAttendance">--</h2>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-icon"><i class="fas fa-star"></i></div>
-            <div class="card-info">
-              <h4>Skill Mastery</h4>
-              <h2 id="avgMastery">85%</h2>
-            </div>
-          </div>
+          <div class="card gold"><div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div><div class="card-info"><h4>Fee Balance</h4><h2 id="wardBalance">GHS 0.00</h2></div></div>
+          <div class="card green"><div class="card-icon"><i class="fas fa-clipboard-check"></i></div><div class="card-info"><h4>Attendance</h4><h2 id="lastAttendance">--</h2></div></div>
+          <div class="card"><div class="card-icon"><i class="fas fa-star"></i></div><div class="card-info"><h4>Mastery</h4><h2 id="avgMastery">85%</h2></div></div>
         </div>
-
         <div class="form-row">
-          <div class="panel">
-            <h3 class="panel-title">Latest School Notices</h3>
-            <div id="schoolNotices"></div>
-          </div>
-          <div class="panel">
-            <h3 class="panel-title">Quick Actions</h3>
+          <div class="panel"><h3 class="panel-title">Notices</h3><div id="schoolNotices"></div></div>
+          <div class="panel"><h3 class="panel-title">Quick Actions</h3>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:10px;">
-                <button class="btn btn-primary" onclick="window.location.href='payment.html'"><i class="fas fa-credit-card"></i> Pay Fees</button>
-                <button class="btn btn-outline" onclick="document.querySelector('[data-target=\'performance\']').click();"><i class="fas fa-file-alt"></i> Report Card</button>
-                <button class="btn btn-success" style="grid-column: span 2;" onclick="document.querySelector('[data-target=\'communication\']').click();"><i class="fas fa-comment-dots"></i> Message School</button>
+              <button class="btn btn-primary" onclick="window.location.href='payment.html'"><i class="fas fa-credit-card"></i> Pay Fees</button>
+              <button class="btn btn-outline" onclick="document.querySelector('[data-target=\'performance\']').click();"><i class="fas fa-file-alt"></i> Report Card</button>
             </div>
           </div>
         </div>
       </section>
-
       <section id="ward-profile" class="section">
-        <div class="section-header">
-          <h2 class="section-title">Ward Profile</h2>
-          <p class="section-subtitle">Information about your child's enrollment.</p>
-        </div>
-        <div class="panel" style="max-width: 600px;">
-            <div id="wardDetails" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:15px;">
-                <!-- Filled by JS -->
-            </div>
-        </div>
+        <div class="section-header"><h2 class="section-title">Ward Profile</h2></div>
+        <div class="panel" style="max-width: 600px;"><div id="wardDetails" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:15px;"></div></div>
       </section>
-
-      <section id="performance" class="section">
-        <div class="section-header">
-           <h2 class="section-title">Academic & Skill Progress</h2>
-           <p class="section-subtitle">Tracking mastery and terminal grades.</p>
-        </div>
-        <div class="panel">
-            <div id="performanceContent"></div>
-        </div>
-      </section>
-
+      <section id="performance" class="section"><div class="section-header"><h2 class="section-title">Progress</h2></div><div class="panel"><div id="performanceContent"></div></div></section>
       <section id="fees" class="section">
-        <div class="section-header">
-           <h2 class="section-title">Fee Management</h2>
-           <p class="section-subtitle">Track payments and outstanding balances for your ward.</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Fee Management</h2></div>
         <div class="panel">
-           <div class="fees-summary-bar">
-             <div><h4>Amount Paid</h4><h3 id="pTotalPaid" style="color:var(--success);">GHS 0.00</h3></div>
-             <div><h4>Balance Due</h4><h3 id="pTotalBalance" style="color:var(--danger);">GHS 0.00</h3></div>
-             <div><button class="btn btn-primary" onclick="window.location.href='payment.html'">Pay Fees Online</button></div>
-           </div>
-           <table class="table" id="parentPaymentsTable">
-             <thead>
-               <tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr>
-             </thead>
-             <tbody></tbody>
-           </table>
+          <div class="fees-summary-bar"><div><h4>Paid</h4><h3 id="pTotalPaid" style="color:var(--success);">GHS 0.00</h3></div><div><h4>Due</h4><h3 id="pTotalBalance" style="color:var(--danger);">GHS 0.00</h3></div><div><button class="btn btn-primary" onclick="window.location.href='payment.html'">Pay Now</button></div></div>
+          <table class="table" id="parentPaymentsTable"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody></tbody></table>
         </div>
       </section>
-
-      <section id="attendance" class="section">
-        <div class="section-header">
-           <h2 class="section-title">Attendance History</h2>
-           <p class="section-subtitle">Visual tracking of ward's school attendance.</p>
-        </div>
-        <div class="panel">
-           <table class="table" id="parentAttendanceTable">
-             <thead>
-               <tr><th>Date</th><th>Status</th><th>Remark</th></tr>
-             </thead>
-             <tbody></tbody>
-           </table>
-        </div>
-      </section>
-
+      <section id="attendance" class="section"><div class="section-header"><h2 class="section-title">Attendance</h2></div><div class="panel"><table class="table" id="parentAttendanceTable"><thead><tr><th>Date</th><th>Status</th><th>Remark</th></tr></thead><tbody></tbody></table></div></section>
       <section id="communication" class="section">
-        <div class="section-header">
-           <h2 class="section-title">Communication Center</h2>
-           <p class="section-subtitle">Send messages directly to teachers or school admin.</p>
-        </div>
+        <div class="section-header"><h2 class="section-title">Communication</h2></div>
         <div class="form-row">
-            <div class="panel">
-                <h3 class="panel-title">Compose Message</h3>
-                <form id="parentMsgForm">
-                    <div class="form-group">
-                        <label>To:</label>
-                        <select id="pMsgTo" class="form-control" required>
-                            <option value="admin">School Administration</option>
-                            <option value="teacher">Class Teacher</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Subject:</label>
-                        <input type="text" id="pMsgSubject" class="form-control" placeholder="e.g. Leave of Absence" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Message Body:</label>
-                        <textarea id="pMsgBody" class="form-control" style="height:100px;" placeholder="Type your message..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button>
-                </form>
-            </div>
-            <div class="panel">
-                <h3 class="panel-title">Message History</h3>
-                <div id="parentMessageList"></div>
-            </div>
+          <div class="panel"><h3 class="panel-title">Message</h3><form id="parentMsgForm"><div class="form-group"><label>To:</label><select id="pMsgTo" class="form-control" required><option value="admin">Administration</option><option value="teacher">Teacher</option></select></div><div class="form-group"><label>Subject:</label><input type="text" id="pMsgSubject" class="form-control" required></div><div class="form-group"><label>Body:</label><textarea id="pMsgBody" class="form-control" style="height:100px;" required></textarea></div><button type="submit" class="btn btn-primary">Send</button></form></div>
+          <div class="panel"><h3 class="panel-title">History</h3><div id="parentMessageList"></div></div>
         </div>
       </section>
-
     </div>
   </main>
-
-  <script src="js/database.js"></script>
-  <script src="js/parent.js"></script>
+  <script src="js/database.js"></script><script src="js/parent.js"></script>
 </body>
-
 </html>
