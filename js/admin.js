@@ -239,19 +239,23 @@ function setupForms() {
             const classId = document.getElementById('sClass').value;
             const className = document.getElementById('sClass').options[document.getElementById('sClass').selectedIndex].text;
             const gender = document.getElementById('sGender').value;
+            const sEmail = document.getElementById('sEmail').value;
+            const sPhone = document.getElementById('sPhone').value;
             const gName = document.getElementById('sGName').value;
+            const gEmail = document.getElementById('sGEmail').value;
             const gPhone = document.getElementById('sGPhone').value;
             const arrears = document.getElementById('sArrears').value;
 
             const studentId = DB.generateUniqueId('STU', 'students');
             const newUser = await DB.insert('users', {
-                username: studentId, password: 'password123', role: 'student', name, status: 'active'
+                username: studentId, password: 'password123', role: 'student', name, status: 'active', email: sEmail
             });
 
             if (newUser) {
                 await DB.insert('students', {
                     user_id: newUser.id, student_id: studentId, name, class_id: classId, class_name: className,
-                    gender, guardian_name: gName, guardian_phone: gPhone, arrears: parseFloat(arrears) || 0, status: 'active'
+                    gender, email: sEmail, phone: sPhone, guardian_name: gName, parent_email: gEmail, parent_phone: gPhone, 
+                    arrears: parseFloat(arrears) || 0, status: 'active'
                 });
             }
 
@@ -259,6 +263,43 @@ function setupForms() {
             hideModal('studentModal');
             document.getElementById('formAddStudent').reset();
             loadStudents();
+        });
+    }
+
+    const broadForm = document.getElementById('formBroadCast');
+    if (broadForm) {
+        broadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = broadForm.querySelector('button');
+            const data = {
+                title: document.getElementById('broadTitle').value,
+                body: document.getElementById('broadMessage').value,
+                target: document.getElementById('broadTarget').value,
+                notification_type: document.getElementById('broadMethod').value
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Broadcasting...';
+
+            try {
+                const resp = await fetch('api.php?action=send_announcement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const res = await resp.json();
+                if (res.success) {
+                    alert('Announcement broadcasted successfully via ' + data.notification_type + '!');
+                    hideModal('announcementNotifModal');
+                    broadForm.reset();
+                    loadAnnouncements();
+                }
+            } catch (err) {
+                alert('Broadcast failed: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bullhorn"></i> Send Notifications';
+            }
         });
     }
 
@@ -791,11 +832,14 @@ window.approveAdmission = async function (id) {
                 admissionId: adm.id,
                 studentId,
                 name: adm.childName,
+                email: adm.email || '',
+                phone: adm.phone || '',
                 classId: adm.classApplying, 
                 className: adm.classApplying,
                 gender: adm.gender || '-',
                 guardianName: adm.pname || adm.guardianName,
-                guardianPhone: adm.pnumber || adm.guardianPhone,
+                parent_email: adm.email || '', 
+                parent_phone: adm.pnumber || adm.guardianPhone,
                 status: 'active'
             });
         }

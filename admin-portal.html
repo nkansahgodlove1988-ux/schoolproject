@@ -841,19 +841,75 @@
             <option value="Female">Female</option>
           </select>
         </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Student Email</label>
+            <input type="email" id="sEmail" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Student Phone</label>
+            <input type="tel" id="sPhone" class="form-control">
+          </div>
+        </div>
         <div class="form-group">
           <label>Guardian Name</label>
           <input type="text" id="sGName" class="form-control" required>
         </div>
-        <div class="form-group">
-          <label>Guardian Phone</label>
-          <input type="tel" id="sGPhone" class="form-control" required>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Guardian Email (Parent)</label>
+            <input type="email" id="sGEmail" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Guardian Phone (Parent)</label>
+            <input type="tel" id="sGPhone" class="form-control" required>
+          </div>
         </div>
         <div class="form-group">
           <label>Arrears / Previous Balance (GHS)</label>
           <input type="number" id="sArrears" class="form-control" value="0">
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%">Register Student</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="announcementNotifModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Broadcast Notification</h3>
+        <button class="close-modal" onclick="hideModal('announcementNotifModal')">&times;</button>
+      </div>
+      <form id="formBroadCast">
+        <div class="form-group">
+          <label>Announcement Title</label>
+          <input type="text" id="broadTitle" class="form-control" placeholder="e.g. School Reopening Date" required>
+        </div>
+        <div class="form-group">
+          <label>Notification Message</label>
+          <textarea id="broadMessage" class="form-control" style="height:100px;" placeholder="Message for SMS/Email..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Target Audience</label>
+          <select id="broadTarget" class="form-control">
+            <option value="all">All Students & Parents</option>
+            <option value="JHS 1">JHS 1</option>
+            <option value="JHS 2">JHS 2</option>
+            <option value="JHS 3">JHS 3</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Delivery Method</label>
+          <select id="broadMethod" class="form-control">
+            <option value="email">Email Only</option>
+            <option value="sms">SMS Only</option>
+            <option value="both">Both Email & SMS</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%"><i class="fas fa-bullhorn" style="margin-right:8px;"></i> Send Notifications</button>
+      </form>
+    </div>
+  </div>
       </form>
     </div>
   </div>

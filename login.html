@@ -382,6 +382,12 @@
         <h3>Finance Portal</h3>
         <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Manage fees, expenses, and financial reports.</p>
       </div>
+
+      <div class="portal-card" style="border-top-color: #8B0000;" onclick="openLogin('parent')">
+        <i class="fas fa-users" style="color: #8B0000;"></i>
+        <h3>Parent Portal</h3>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Monitor ward's progress, pay fees, and message teachers.</p>
+      </div>
     </div>
 
     <div class="login-form-container" id="loginFormContainer">
@@ -460,6 +466,11 @@
         icon.className = 'fas fa-wallet';
         icon.style.color = '#27ae60';
         document.getElementById('username').placeholder = 'Staff Username';
+      } else if (role === 'parent') {
+        title.innerText = 'Parent Login';
+        icon.className = 'fas fa-users';
+        icon.style.color = '#8B0000';
+        document.getElementById('username').placeholder = 'Registered Phone / Email';
       }
 
       showLoginForm();
@@ -484,6 +495,7 @@
       else if (role === 'teacher') title.innerText = 'Teacher Login';
       else if (role === 'student') title.innerText = 'Student Login';
       else if (role === 'applicant') title.innerText = 'Applicant Login';
+      else if (role === 'parent') title.innerText = 'Parent Login';
     }
 
     function goBack() {
@@ -537,6 +549,7 @@
         else if (role === 'student' && loggedInUser.role === 'student') targetPage = 'student-portal.html';
         else if (role === 'applicant' && loggedInUser.role === 'applicant') targetPage = 'applicant-portal.html';
         else if (role === 'finance' && loggedInUser.role === 'finance') targetPage = 'finance-portal.html';
+        else if (role === 'parent' && loggedInUser.role === 'parent') targetPage = 'parent-portal.html';
 
         if (targetPage) {
           window.location.href = targetPage;
@@ -558,6 +571,7 @@
         else if (user.role === 'student') window.location.href = 'student-portal.html';
         else if (user.role === 'applicant') window.location.href = 'applicant-portal.html';
         else if (user.role === 'finance') window.location.href = 'finance-portal.html';
+        else if (user.role === 'parent') window.location.href = 'parent-portal.html';
       }
     }
 

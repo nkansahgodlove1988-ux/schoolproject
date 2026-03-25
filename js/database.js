@@ -169,9 +169,7 @@ const DB = {
         let newId;
         let isUnique = false;
         while (!isUnique) {
-            
             newId = prefix + Math.floor(10000 + Math.random() * 89999);
-            
             isUnique = !records.some(r => 
                 r.student_id === newId || 
                 r.teacher_id === newId || 
@@ -180,5 +178,38 @@ const DB = {
             );
         }
         return newId;
+    },
+
+    /**
+     * Calculates the total outstanding debt for a student.
+     */
+    calculateStudentDebt: function(student) {
+        const classes = this.getTable('classes');
+        const payments = this.getTable('payments');
+
+        const cls = classes.find(c => c.id == student.class_id || c.name == student.className);
+        const tuition = cls ? parseFloat(cls.tuitionFee || 0) : 0;
+        const arrears = parseFloat(student.arrears || 0);
+        
+        const totalBilled = tuition + arrears;
+        
+        const totalPaid = payments
+            .filter(p => (p.studentId == student.studentId || p.student_id == student.student_id) && p.status === 'success' || p.status === 'Paid')
+            .reduce((sum, p) => sum + parseFloat(p.amountPaid || p.amount_paid || 0), 0);
+            
+        return Math.max(0, totalBilled - totalPaid);
+    },
+
+    /**
+     * Finds a student record linked to a parent user.
+     */
+    getWardByParent: function(parent) {
+        const students = this.getTable('students');
+        // Match by phone or email
+        return students.find(s => 
+            s.parent_phone === parent.username || 
+            s.parent_email === parent.username ||
+            s.guardian_phone === parent.username
+        );
     }
 };

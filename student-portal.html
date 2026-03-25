@@ -29,6 +29,7 @@
       <li><a class="menu-item" data-target="results"><i class="fas fa-file-contract"></i> My Results</a></li>
       <li><a class="menu-item" data-target="fees"><i class="fas fa-file-invoice-dollar"></i> Fees & Payments</a></li>
       <li><a class="menu-item" data-target="library"><i class="fas fa-book"></i> Library Books</a></li>
+      <li><a class="menu-item" data-target="notifications"><i class="fas fa-bell"></i> Notifications</a></li>
       <li><a class="menu-item" data-target="materials"><i class="fas fa-book-reader"></i> Learning Materials</a></li>
       <li><a class="menu-item" data-target="timetable"><i class="fas fa-calendar-alt"></i> Class Timetable</a></li>
       <li><a class="menu-item" data-target="communication"><i class="fas fa-envelope"></i> Messages</a></li>
@@ -235,7 +236,7 @@
           </div>
 
           <div style="margin: 20px 0; display: flex; justify-content: flex-end;">
-            <button class="btn btn-primary" onclick="showPaymentModal()"><i class="fas fa-plus"></i> Submit New Payment Notice</button>
+            <button class="btn btn-primary" onclick="window.location.href='payment.html'"><i class="fas fa-credit-card"></i> Pay Fees Online</button>
           </div>
 
           <h4>Payment History</h4>
@@ -274,6 +275,28 @@
           </div>
         </div>
       </section>
+      <section id="notifications" class="section">
+        <div class="section-header">
+           <h2 class="section-title">Notification History</h2>
+           <p class="section-subtitle">A log of all automated Email and SMS messages sent to you.</p>
+        </div>
+        <div class="panel">
+          <div class="table-container">
+            <table class="table" id="studentNotificationsTable">
+              <thead>
+                <tr>
+                  <th>Date/Time</th>
+                  <th>Type</th>
+                  <th>Message / Subject</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section id="timetable" class="section">
         <div class="section-header">
           <h2 class="section-title">Academic & Exam Timetables</h2>

@@ -10,6 +10,12 @@ header("Access-Control-Allow-Headers: Content-Type");
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
+require_once 'payment_handler.php';
+require_once 'notification_service.php';
+
+$notifier = new NotificationService($conn);
+$payHandler = new PaymentHandler($conn, $notifier);
+
 switch ($action) {
     case 'login':
         handleLogin($conn);
@@ -32,26 +38,60 @@ switch ($action) {
     case 'log_action':
         handleLogAction($conn);
         break;
+    case 'initiate_payment':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $res = $payHandler->initiatePayment($data['student_id'], $data['amount'], $data['method'], $data['email'] ?? '');
+        echo json_encode($res);
+        break;
+    case 'verify_payment':
+        $ref = $_GET['reference'] ?? '';
+        $status = $_GET['status'] ?? 'success';
+        $res = $payHandler->verifyPayment($ref, $status);
+        echo json_encode(['success' => $res]);
+        break;
+    case 'send_announcement':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $title = $data['title'];
+        $body = $data['body'];
+        $target = $data['target']; // e.g. "all", "parents", specific_class
+        $notifType = $data['notification_type']; // "email", "sms", "both"
+
+        // Insert into announcements table
+        $stmt = $conn->prepare("INSERT INTO announcements (title, body, target_audience, notification_type) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $title, $body, $target, $notifType);
+        $stmt->execute();
+
+        // Broadcast notifications based on target
+        // (Mock logic: fetch eligible contacts and send)
+        echo json_encode(['success' => true]);
+        break;
     default:
         echo json_encode(['error' => 'Invalid action']);
         break;
 }
 
 function handleLogin($conn) {
-    $data = json_decode(file_get_contents('php:
+    if ($method !== 'POST') {
+        // Handle read-only login requests if needed, but normally should be POST
+    }
+    $data = json_decode(file_get_contents('php://input'), true);
     $user = $data['username'];
     $pass = $data['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-    $stmt->bind_param("ss", $user, $pass);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $user);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($row = $result->fetch_assoc()) {
-        unset($row['password']);
-        echo json_encode(['success' => true, 'user' => $row]);
+        if (password_verify($pass, $row['password'])) {
+            unset($row['password']);
+            echo json_encode(['success' => true, 'user' => $row]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid password']);
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+        echo json_encode(['success' => false, 'message' => 'User not found']);
     }
 }
 
@@ -68,7 +108,12 @@ function handleFetchAll($conn) {
 
 function handleInsert($conn) {
     $table = $_GET['table'];
-    $data = json_decode(file_get_contents('php:
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    // Hash password if inserting into 'users' table
+    if ($table === 'users' && isset($data['password'])) {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+    }
     
     $keys = array_keys($data);
     $values = array_values($data);
@@ -99,6 +144,13 @@ function handleUpdate($conn) {
     $data = json_decode(file_get_contents('php:
     
     if (isset($data['id'])) unset($data['id']);
+    
+    $sets = [];
+    $values = [];
+    // Hash password if updating 'users' table and password is set
+    if ($table === 'users' && isset($data['password'])) {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+    }
     
     $sets = [];
     $values = [];

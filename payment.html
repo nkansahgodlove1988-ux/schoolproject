@@ -254,43 +254,139 @@
 <div class="payment-container">
     <div class="pay-box">
         <h2>Secure Fee Payment</h2>
-        <p style="color:#666; margin-bottom: 25px;">Complete your tuition or registration fee payment below.</p>
+        <p style="color:#666; margin-bottom: 25px;">Select your preferred payment method and proceed securely.</p>
         
         <div class="balance-card">
             <span>Outstanding Balance</span>
-            <h3>GHS 1,500.00</h3>
+            <h3 id="billAmount">GHS 0.00</h3>
         </div>
         
-        <div class="payment-method">
-            <div class="method-icon"><i class="fas fa-mobile-alt"></i></div>
-            <div class="method-info">
-                <strong>Mobile Money (MTN / Telecel)</strong>
-                <p>Dial *123# | Merchant ID: 556677</p>
+        <div class="payment-methods">
+            <div class="payment-method" onclick="selectMethod('momo', this)" id="method-momo">
+                <div class="method-icon"><i class="fas fa-mobile-alt"></i></div>
+                <div class="method-info">
+                    <strong>Mobile Money (MTN / Telecel)</strong>
+                    <p>Instant approval via prompt</p>
+                </div>
+                <i class="fas fa-check-circle check-icon" style="margin-left:auto; display:none; color:var(--blue);"></i>
+            </div>
+
+            <div class="payment-method" onclick="selectMethod('card', this)" id="method-card">
+                <div class="method-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="method-info">
+                    <strong>Visa / Mastercard</strong>
+                    <p>Local & International cards</p>
+                </div>
+                <i class="fas fa-check-circle check-icon" style="margin-left:auto; display:none; color:var(--blue);"></i>
+            </div>
+
+            <div class="payment-method" onclick="selectMethod('paypal', this)" id="method-paypal">
+                <div class="method-icon"><i class="fab fa-paypal"></i></div>
+                <div class="method-info">
+                    <strong>PayPal</strong>
+                    <p>International payment gateway</p>
+                </div>
+                <i class="fas fa-check-circle check-icon" style="margin-left:auto; display:none; color:var(--blue);"></i>
             </div>
         </div>
 
-        <div class="payment-method">
-            <div class="method-icon"><i class="fas fa-university"></i></div>
-            <div class="method-info">
-                <strong>Bank Transfer / Cash Deposit</strong>
-                <p>Elyon Bank | Acc: 0099887766</p>
-            </div>
+        <div id="paymentStatus" style="display:none; margin: 20px 0; padding:15px; border-radius:10px; background:rgba(0,51,102,0.05); text-align:center;">
+            <p id="statusMsg"></p>
         </div>
 
-        <div class="upload-section">
-            <h3>Upload Proof of Payment</h3>
-            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Once payment is made, upload your screenshot or receipt for verification.</p>
-            <div class="file-input-wrapper">
-                <input type="file" id="receipt">
-            </div>
-            <button class="btn btn-primary" onclick="alert('Payment receipt uploaded successfully! Our accounts department will verify and update your portal within 24 hours.')">
-                <i class="fas fa-cloud-upload-alt" style="margin-right: 8px;"></i> Submit Receipt
-            </button>
-        </div>
+        <button class="btn btn-primary" id="btnPay" onclick="processPayment()" disabled>
+            <i class="fas fa-lock" style="margin-right: 8px;"></i> Proceed to Payment
+        </button>
         
-        <a href="student-portal.html" class="btn btn-outline">Back to Portal Dashboard</a>
+        <a href="student-portal.html" class="btn btn-outline">Cancel and Return</a>
     </div>
 </div>
+
+<script src="js/database.js"></script>
+<script>
+    let selectedMethod = null;
+    let student = null;
+    let debt = 0;
+
+    async function init() {
+        await DB.init();
+        student = DB.getCurrentUser();
+        if(!student || student.role !== 'student') {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const studentProfile = DB.findOne('students', { student_id: student.username });
+        debt = studentProfile ? DB.calculateStudentDebt(studentProfile) : 0;
+        document.getElementById('billAmount').innerText = `GHS ${debt.toFixed(2)}`;
+        
+        if(debt <= 0) {
+            document.getElementById('btnPay').innerText = 'No Outstanding Fees';
+        }
+    }
+
+    function selectMethod(method, element) {
+        if(debt <= 0) return;
+        selectedMethod = method;
+        document.querySelectorAll('.payment-method').forEach(m => {
+            m.style.borderColor = '#eee';
+            m.querySelector('.check-icon').style.display = 'none';
+        });
+        element.style.borderColor = 'var(--blue)';
+        element.querySelector('.check-icon').style.display = 'block';
+        document.getElementById('btnPay').disabled = false;
+    }
+
+    async function processPayment() {
+        if(!selectedMethod) return;
+        
+        const btn = document.getElementById('btnPay');
+        const status = document.getElementById('paymentStatus');
+        const statusMsg = document.getElementById('statusMsg');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+        
+        try {
+            const resp = await fetch('api.php?action=initiate_payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_id: student.username,
+                    amount: debt,
+                    method: selectedMethod,
+                    email: student.email || ''
+                })
+            });
+            const data = await resp.json();
+
+            if(data.success) {
+                status.style.display = 'block';
+                statusMsg.style.color = 'var(--blue)';
+                statusMsg.innerHTML = `Transaction Reference: <strong>${data.reference}</strong><br>Redirecting to gateway...`;
+                
+                // MOCK SUCCESS for demo purposes (Simulator)
+                setTimeout(async () => {
+                    alert('Redirecting to Payment Gateway Simulator...\n\nIn a real environment, you would be redirected to: ' + data.checkout_url);
+                    const verify = await fetch(`api.php?action=verify_payment&reference=${data.reference}&status=success`);
+                    const vData = await verify.json();
+                    if(vData.success) {
+                        alert('Payment Successful! Your receipt has been generated and sent to your email.');
+                        window.location.href = 'student-portal.html';
+                    }
+                }, 2000);
+            } else {
+                throw new Error(data.error || 'Failed to initiate payment.');
+            }
+        } catch (err) {
+            alert('Error: ' + err.message);
+            btn.disabled = false;
+            btn.innerText = 'Proceed to Payment';
+        }
+    }
+
+    init();
+</script>
 
 <footer class="site-footer">
     <div class="footer-grid">

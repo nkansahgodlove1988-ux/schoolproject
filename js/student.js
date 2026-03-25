@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadFeesData();
             }
             if (target === 'timetable') loadTimetables();
+            if (target === 'notifications') loadNotifications();
             if (target === 'materials') loadMaterials();
             if (target === 'communication') loadMessages();
             if (target === 'attendance') loadAttendanceHistory();
@@ -173,8 +174,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.showPaymentModal = function() {
-    document.getElementById('payDate').valueAsDate = new Date();
-    document.getElementById('paymentModal').classList.add('active');
+    window.location.href = 'payment.html';
+}
+
+function loadNotifications() {
+    const tbody = document.querySelector('#studentNotificationsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const user = DB.getCurrentUser();
+    const studentRec = DB.findOne('students', { userId: user.id });
+    if (!studentRec) return;
+
+    // Fetch notifications from the database (persisted via NotificationService)
+    // For now, we fetch from the 'notifications' table via a mock logic or direct query
+    const notifs = DB.getTable('notifications').filter(n => n.student_id === studentRec.studentId || !n.student_id).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+    if (notifs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No automated notifications found.</td></tr>';
+        return;
+    }
+
+    notifs.forEach(n => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${new Date(n.created_at).toLocaleString()}</td>
+            <td><span class="badge badge-active">${n.type.toUpperCase()}</span></td>
+            <td>${n.message}</td>
+            <td><span class="badge badge-${n.status === 'sent' ? 'active' : 'inactive'}">${n.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
 window.hideModal = function(id) {
