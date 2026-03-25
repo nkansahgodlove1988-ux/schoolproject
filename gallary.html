@@ -43,6 +43,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            overflow: hidden;
         }
 
         .nav-left {
@@ -186,6 +187,12 @@
         @media (max-width: 400px) {
             .gallery { column-count: 2; } /* Even smaller, keeping 2 columns */
             .logo { font-size: 16px; }
+            .site-footer {
+                padding: 30px 4% 0;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Full image viewer */
@@ -235,6 +242,10 @@
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1.5fr;
             gap: 35px;
+        }
+        .footer-col {
+            min-width: 0;
+            overflow: hidden;
         }
         .footer-col h4 {
             color: var(--gold);

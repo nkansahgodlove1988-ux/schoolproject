@@ -144,6 +144,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
         }
 
         .nav-left {
@@ -563,6 +564,9 @@
             grid-template-columns: 2fr 1fr 1fr 1.5fr;
             gap: 35px;
         }
+        .footer-col {
+            min-width: 0;
+        }
         .footer-col h4 {
             color: var(--gold);
             font-size: 1.1rem;
@@ -598,6 +602,9 @@
         .footer-col ul li a:hover {
             color: var(--gold);
             padding-left: 5px;
+        }
+        .footer-col {
+            overflow: hidden;
         }
         .footer-social {
             display: flex;
@@ -678,6 +685,10 @@
             .nav-left img {
                 width: 55px;
                 height: 55px;
+            }
+
+            .site-footer {
+                padding: 40px 6% 0;
             }
 
             .menu-toggle {
@@ -799,6 +810,10 @@
             .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
+            }
+            
+            .site-footer {
+                padding: 30px 4% 0;
             }
 
             .testimonial-card {
