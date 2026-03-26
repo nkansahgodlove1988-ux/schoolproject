@@ -36,6 +36,8 @@ switch ($action) {
 }
 function handleLogin($conn) {
     $data = json_decode(file_get_contents('php://input'), true);
+    if (empty($data)) { $data = $_POST; }
+    
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->bind_param("s", $data['username']);
     $stmt->execute();
