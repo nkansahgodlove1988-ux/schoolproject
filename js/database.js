@@ -20,7 +20,11 @@ const DB = {
             const result = await resp.json();
             if (result.success) { this.cache[table].push(result.data); return result.data; }
         } catch (err) {}
-        return null;
+        // Fallback for Vercel/GitHub Pages
+        record.id = Math.floor(Math.random() * 100000);
+        if (!this.cache[table]) this.cache[table] = [];
+        this.cache[table].push(record);
+        return record;
     },
     update: async function(table, id, updates) {
         try {
