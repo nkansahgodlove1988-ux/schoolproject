@@ -284,11 +284,11 @@
       <i id="formIcon" class="fas fa-user"
         style="font-size:3.5rem; color:var(--blue); margin-bottom:15px; display:block;"></i>
       <h2 id="formTitle">Login</h2>
-      <form id="loginForm">
+      <form id="loginForm" onsubmit="loginUser(event)">
         <input type="hidden" name="role" id="loginRole"><input type="text" name="username" id="username" required>
         <div class="password-wrapper"><input type="password" name="password" id="password" required><i
             class="fas fa-eye" id="toggleIcon" onclick="togglePassword('password', 'toggleIcon')"></i></div>
-        <button type="button" onclick="loginUser()">Login</button>
+        <button type="submit">Login</button>
       </form>
     </div>
   </div>
@@ -315,7 +315,9 @@
     }
   </script>
   <script>
-    function loginUser() {
+    function loginUser(event) {
+      if (event) event.preventDefault();
+      
       let username = document.getElementById("username").value;
       let password = document.getElementById("password").value;
 
