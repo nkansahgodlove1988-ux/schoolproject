@@ -1,14 +1,12 @@
 <?php
+$servername = "sql113.infinityfree.com";
+$username = "if0_41478939";
+$password = "QYLqhzZrd4"; // ← replace this
+$dbname = "if0_41478939_elyon_school_db";
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "elyon_school_db";
-
-$conn = new mysqli($servername, $username, $password, $dbname, 3307);
+$conn = new mysqli($servername, $username, $password, $dbname, 3306);
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 ?>

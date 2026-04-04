@@ -1,4 +1,4 @@
-const API_URL = 'api.php';
+const API_URL = 'http://elyon-montessori.rf.gd/api.php';
 const DB = {
     cache: {},
     isInitialized: false,
