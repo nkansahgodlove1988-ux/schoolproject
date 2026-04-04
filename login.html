@@ -322,13 +322,20 @@
       let password = document.getElementById("password").value;
 
       if (username === "admin" && password === "admin123") {
-        // Saving a mock admin session so the portal doesn't kick you out
         if (typeof DB !== 'undefined') {
           DB.setCurrentUser({ id: 1, username: 'admin', role: 'admin', name: 'System Admin' });
         }
         alert("Login successful!");
         window.location.href = "admin-portal.html";
-      } else {
+      } 
+      else if (username === "finance" && password === "password123") {
+        if (typeof DB !== 'undefined') {
+          DB.setCurrentUser({ id: 2, username: 'finance', role: 'finance', name: 'School Accountant' });
+        }
+        alert("Login successful!");
+        window.location.href = "finance-portal.html";
+      } 
+      else {
         alert("Invalid username or password");
       }
     }
