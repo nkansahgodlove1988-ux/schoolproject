@@ -3,14 +3,33 @@ const DB = {
     cache: {},
     isInitialized: false,
     init: async function() {
+        if (this.isInitialized) return;
         const tables = ['users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'admissions', 'results', 'attendance', 'announcements', 'timetables', 'payments', 'expenses', 'audit_logs', 'messages', 'learning_materials', 'library_books', 'library_issues'];
+        
+        // Initialize cache with empty arrays first
+        tables.forEach(t => { if (!this.cache[t]) this.cache[t] = []; });
+
         try {
-            for (const table of tables) {
-                const response = await fetch(`${API_URL}?action=fetch_all&table=${table}`);
-                this.cache[table] = await response.json();
-            }
+            const fetchPromises = tables.map(async (table) => {
+                try {
+                    const response = await fetch(`${API_URL}?action=fetch_all&table=${table}`, {
+                        signal: AbortSignal.timeout(10000) // 10 second timeout per request
+                    });
+                    if (response.ok) {
+                        this.cache[table] = await response.json();
+                    }
+                } catch (e) {
+                    console.warn(`Failed to fetch table ${table}:`, e);
+                }
+            });
+
+            await Promise.allSettled(fetchPromises);
             this.isInitialized = true;
-        } catch (err) { tables.forEach(t => this.cache[t] = []); }
+            console.log('Database initialized successfully (some tables may have failed but UI is unblocked)');
+        } catch (err) {
+            console.error('Critical database initialization error:', err);
+            this.isInitialized = true; // Still set to true to unblock UI
+        }
     },
     getTable: function(table) { return this.cache[table] || []; },
     saveTable: async function(table, data) { this.cache[table] = data; },

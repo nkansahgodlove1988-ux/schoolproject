@@ -320,25 +320,55 @@
 
       const username = document.querySelector('input[name="username"]').value;
       const password = document.querySelector('input[name="password"]').value;
+      const role = document.getElementById('loginRole').value;
 
-      const res = await fetch("api.php?action=login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        })
-      });
+      // Use the API_URL from database.js if it's defined
+      const targetUrl = typeof API_URL !== 'undefined' ? `${API_URL}?action=login` : 'api.php?action=login';
 
-      const data = await res.json();
+      try {
+        const res = await fetch(targetUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+            role: role
+          })
+        });
 
-      if (data.success) {
-        alert("Login successful!");
-        window.location.href = "admin-portal.html";
-      } else {
-        alert(data.message);
+        const data = await res.json();
+
+        if (data.success) {
+          // IMPORTANT: Save the user session so portals can recognize they are logged in!
+          DB.setCurrentUser(data.user);
+          
+          alert("Login successful!");
+
+          // Role-based routing
+          if (data.user.role === "admin") {
+            window.location.href = "admin-portal.html";
+          } else if (data.user.role === "teacher") {
+            window.location.href = "teacher-portal.html";
+          } else if (data.user.role === "finance") {
+            window.location.href = "finance-portal.html";
+          } else if (data.user.role === "student") {
+            window.location.href = "student-portal.html";
+          } else if (data.user.role === "parent") {
+            window.location.href = "parent-portal.html";
+          } else if (data.user.role === "applicant") {
+            window.location.href = "applicant-portal.html";
+          } else {
+            window.location.href = "index.html";
+          }
+
+        } else {
+          alert(data.message || "Invalid credentials");
+        }
+      } catch (err) {
+        console.error("Login Error:", err);
+        alert("An error occurred during login. Please try again. " + err.message);
       }
     }
   </script>
