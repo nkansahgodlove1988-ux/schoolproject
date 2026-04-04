@@ -315,38 +315,32 @@
     }
   </script>
   <script>
-async function loginUser(event) {
-    event.preventDefault();
+    async function loginUser(event) {
+      event.preventDefault();
 
-    const username = document.querySelector('input[name="username"]').value;
-    const password = document.querySelector('input[name="password"]').value;
+      const username = document.querySelector('input[name="username"]').value;
+      const password = document.querySelector('input[name="password"]').value;
 
-    const res = await fetch("api.php?action=login", {
+      const res = await fetch("api.php?action=login", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            username: username,
-            password: password
+          username: username,
+          password: password
         })
-    });
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) {
+      if (data.success) {
         alert("Login successful!");
-
-        if (data.user.role === "admin") {
-            window.location.href = "admin-portal.html";
-        } else {
-            window.location.href = "dashboard.html";
-        }
-
-    } else {
+        window.location.href = "admin-portal.html";
+      } else {
         alert(data.message);
+      }
     }
-}
   </script>
 </body>
 
