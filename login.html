@@ -218,7 +218,7 @@
       .nav-links.show {
         display: flex;
       }
-      
+
       .login-container {
         padding: 30px 10px;
       }
@@ -284,10 +284,10 @@
       <i id="formIcon" class="fas fa-user"
         style="font-size:3.5rem; color:var(--blue); margin-bottom:15px; display:block;"></i>
       <h2 id="formTitle">Login</h2>
-      <form method="POST" action="api.php">
+      <form method="POST" action="api.php?action=login">
         <input type="hidden" name="role" id="loginRole"><input type="text" name="username" id="username" required>
-        <div class="password-wrapper"><input type="password" name="password" id="password" required><i class="fas fa-eye"
-            id="toggleIcon" onclick="togglePassword('password', 'toggleIcon')"></i></div>
+        <div class="password-wrapper"><input type="password" name="password" id="password" required><i
+            class="fas fa-eye" id="toggleIcon" onclick="togglePassword('password', 'toggleIcon')"></i></div>
         <button type="submit" name="login">Login</button>
       </form>
     </div>
@@ -297,7 +297,7 @@
     function toggleMenu() { document.getElementById("navLinks").classList.toggle("show"); }
     function openLogin(r) {
       document.getElementById('portalSelection').style.display = 'none'; document.getElementById('loginFormContainer').style.display = 'block';
-      document.getElementById('loginRole').value = r; document.getElementById('loginForm').reset();
+      document.getElementById('loginForm').reset(); document.getElementById('loginRole').value = r;
       const t = document.getElementById('formTitle'); const i = document.getElementById('formIcon');
       if (r === 'admin') { t.innerText = 'Admin Login'; i.className = 'fas fa-user-shield'; i.style.color = '#e74c3c'; document.getElementById('username').placeholder = 'Admin ID'; }
       else if (r === 'teacher') { t.innerText = 'Teacher Login'; i.className = 'fas fa-chalkboard-teacher'; i.style.color = 'var(--gold)'; document.getElementById('username').placeholder = 'Teacher ID'; }
@@ -307,10 +307,7 @@
       else if (r === 'parent') { t.innerText = 'Parent Login'; i.className = 'fas fa-users'; i.style.color = '#8B0000'; document.getElementById('username').placeholder = 'Phone/Email'; }
     }
     function goBack() { document.getElementById('loginFormContainer').style.display = 'none'; document.getElementById('portalSelection').style.display = 'flex'; }
-    async function handleLogin(e) {
-      e.preventDefault(); const r = document.getElementById('loginRole').value; const u = await DB.login(document.getElementById('username').value, document.getElementById('password').value);
-      if (u && u.role === r) { window.location.href = r + '-portal.html'; } else alert("Invalid credentials.");
-    }
+
     function togglePassword(i, c) {
       const input = document.getElementById(i); const icon = document.getElementById(c);
       if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
