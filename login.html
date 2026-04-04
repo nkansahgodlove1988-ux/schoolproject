@@ -313,30 +313,37 @@
       if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
       else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
     }
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof DB !== 'undefined') await DB.init();
+    });
   </script>
   <script>
-    function loginUser(event) {
+    async function loginUser(event) {
       if (event) event.preventDefault();
       
       let username = document.getElementById("username").value;
       let password = document.getElementById("password").value;
 
-      if (username === "admin" && password === "admin123") {
-        if (typeof DB !== 'undefined') {
-          DB.setCurrentUser({ id: 1, username: 'admin', role: 'admin', name: 'System Admin' });
-        }
+      if (typeof DB === 'undefined') {
+        alert("Database system not loaded. Please refresh.");
+        return;
+      }
+
+      const user = await DB.login(username, password);
+
+      if (user) {
         alert("Login successful!");
-        window.location.href = "admin-portal.html";
-      } 
-      else if (username === "finance" && password === "password123") {
-        if (typeof DB !== 'undefined') {
-          DB.setCurrentUser({ id: 2, username: 'finance', role: 'finance', name: 'School Accountant' });
-        }
-        alert("Login successful!");
-        window.location.href = "finance-portal.html";
-      } 
-      else {
-        alert("Invalid username or password");
+        
+        // Simple role-based routing
+        if (user.role === 'admin') window.location.href = "admin-portal.html";
+        else if (user.role === 'teacher') window.location.href = "teacher-portal.html";
+        else if (user.role === 'student') window.location.href = "student-portal.html";
+        else if (user.role === 'applicant') window.location.href = "applicant-portal.html";
+        else if (user.role === 'finance') window.location.href = "finance-portal.html";
+        else if (user.role === 'parent') window.location.href = "parent-portal.html";
+        else window.location.href = "index.html";
+      } else {
+        alert("Invalid username or password. Please try again.");
       }
     }
   </script>
