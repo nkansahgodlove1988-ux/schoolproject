@@ -284,7 +284,7 @@
       <i id="formIcon" class="fas fa-user"
         style="font-size:3.5rem; color:var(--blue); margin-bottom:15px; display:block;"></i>
       <h2 id="formTitle">Login</h2>
-      <form id="loginForm" method="POST" action="api.php?action=login">
+      <form id="loginForm" onsubmit="loginUser(event)">
         <input type="hidden" name="role" id="loginRole"><input type="text" name="username" id="username" required>
         <div class="password-wrapper"><input type="password" name="password" id="password" required><i
             class="fas fa-eye" id="toggleIcon" onclick="togglePassword('password', 'toggleIcon')"></i></div>
@@ -313,6 +313,40 @@
       if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
       else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
     }
+  </script>
+  <script>
+async function loginUser(event) {
+    event.preventDefault();
+
+    const username = document.querySelector('input[name="username"]').value;
+    const password = document.querySelector('input[name="password"]').value;
+
+    const res = await fetch("api.php?action=login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Login successful!");
+
+        if (data.user.role === "admin") {
+            window.location.href = "admin-portal.html";
+        } else {
+            window.location.href = "dashboard.html";
+        }
+
+    } else {
+        alert(data.message);
+    }
+}
   </script>
 </body>
 
