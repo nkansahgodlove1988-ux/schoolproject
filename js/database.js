@@ -72,7 +72,16 @@ const DB = {
     findOne: function(table, query) { const res = this.find(table, query); return res.length > 0 ? res[0] : null; },
     login: async function(username, password) {
         try {
-            const resp = await fetch(`${API_URL}?action=login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }) });
+            const resp = await fetch(API_URL + '?action=login', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
             const res = await resp.json();
             if (res.success) { this.setCurrentUser(res.user); return res.user; }
         } catch (err) {}
