@@ -6,6 +6,7 @@
   <link rel="icon" type="image/png" href="image/favicon2.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="portal.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -122,8 +123,8 @@
                 <p style="margin: 0; font-size: 14px; color: #555;">Elyon Montessori School</p>
               </div>
               <!-- Print Button -->
-              <div style="text-align: center; margin-top: 50px;" class="hide-on-print">
-                <button class="btn btn-primary" onclick="window.print()" style="font-size: 16px; padding: 12px 30px; border-radius: 6px;"><i class="fas fa-print"></i> Download / Print Letter</button>
+              <div style="text-align: center; margin-top: 50px;" class="hide-on-print" id="printBtnContainer">
+                <button class="btn btn-primary" onclick="downloadAdmissionLetter()" style="font-size: 16px; padding: 12px 30px; border-radius: 6px;"><i class="fas fa-download"></i> Download Admission Letter</button>
               </div>
             </div>
           `;
@@ -140,6 +141,27 @@
       const input = document.getElementById(i); const icon = document.getElementById(c);
       if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }
       else { input.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+    }
+    
+    window.downloadAdmissionLetter = function() {
+      const element = document.getElementById('printableLetter');
+      const btnContainer = document.getElementById('printBtnContainer');
+      
+      // Temporarily hide the button while generating PDF
+      btnContainer.style.display = 'none';
+      
+      const opt = {
+        margin:       10,
+        filename:     'Elyon_Admission_Letter.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save().then(() => {
+          // Restore the button after download
+          btnContainer.style.display = 'block';
+      });
     }
   </script>
 </body>
