@@ -570,7 +570,9 @@ window.approveAdmission = async function (id) {
         const studentId = DB.generateUniqueId('STU', 'students');
         const newUser = await DB.insert('users', { username: studentId, password: 'password123', role: 'student', name: adm.childName, status: 'active' });
         if (newUser) {
-            await DB.insert('students', { userId: newUser.id, admissionId: adm.id, studentId, name: adm.childName, email: adm.email || '', phone: adm.phone || '', classId: adm.classApplying, className: adm.classApplying, gender: adm.gender || '-', guardianName: adm.pname || adm.guardianName, parent_email: adm.email || '', parent_phone: adm.pnumber || adm.guardianPhone, status: 'active' });
+            const matchingClass = DB.getTable('classes').find(c => c.name === adm.classApplying);
+            const classId = matchingClass ? matchingClass.id : null;
+            await DB.insert('students', { userId: newUser.id, admissionId: adm.id, studentId, name: adm.childName, email: adm.email || '', phone: adm.phone || '', classId: classId, className: adm.classApplying, gender: adm.gender || '-', guardianName: adm.pname || adm.guardianName, parent_email: adm.email || '', parent_phone: adm.pnumber || adm.guardianPhone, status: 'active' });
             
             // Send automatic Email and SMS Notification
             try {
