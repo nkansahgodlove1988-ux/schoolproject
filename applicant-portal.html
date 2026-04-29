@@ -118,7 +118,7 @@
               <!-- Sign-off -->
               <div style="margin-top: 50px;">
                 <p style="margin: 0 0 5px; font-size: 16px;">Yours faithfully,</p>
-                <img src="image/signature.png" alt="Signature" style="height: 50px; margin-bottom: 5px; opacity: 0.8;" onerror="this.style.display='none'">
+                <div style="height: 40px;"></div> <!-- Space for physical signature -->
                 <p style="margin: 0; font-weight: bold; font-size: 16px;">The Principal</p>
                 <p style="margin: 0; font-size: 14px; color: #555;">Elyon Montessori School</p>
               </div>
@@ -154,14 +154,22 @@
         margin:       10,
         filename:     'Elyon_Admission_Letter.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
+        html2canvas:  { scale: 2, useCORS: true, logging: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       
-      html2pdf().set(opt).from(element).save().then(() => {
-          // Restore the button after download
-          btnContainer.style.display = 'block';
-      });
+      try {
+        html2pdf().set(opt).from(element).save().then(() => {
+            btnContainer.style.display = 'block';
+        }).catch(err => {
+            console.error(err);
+            btnContainer.style.display = 'block';
+            alert('Failed to generate PDF. Check console.');
+        });
+      } catch (e) {
+         console.error(e);
+         btnContainer.style.display = 'block';
+      }
     }
   </script>
 </body>
