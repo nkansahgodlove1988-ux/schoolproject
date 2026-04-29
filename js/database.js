@@ -1,10 +1,74 @@
-const API_URL = 'http://elyon-montessori.rf.gd/api.php';
+const API_URL = 'http://localhost/ElyonMontessoriSMS/api.php';
+
+// Maps JS camelCase keys to MySQL snake_case column names
+const COLUMN_MAP = {
+    studentId: 'student_id', teacherId: 'teacher_id', userId: 'user_id',
+    className: 'class_name', classId: 'class_id', departmentId: 'department_id',
+    guardianName: 'guardian_name', guardianPhone: 'guardian_phone',
+    amountPaid: 'amount_paid', receiptNo: 'receipt_no', recordedBy: 'recorded_by',
+    paymentMethod: 'payment_method', tuitionFee: 'tuition_fee',
+    parentEmail: 'parent_email', parentPhone: 'parent_phone',
+    senderName: 'sender_name', senderId: 'sender_id', senderRole: 'sender_role',
+    receiverRole: 'receiver_role', teacherName: 'teacher_name',
+    fileName: 'file_name', childName: 'child_name', childAge: 'child_age',
+    targetClass: 'target_class', dateApplied: 'date_applied',
+    studentName: 'student_name', classScore: 'class_score', examScore: 'exam_score',
+    rejectionReason: 'rejection_reason', isActive: 'is_active',
+    roleName: 'role_name', totalCopies: 'total_copies',
+    availableCopies: 'available_copies', bookId: 'book_id',
+    bookTitle: 'book_title', borrowerType: 'borrower_type',
+    issueDate: 'issue_date', dueDate: 'due_date', returnDate: 'return_date',
+    notificationType: 'notification_type', targetAudience: 'target_audience',
+    admissionId: 'admission_id', createdAt: 'created_at',
+    arrears: 'arrears'
+};
+
+// Reverse map: snake_case -> camelCase
+const REVERSE_MAP = {};
+Object.entries(COLUMN_MAP).forEach(([camel, snake]) => { REVERSE_MAP[snake] = camel; });
+
+// Fields stored as JSON strings in MySQL but used as arrays in JS
+const JSON_FIELDS = ['classes', 'subjects'];
+
+// Convert a JS object's keys from camelCase to snake_case for MySQL
+function toSnakeCase(obj) {
+    const result = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        const dbKey = COLUMN_MAP[key] || key;
+        // Stringify arrays for JSON columns
+        if (JSON_FIELDS.includes(key) && Array.isArray(value)) {
+            result[dbKey] = JSON.stringify(value);
+        } else {
+            result[dbKey] = value;
+        }
+    });
+    return result;
+}
+
+// Convert a MySQL row's keys from snake_case to camelCase for JS
+function toCamelCase(obj) {
+    const result = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        const jsKey = REVERSE_MAP[key] || key;
+        // Parse JSON array fields
+        if (JSON_FIELDS.includes(jsKey) && typeof value === 'string') {
+            try { result[jsKey] = JSON.parse(value); }
+            catch (e) { result[jsKey] = []; }
+        } else if (JSON_FIELDS.includes(jsKey) && !value) {
+            result[jsKey] = [];
+        } else {
+            result[jsKey] = value;
+        }
+    });
+    return result;
+}
+
 const DB = {
     cache: {},
     isInitialized: false,
     init: async function() {
         if (this.isInitialized) return;
-        const tables = ['users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'admissions', 'results', 'attendance', 'announcements', 'timetables', 'payments', 'expenses', 'audit_logs', 'messages', 'learning_materials', 'library_books', 'library_issues'];
+        const tables = ['users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'admissions', 'results', 'attendance', 'announcements', 'timetables', 'payments', 'expenses', 'audit_logs', 'messages', 'learning_materials', 'library_books', 'library_issues', 'notifications'];
         
         // Initialize cache with empty arrays first
         tables.forEach(t => { if (!this.cache[t]) this.cache[t] = []; });
@@ -16,7 +80,9 @@ const DB = {
                         signal: AbortSignal.timeout(10000) // 10 second timeout per request
                     });
                     if (response.ok) {
-                        this.cache[table] = await response.json();
+                        const rawData = await response.json();
+                        // Convert snake_case keys from MySQL to camelCase for JS
+                        this.cache[table] = Array.isArray(rawData) ? rawData.map(toCamelCase) : [];
                     }
                 } catch (e) {
                     console.warn(`Failed to fetch table ${table}:`, e);
@@ -35,11 +101,19 @@ const DB = {
     saveTable: async function(table, data) { this.cache[table] = data; },
     insert: async function(table, record) {
         try {
-            const resp = await fetch(`${API_URL}?action=insert&table=${table}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(record) });
+            // Convert camelCase to snake_case for MySQL
+            const snakeRecord = toSnakeCase(record);
+            const resp = await fetch(`${API_URL}?action=insert&table=${table}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snakeRecord) });
             const result = await resp.json();
-            if (result.success) { this.cache[table].push(result.data); return result.data; }
-        } catch (err) {}
-        // Fallback for Vercel/GitHub Pages
+            if (result.success) {
+                const camelData = toCamelCase(result.data);
+                this.cache[table].push(camelData);
+                return camelData;
+            }
+        } catch (err) {
+            console.warn(`Insert to ${table} failed:`, err);
+        }
+        // Fallback for offline mode
         record.id = Math.floor(Math.random() * 100000);
         if (!this.cache[table]) this.cache[table] = [];
         this.cache[table].push(record);
@@ -47,14 +121,21 @@ const DB = {
     },
     update: async function(table, id, updates) {
         try {
-            const resp = await fetch(`${API_URL}?action=update&table=${table}&id=${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
+            // Convert camelCase to snake_case for MySQL
+            const snakeUpdates = toSnakeCase(updates);
+            const resp = await fetch(`${API_URL}?action=update&table=${table}&id=${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snakeUpdates) });
             const result = await resp.json();
             if (result.success) {
                 const idx = this.cache[table].findIndex(item => item.id == id);
                 if (idx !== -1) this.cache[table][idx] = { ...this.cache[table][idx], ...updates };
                 return true;
             }
-        } catch (err) {}
+        } catch (err) {
+            console.warn(`Update ${table} id=${id} failed:`, err);
+        }
+        // Fallback: update local cache anyway
+        const idx = this.cache[table].findIndex(item => item.id == id);
+        if (idx !== -1) this.cache[table][idx] = { ...this.cache[table][idx], ...updates };
         return false;
     },
     delete: async function(table, id) {
@@ -62,7 +143,11 @@ const DB = {
             const resp = await fetch(`${API_URL}?action=delete&table=${table}&id=${id}`);
             const result = await resp.json();
             if (result.success) { this.cache[table] = this.cache[table].filter(item => item.id != id); return true; }
-        } catch (err) {}
+        } catch (err) {
+            console.warn(`Delete ${table} id=${id} failed:`, err);
+        }
+        // Fallback: remove from local cache
+        this.cache[table] = this.cache[table].filter(item => item.id != id);
         return false;
     },
     findById: function(table, id) { return this.getTable(table).find(item => item.id == id); },
@@ -83,9 +168,15 @@ const DB = {
                 })
             });
             const res = await resp.json();
-            if (res.success) { this.setCurrentUser(res.user); return res.user; }
-        } catch (err) {}
-        // Fallback for Vercel/GitHub Pages (No PHP support) or offline mode
+            if (res.success) { 
+                const camelUser = toCamelCase(res.user);
+                this.setCurrentUser(camelUser); 
+                return camelUser; 
+            }
+        } catch (err) {
+            console.warn('Login API failed, using fallback:', err);
+        }
+        // Fallback for offline mode
         if (username === 'admin' && password === 'admin123') { const u = { id: 1, username: 'admin', role: 'admin', name: 'System Admin' }; this.setCurrentUser(u); return u; }
         if (username === 'finance' && password === 'password123') { const u = { id: 2, username: 'finance', role: 'finance', name: 'School Accountant' }; this.setCurrentUser(u); return u; }
         
@@ -114,18 +205,19 @@ const DB = {
         let newId, isUnique = false;
         while (!isUnique) {
             newId = prefix + Math.floor(10000 + Math.random() * 89999);
-            isUnique = !recs.some(r => r.student_id === newId || r.teacher_id === newId || r.studentId === newId || r.teacherId === newId);
+            isUnique = !recs.some(r => r.studentId === newId || r.teacherId === newId || r.student_id === newId || r.teacher_id === newId);
         }
         return newId;
     },
     calculateStudentDebt: function(student) {
         const classes = this.getTable('classes');
         const payments = this.getTable('payments');
-        const cls = classes.find(c => c.id == student.class_id || c.name == student.className);
-        const tuition = cls ? parseFloat(cls.tuitionFee || 0) : 0;
+        const cls = classes.find(c => c.id == student.classId || c.id == student.class_id || c.name == student.className);
+        const tuition = cls ? parseFloat(cls.tuitionFee || cls.tuition_fee || 0) : 0;
         const totalBilled = tuition + parseFloat(student.arrears || 0);
-        const totalPaid = payments.filter(p => (p.studentId == student.studentId || p.student_id == student.student_id) && (p.status === 'success' || p.status === 'Paid')).reduce((sum, p) => sum + parseFloat(p.amountPaid || p.amount_paid || 0), 0);
+        const sid = student.studentId || student.student_id;
+        const totalPaid = payments.filter(p => (p.studentId == sid || p.student_id == sid) && (p.status === 'success' || p.status === 'Paid')).reduce((sum, p) => sum + parseFloat(p.amountPaid || p.amount_paid || 0), 0);
         return Math.max(0, totalBilled - totalPaid);
     },
-    getWardByParent: function(parent) { return this.getTable('students').find(s => s.parent_phone === parent.username || s.parent_email === parent.username || s.guardian_phone === parent.username); }
+    getWardByParent: function(parent) { return this.getTable('students').find(s => s.parentPhone === parent.username || s.parentEmail === parent.username || s.guardianPhone === parent.username || s.parent_phone === parent.username || s.parent_email === parent.username || s.guardian_phone === parent.username); }
 };

@@ -1,17 +1,16 @@
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0); // Don't display errors in JSON responses
 
-$servername = "sql113.infinityfree.com";
-$username = "if0_41478939";
-$password = "PASTE_CORRECT_PASSWORD_HERE";
-$dbname = "if0_41478939_elyon_school_db";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "elyon_school_db";
 
-$conn = new mysqli($servername, $username, $password, $dbname, 3306);
+$conn = new mysqli($servername, $username, $password, $dbname, 3307);
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    header('Content-Type: application/json');
+    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
 }
-
-echo "CONNECTED SUCCESSFULLY";
 ?>

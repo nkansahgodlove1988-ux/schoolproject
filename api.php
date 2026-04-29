@@ -1,10 +1,14 @@
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Content-Type: application/json");
+
+// Handle preflight OPTIONS
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
 include 'db_connect.php';
 $method = $_SERVER['REQUEST_METHOD'];
@@ -53,8 +57,9 @@ function handleLogin($conn) {
     } else echo json_encode(['success' => false, 'message' => 'User not found']);
 }
 function handleFetchAll($conn) {
-    $table = $_GET['table'];
-    $res = $conn->query("SELECT * FROM $table");
+    $table = preg_replace('/[^a-zA-Z0-9_]/', '', $_GET['table']); // sanitize table name
+    $res = $conn->query("SELECT * FROM `$table`");
+    if (!$res) { echo json_encode([]); return; }
     $data = [];
     while ($row = $res->fetch_assoc()) $data[] = $row;
     echo json_encode($data);
