@@ -39,6 +39,23 @@ switch ($action) {
         $stmt->execute();
         echo json_encode(['success' => true]);
         break;
+    case 'notify_admission':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $email = $data['email'] ?? '';
+        $phone = $data['phone'] ?? '';
+        $childName = $data['childName'] ?? '';
+        $studentId = $data['studentId'] ?? '';
+        
+        $subject = "Admission Approved - Elyon Montessori School";
+        $body = "Dear Parent/Guardian,<br><br>Congratulations! We are pleased to inform you that <b>$childName</b> has been successfully admitted to Elyon Montessori School.<br><br>Your child's official Student ID is: <b>$studentId</b><br><br>Please keep this ID safe as you will need it to pay fees and log into the Parent Portal.<br><br>Welcome to the Elyon Family!";
+        
+        $smsMsg = "Congratulations! $childName has been admitted to Elyon Montessori. Student ID: $studentId. Welcome to the Elyon Family!";
+        
+        if (!empty($email)) $notifier->sendEmail($email, $subject, $body);
+        if (!empty($phone)) $notifier->sendSMS($phone, $smsMsg);
+        
+        echo json_encode(['success' => true]);
+        break;
     default: echo json_encode(['error' => 'Invalid action']); break;
 }
 function handleLogin($conn) {

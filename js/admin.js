@@ -571,9 +571,26 @@ window.approveAdmission = async function (id) {
         const newUser = await DB.insert('users', { username: studentId, password: 'password123', role: 'student', name: adm.childName, status: 'active' });
         if (newUser) {
             await DB.insert('students', { userId: newUser.id, admissionId: adm.id, studentId, name: adm.childName, email: adm.email || '', phone: adm.phone || '', classId: adm.classApplying, className: adm.classApplying, gender: adm.gender || '-', guardianName: adm.pname || adm.guardianName, parent_email: adm.email || '', parent_phone: adm.pnumber || adm.guardianPhone, status: 'active' });
+            
+            // Send automatic Email and SMS Notification
+            try {
+                await fetch(`${API_URL}?action=notify_admission`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: adm.email,
+                        phone: adm.pnumber,
+                        childName: adm.childName,
+                        studentId: studentId
+                    })
+                });
+            } catch (err) {
+                console.warn('Failed to send admission notification:', err);
+            }
         }
         await DB.logAction('Approved Admission', `Applicant: ${adm.childName}`);
         loadAdmissions();
+        alert(`Successfully approved! ${adm.childName} is now a student (ID: ${studentId}). Notifications have been sent.`);
     }
 }
 
