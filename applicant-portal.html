@@ -81,42 +81,42 @@
           const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
           const studentId = student ? student.studentId : 'PENDING';
           const letterHTML = `
-            <div style="padding: 40px; background: white; color: #333; font-family: 'Times New Roman', serif; text-align: left; max-width: 800px; margin: auto; border: 1px solid #ddd;" id="printableLetter">
+            <div class="letter-container" id="printableLetter">
               <!-- Letterhead -->
-              <div style="text-align: center; border-bottom: 2px solid #003366; padding-bottom: 20px; margin-bottom: 30px;">
+              <div class="letter-header">
                 <img src="image/logo.jpeg" alt="School Logo" style="height: 80px; margin-bottom: 10px;">
-                <h1 style="color: #003366; margin: 0; font-size: 28px; text-transform: uppercase;">Elyon Montessori School</h1>
+                <h1>Elyon Montessori School</h1>
                 <p style="color: #555; margin: 5px 0 0; font-style: italic;">Nurturing Potential, Building Character</p>
                 <p style="margin: 5px 0 0; font-size: 14px;">Brafoyaw, Cape Coast | Tel: 024-443-0918 | info@elyonmontessori.com</p>
               </div>
               <!-- Date & Ref -->
-              <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+              <div class="letter-meta">
                 <p style="margin: 0;"><strong>Ref:</strong> EMS/ADM/${new Date().getFullYear()}/${studentId}</p>
                 <p style="margin: 0;"><strong>Date:</strong> ${today}</p>
               </div>
               <!-- Salutation -->
-              <p style="font-size: 16px; margin-bottom: 20px;">Dear <strong>${admission.pname || admission.guardianName || 'Parent/Guardian'}</strong>,</p>
+              <p class="letter-body">Dear <strong>${admission.pname || admission.guardianName || 'Parent/Guardian'}</strong>,</p>
               <!-- Title -->
               <h2 style="text-align: center; text-decoration: underline; margin-bottom: 30px; font-size: 20px;">OFFER OF ADMISSION</h2>
               <!-- Body text -->
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; text-align: justify;">
+              <p class="letter-body">
                 We are pleased to inform you that your child, <strong>${admission.childName}</strong>, has been officially offered admission to Elyon Montessori School for the upcoming academic term. Based on the application and academic records provided, we are confident that your ward will thrive in <strong>${admission.classApplying}</strong>.
               </p>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; text-align: justify;">
+              <p class="letter-body">
                 Please find below the official student credentials assigned to your child. These credentials are required to access the online Parent Portal, check terminal reports, and complete tuition fee payments:
               </p>
               <!-- Credentials Box -->
-              <div style="background: #f8f9fa; padding: 15px 20px; border-left: 4px solid #003366; margin-bottom: 30px;">
-                <p style="margin: 0 0 10px; font-size: 16px;"><strong>Student ID:</strong> ${studentId}</p>
-                <p style="margin: 0 0 10px; font-size: 16px;"><strong>Default Password:</strong> password123</p>
-                <p style="margin: 0; font-size: 14px; color: #d9534f; font-style: italic;"><strong>*Important Note:</strong> For security purposes, please log into your Student Portal and change this default password immediately to a memorable password of your choice (minimum 6 characters).</p>
+              <div class="letter-credentials">
+                <p style="margin: 0 0 10px;"><strong>Student ID:</strong> ${studentId}</p>
+                <p style="margin: 0 0 10px;"><strong>Default Password:</strong> password123</p>
+                <p style="margin: 0; font-size: 13px; color: #d9534f; font-style: italic;"><strong>*Important Note:</strong> For security purposes, please log into your Student Portal and change this default password immediately to a memorable password of your choice (minimum 6 characters).</p>
               </div>
-              <p style="font-size: 16px; line-height: 1.6; margin-bottom: 40px; text-align: justify;">
+              <p class="letter-body">
                 We look forward to partnering with you to provide an excellent educational experience for your child. Should you have any questions regarding the admission process, please do not hesitate to contact the school administration office.
               </p>
               <!-- Sign-off -->
               <div style="margin-top: 50px;">
-                <p style="margin: 0 0 5px; font-size: 16px;">Yours faithfully,</p>
+                <p class="letter-body" style="margin-bottom: 5px;">Yours faithfully,</p>
                 <div style="height: 40px;"></div> <!-- Space for physical signature -->
                 <p style="margin: 0; font-weight: bold; font-size: 16px;">The Principal</p>
                 <p style="margin: 0; font-size: 14px; color: #555;">Elyon Montessori School</p>

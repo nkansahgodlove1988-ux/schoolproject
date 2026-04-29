@@ -103,3 +103,18 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   #letterPanel { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; box-shadow: none; border: none; }
   .hide-on-print { display: none !important; }
 }
+
+/* Admission Letter Responsive Styles */
+.letter-container { padding: 40px; background: white; color: #333; font-family: 'Times New Roman', serif; text-align: left; max-width: 800px; margin: auto; border: 1px solid #ddd; }
+.letter-header { text-align: center; border-bottom: 2px solid #003366; padding-bottom: 20px; margin-bottom: 30px; }
+.letter-header h1 { color: #003366; margin: 0; font-size: 28px; text-transform: uppercase; }
+.letter-meta { display: flex; justify-content: space-between; margin-bottom: 30px; }
+.letter-body { font-size: 16px; line-height: 1.6; margin-bottom: 20px; text-align: justify; }
+.letter-credentials { background: #f8f9fa; padding: 15px 20px; border-left: 4px solid #003366; margin-bottom: 30px; }
+@media (max-width: 600px) {
+  .letter-container { padding: 15px; border: none; }
+  .letter-header h1 { font-size: 22px; }
+  .letter-meta { flex-direction: column; gap: 10px; }
+  .letter-body { font-size: 14px; text-align: left; }
+  .letter-credentials { padding: 10px; font-size: 14px; }
+}
