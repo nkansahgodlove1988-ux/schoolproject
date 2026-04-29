@@ -62,9 +62,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(profForm) {
         profForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const newPass = document.getElementById('studNewPass').value; if(!newPass) return alert("Enter password.");
+            const name = document.getElementById('profName').value;
+            const guardianName = document.getElementById('profGuardian').value;
+            const guardianPhone = document.getElementById('profPhone').value;
+            const sRec = DB.findOne('students', { userId: user.id });
+            if (sRec) {
+                await DB.update('students', sRec.id, { name: name, guardianName: guardianName, guardianPhone: guardianPhone });
+                await DB.update('users', user.id, { name: name });
+                
+                // Update local storage so UI updates on refresh
+                user.name = name;
+                DB.setCurrentUser(user);
+                document.getElementById('currentStudentName').innerText = name;
+                document.getElementById('dashName').innerText = name;
+                alert("Personal details updated successfully!");
+            }
+        });
+    }
+
+    const passForm = document.getElementById('passwordForm');
+    if(passForm) {
+        passForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('studNewPass').value;
+            if(!newPass || newPass.length < 6) return alert("Password must be at least 6 characters.");
             await DB.update('users', user.id, { password: newPass });
-            alert("Updated!"); document.getElementById('studNewPass').value = '';
+            alert("Password updated securely!"); 
+            document.getElementById('studNewPass').value = '';
         });
     }
     const payForm = document.getElementById('paymentNoticeForm');
