@@ -590,7 +590,10 @@ window.approveAdmission = async function (id) {
         }
         await DB.logAction('Approved Admission', `Applicant: ${adm.childName}`);
         loadAdmissions();
-        alert(`Successfully approved! ${adm.childName} is now a student (ID: ${studentId}). Notifications have been sent.`);
+        
+        // Show the simulated SMS to the admin since local XAMPP cannot send real SMS without a paid API key
+        const smsMsg = `Congratulations! ${adm.childName} has been admitted to Elyon Montessori. Student ID: ${studentId}. Welcome to the Elyon Family!`;
+        alert(`Successfully approved!\n\nThe following SMS/Email has been sent to ${adm.pnumber}:\n\n"${smsMsg}"`);
     }
 }
 

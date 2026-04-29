@@ -96,3 +96,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   .fees-summary-bar { flex-direction: column; align-items: flex-start; gap: 12px; } .fees-summary-bar > div { width: 100%; }
 }
 @media (max-width: 400px) { .topbar { height: 55px; } .user-profile span { display: none; } .section-title { font-size: 1.2rem; } .dashboard-cards { gap: 8px; } .card { padding: 12px; } .card-icon { width: 36px; height: 36px; font-size: 1rem; } .card-info h4 { font-size: 0.8rem; } .card-info h2 { font-size: 1.1rem; } .table th, .table td { padding: 6px 8px; font-size: 0.78rem; } }
+
+@media print {
+  body * { visibility: hidden; }
+  #letterPanel, #letterPanel * { visibility: visible; }
+  #letterPanel { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; box-shadow: none; border: none; }
+  .hide-on-print { display: none !important; }
+}
