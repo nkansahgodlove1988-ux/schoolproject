@@ -1,53 +1,69 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    await DB.init();
-    const user = DB.requireAuth('admin');
-    if (!user) return;
+    try {
+        await DB.init();
+        const user = DB.requireAuth('admin');
+        if (!user) return;
 
-    document.getElementById('currentAdminName').innerText = user.name || 'Administrator';
+        const adminNameEl = document.getElementById('currentAdminName');
+        if (adminNameEl) adminNameEl.innerText = user.name || 'Administrator';
 
-    const menuItems = document.querySelectorAll('.menu-item');
-    const sections = document.querySelectorAll('.section');
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const overlay = document.getElementById('sidebarOverlay');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const sections = document.querySelectorAll('.section');
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
 
-    function closeSidebar() {
-        sidebar.classList.remove('show');
-        if (overlay) overlay.classList.remove('active');
-    }
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('show');
+            if (overlay) overlay.classList.remove('active');
+        }
 
-    menuItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            menuItems.forEach(mi => mi.classList.remove('active'));
-            item.classList.add('active');
-            const target = item.getAttribute('data-target');
-            sections.forEach(sec => {
-                if (sec.id === target) sec.classList.add('active');
-                else sec.classList.remove('active');
+        menuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = item.getAttribute('data-target');
+                if (!target) return;
+
+                // UI Update
+                menuItems.forEach(mi => mi.classList.remove('active'));
+                item.classList.add('active');
+                
+                sections.forEach(sec => {
+                    if (sec.id === target) sec.classList.add('active');
+                    else sec.classList.remove('active');
+                });
+
+                if (window.innerWidth <= 768) closeSidebar();
+                
+                // Data Update (Protected)
+                try { loadSectionData(target); } catch (err) { console.error("Load section error:", err); }
             });
-            if (window.innerWidth <= 768) closeSidebar();
-            loadSectionData(target);
         });
-    });
 
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('show');
-            if (overlay) overlay.classList.toggle('active');
-        });
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                if (sidebar) sidebar.classList.toggle('show');
+                if (overlay) overlay.classList.toggle('active');
+            });
+        }
+
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+
+        setupForms();
+        
+        // Dynamic event listeners
+        document.getElementById('searchStudent')?.addEventListener('input', () => loadStudents());
+        document.getElementById('filterStudentClass')?.addEventListener('change', () => loadStudents());
+        document.getElementById('searchAdmissions')?.addEventListener('input', () => loadAdmissions());
+        document.getElementById('searchTeachers')?.addEventListener('input', () => loadTeachers());
+
+        // Initial Load
+        loadSectionData('dashboard');
+    } catch (error) {
+        console.error("Initialization error:", error);
     }
-
-    if (overlay) overlay.addEventListener('click', closeSidebar);
-
-    setupForms();
-    document.getElementById('searchStudent')?.addEventListener('input', () => loadStudents());
-    document.getElementById('filterStudentClass')?.addEventListener('change', () => loadStudents());
-    document.getElementById('searchAdmissions')?.addEventListener('input', () => loadAdmissions());
-    document.getElementById('searchTeachers')?.addEventListener('input', () => loadTeachers());
-
-    loadSectionData('dashboard');
 });
+
 
 window.showModal = function (id) {
     const modal = document.getElementById(id);
@@ -431,9 +447,13 @@ function loadDashboard() {
         const payments = DB.getTable('payments');
         const data = { 'Jan': 0, 'Feb': 0, 'Mar': 0, 'Apr': 0, 'May': 0, 'Jun': 0, 'Jul': 0, 'Aug': 0, 'Sep': 0, 'Oct': 0, 'Nov': 0, 'Dec': 0 };
         payments.forEach(p => {
-            const month = new Date(p.date).toLocaleString('default', { month: 'short' });
-            if (data[month] !== undefined) data[month] += parseFloat(p.amountPaid);
+            if (!p.date || !p.amountPaid) return;
+            try {
+                const month = new Date(p.date).toLocaleString('default', { month: 'short' });
+                if (data[month] !== undefined) data[month] += parseFloat(p.amountPaid) || 0;
+            } catch (e) {}
         });
+
         window.myFeesChart = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(data), datasets: [{ label: 'Fees Collected (GHS)', data: Object.values(data), backgroundColor: '#003366', borderRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
     }
     const tbody = document.getElementById('auditLogsTableBody');
