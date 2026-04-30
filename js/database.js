@@ -72,38 +72,33 @@ const DB = {
         if (this.isInitialized) return;
         const tables = ['users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'admissions', 'results', 'attendance', 'announcements', 'timetables', 'payments', 'expenses', 'audit_logs', 'messages', 'learning_materials', 'library_books', 'library_issues', 'notifications'];
         
-        // Initialize cache with empty arrays first
-        tables.forEach(t => { if (!this.cache[t]) this.cache[t] = []; });
+        // 1. Initialize cache with empty arrays and load from localStorage for immediate view
+        tables.forEach(t => { 
+            const localData = localStorage.getItem(`ems_cache_${t}`);
+            this.cache[t] = localData ? JSON.parse(localData) : []; 
+        });
 
+        // 2. Single request to fetch everything from server
         try {
-            const fetchPromises = tables.map(async (table) => {
-                // Try loading from localStorage first to show something immediately if offline
-                const localData = localStorage.getItem(`ems_cache_${table}`);
-                if (localData) this.cache[table] = JSON.parse(localData);
-
-                try {
-                    const response = await fetch(`${API_URL}?action=fetch_all&table=${table}`, {
-                        signal: AbortSignal.timeout(10000)
-                    });
-                    if (response.ok) {
-                        const rawData = await response.json();
-                        this.cache[table] = Array.isArray(rawData) ? rawData.map(toCamelCase) : [];
-                        // Sync back to local storage for next offline use
+            const response = await fetch(`${API_URL}?action=fetch_everything`);
+            if (response.ok) {
+                const everything = await response.json();
+                Object.keys(everything).forEach(table => {
+                    const rawData = everything[table];
+                    if (Array.isArray(rawData)) {
+                        this.cache[table] = rawData.map(toCamelCase);
+                        // Sync back to local storage
                         localStorage.setItem(`ems_cache_${table}`, JSON.stringify(this.cache[table]));
                     }
-                } catch (e) {
-                    console.warn(`Failed to fetch table ${table}, using local storage fallback:`, e);
-                }
-            });
-
-            await Promise.allSettled(fetchPromises);
-            this.isInitialized = true;
+                });
+            }
         } catch (err) {
-            console.error('Critical database initialization error:', err);
-            this.isInitialized = true;
+            console.warn('API fetch_everything failed, staying with local storage fallback:', err);
         }
 
+        this.isInitialized = true;
     },
+
     getTable: function(table) { return this.cache[table] || []; },
     saveTable: async function(table, data) { this.cache[table] = data; },
     insert: async function(table, record) {

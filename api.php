@@ -56,8 +56,20 @@ switch ($action) {
         
         echo json_encode(['success' => true]);
         break;
+    case 'fetch_everything':
+        $tables = ['users', 'students', 'teachers', 'classes', 'departments', 'subjects', 'terms', 'admissions', 'results', 'attendance', 'announcements', 'timetables', 'payments', 'expenses', 'audit_logs', 'messages', 'learning_materials', 'library_books', 'library_issues', 'notifications'];
+        $everything = [];
+        foreach ($tables as $t) {
+            $res = $conn->query("SELECT * FROM `$t`") or die($conn->error);
+            $tableData = [];
+            while ($row = $res->fetch_assoc()) $tableData[] = $row;
+            $everything[$t] = $tableData;
+        }
+        echo json_encode($everything);
+        break;
     default: echo json_encode(['error' => 'Invalid action']); break;
 }
+
 function handleLogin($conn) {
     $data = json_decode(file_get_contents('php://input'), true);
     if (empty($data)) { $data = $_POST; }
