@@ -155,8 +155,11 @@
   <div class="modal-overlay" id="viewStudentModal"><div class="modal-content"><h3>Profile</h3><div id="studentDetailsView"></div><button class="btn btn-primary" onclick="hideModal('viewStudentModal')">Close</button></div></div>
   <div class="modal-overlay" id="viewResultModal"><div class="modal-content"><h3>Result</h3><div id="resultDetailsView"></div><div id="resultModalActions"></div><button class="btn btn-primary" onclick="hideModal('viewResultModal')">Close</button></div></div>
   <div class="modal-overlay" id="viewReportModal"><div class="modal-content" style="max-width: 850px;"><div class="modal-header"><h3>Academic Record / Report Card</h3><button class="close-modal" onclick="hideModal('viewReportModal')">&times;</button></div><div id="reportViewContent" style="min-height:300px; text-align:center; padding-top:15px;"></div><div style="margin-top:20px; text-align:right;"><button class="btn btn-primary" onclick="hideModal('viewReportModal')">Close Viewer</button></div></div></div>
+  <div class="modal-overlay" id="updateArrearsModal"><div class="modal-content"><div class="modal-header"><h3>Adjust Student Arrears</h3><button class="close-modal" onclick="hideModal('updateArrearsModal')">&times;</button></div><form id="formUpdateArrears"><input type="hidden" id="adjStudId"><div class="form-group"><label>Student Name</label><input type="text" id="adjStudName" class="form-control" readonly></div><div class="form-group"><label>Arrears Amount (GHS)</label><input type="number" id="adjAmount" class="form-control" step="0.01" required></div><button type="submit" class="btn btn-primary" style="width:100%">Update Arrears</button></form></div></div>
+
 
   <script src="js/database.js"></script><script src="js/admin.js"></script>
+
   <script>
     function togglePassword(i, c) {
       const input = document.getElementById(i); const icon = document.getElementById(c);

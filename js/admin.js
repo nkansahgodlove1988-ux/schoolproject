@@ -883,12 +883,69 @@ window.deleteMessage = async function(id) { if(confirm('Delete?')) { await DB.de
 
 window.generateStudentReport = function() {
     const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.text("Student Registry", 105, 20, { align: "center" });
+    doc.setFontSize(18); doc.text("Elyon Montessori School", 105, 15, { align: "center" });
+    doc.setFontSize(14); doc.text("Student Registry Report", 105, 25, { align: "center" });
     const students = DB.getTable('students');
-    const rows = students.map(s => [s.studentId, s.name, s.className]);
-    doc.autoTable({ head: [['ID', 'Name', 'Class']], body: rows, startY: 30 });
-    doc.save("Students.pdf");
+    const rows = students.map(s => [s.studentId, s.name, s.className, s.status]);
+    doc.autoTable({ head: [['ID', 'Name', 'Class', 'Status']], body: rows, startY: 35 });
+    doc.save("Student_Registry.pdf");
 }
+
+window.generateTeacherReport = function() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.setFontSize(18); doc.text("Elyon Montessori School", 105, 15, { align: "center" });
+    doc.setFontSize(14); doc.text("Teacher Registry Report", 105, 25, { align: "center" });
+    const teachers = DB.getTable('teachers');
+    const rows = teachers.map(t => [t.teacherId, t.name, t.phone, t.status]);
+    doc.autoTable({ head: [['ID', 'Name', 'Phone', 'Status']], body: rows, startY: 35 });
+    doc.save("Teacher_Registry.pdf");
+}
+
+window.generateDefaultersReport = function() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.setFontSize(18); doc.text("Elyon Montessori School", 105, 15, { align: "center" });
+    doc.setFontSize(14); doc.setTextColor(200, 0, 0); doc.text("Fee Defaulters / Debtors List", 105, 25, { align: "center" });
+    doc.setTextColor(0, 0, 0);
+    const students = DB.getTable('students');
+    const defaulters = students.filter(s => DB.calculateStudentDebt(s) > 0);
+    const rows = defaulters.map(s => [s.studentId, s.name, s.className, `GHS ${DB.calculateStudentDebt(s).toFixed(2)}`]);
+    if (rows.length === 0) {
+        doc.text("No fee defaulters found in the system.", 105, 45, { align: "center" });
+    } else {
+        doc.autoTable({ head: [['ID', 'Name', 'Class', 'Total Debt']], body: rows, startY: 35 });
+    }
+    doc.save("Fee_Defaulters.pdf");
+}
+
+window.generateFinancialReport = function() {
+    const start = document.getElementById('repStartDate').value;
+    const end = document.getElementById('repEndDate').value;
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    doc.setFontSize(18); doc.text("Elyon Montessori School", 105, 15, { align: "center" });
+    doc.setFontSize(14); doc.text(`Financial Report (${start || 'Start'} to ${end || 'End'})`, 105, 25, { align: "center" });
+    
+    let payments = DB.getTable('payments');
+    let expenses = DB.getTable('expenses');
+    
+    if (start) { payments = payments.filter(p => p.date >= start); expenses = expenses.filter(e => e.date >= start); }
+    if (end) { payments = payments.filter(p => p.date <= end); expenses = expenses.filter(e => e.date <= end); }
+    
+    const totalRev = payments.reduce((sum, p) => sum + parseFloat(p.amountPaid || 0), 0);
+    const totalExp = expenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    
+    doc.autoTable({
+        head: [['Category', 'Total Amount']],
+        body: [['Total Revenue', `GHS ${totalRev.toFixed(2)}`], ['Total Expenses', `GHS ${totalExp.toFixed(2)}`], ['Net Balance', `GHS ${(totalRev - totalExp).toFixed(2)}`]],
+        startY: 35
+    });
+    
+    doc.text("Recent Transactions", 14, doc.lastAutoTable.finalY + 15);
+    const transRows = payments.slice(0, 10).map(p => [p.date, 'Revenue', p.receiptNo, `GHS ${p.amountPaid}`]);
+    doc.autoTable({ head: [['Date', 'Type', 'Ref', 'Amount']], body: transRows, startY: doc.lastAutoTable.finalY + 20 });
+    
+    doc.save("Financial_Report.pdf");
+}
+
 
 function loadSubjects() {
     const tbody = document.querySelector('#subjectsTable tbody');
