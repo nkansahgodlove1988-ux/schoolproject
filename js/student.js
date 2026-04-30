@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const sRec = DB.findOne('students', { userId: user.id });
             await DB.insert('messages', { senderId: user.id, senderName: user.name, senderRole: 'student', className: sRec ? sRec.className : 'N/A', receiverRole: 'admin', subject: document.getElementById('supSubject').value, body: document.getElementById('supBody').value, date: new Date().toISOString() });
-            alert("Request sent!"); supportForm.reset();
+            DB.showToast("Request sent!"); supportForm.reset();
         });
     }
     const profForm = document.getElementById('profileForm');
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 DB.setCurrentUser(user);
                 document.getElementById('currentStudentName').innerText = name;
                 document.getElementById('dashName').innerText = name;
-                alert("Personal details updated successfully!");
+                DB.showToast("Personal details updated successfully!");
             }
         });
     }
@@ -85,9 +85,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         passForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const newPass = document.getElementById('studNewPass').value;
-            if(!newPass || newPass.length < 6) return alert("Password must be at least 6 characters.");
+            if(!newPass || newPass.length < 6) return DB.showToast("Password must be at least 6 characters.");
             await DB.update('users', user.id, { password: newPass });
-            alert("Password updated securely!"); 
+            DB.showToast("Password updated securely!"); 
             document.getElementById('studNewPass').value = '';
         });
     }
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const sRec = DB.findOne('students', { userId: user.id });
             if (sRec) {
                 await DB.insert('payments', { studentId: sRec.studentId, amountPaid: parseFloat(document.getElementById('payAmount').value), date: new Date(document.getElementById('payDate').value).toISOString(), receiptNo: document.getElementById('payRef').value, status: 'Pending Verification', recordedBy: 'Student' });
-                alert("Notice submitted!"); payForm.reset(); hideModal('paymentModal'); loadFeesData();
+                DB.showToast("Notice submitted!"); payForm.reset(); hideModal('paymentModal'); loadFeesData();
             }
         });
     }
@@ -150,7 +150,7 @@ function loadMessages() {
     list.forEach(m => { const tr = document.createElement('tr'); tr.innerHTML = `<td><strong>${m.senderName}</strong></td><td>${m.subject}</td><td>${new Date(m.date).toLocaleDateString()}</td><td><button class="btn btn-primary" onclick="viewStudentMessage('${m.id}')">View</button></td>`; tbody.appendChild(tr); });
 }
 
-window.viewStudentMessage = function(id) { const m = DB.findById('messages', id); if(m) alert(`FROM: ${m.senderName}\n\nSUBJECT: ${m.subject}\n\n${m.body}`); }
+window.viewStudentMessage = function(id) { const m = DB.findById('messages', id); if(m) DB.showToast(`FROM: ${m.senderName}\n\nSUBJECT: ${m.subject}\n\n${m.body}`); }
 
 window.loadResults = function(term) {
     const sRec = DB.findOne('students', { userId: DB.getCurrentUser().id }); if (!sRec) return;

@@ -134,7 +134,7 @@
         } else if (admission.status === 'rejected') { icon.className = 'fas fa-times-circle'; icon.style.color = '#e74c3c'; text.innerText = 'Declined'; }
         document.getElementById('applicationDetails').innerHTML = `<p>Child: ${admission.childName}<br>Class: ${admission.classApplying}<br>Guardian: ${admission.pname || admission.guardianName}</p>`;
       }
-      document.getElementById('passForm').addEventListener('submit', async (e) => { e.preventDefault(); await DB.update('users', user.id, { password: document.getElementById('appNewPass').value }); alert('Updated!'); });
+      document.getElementById('passForm').addEventListener('submit', async (e) => { e.preventDefault(); await DB.update('users', user.id, { password: document.getElementById('appNewPass').value }); DB.showToast('Updated!'); });
     });
     function togglePassword(i, c) {
       const input = document.getElementById(i); const icon = document.getElementById(c);

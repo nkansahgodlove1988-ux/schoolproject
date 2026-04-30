@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await DB.logAction('Teacher: Message Sent', `To: ${to}, Subject: ${subject}`);
-            alert("Message sent successfully and logged in system!");
+            DB.showToast("Message sent successfully and logged in system!");
             msgForm.reset();
         });
     }
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 await DB.logAction('Teacher: Material Uploaded', `Title: ${title}, Class: ${targetClass}`);
-                alert("Material uploaded successfully!");
+                DB.showToast("Material uploaded successfully!");
                 window.hideModal('uploadMaterialModal');
                 matForm.reset();
                 loadMaterials();
@@ -134,9 +134,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await DB.update('teachers', teacherRec.id, { phone });
                 if(newPass) {
                     await DB.update('users', user.id, { password: newPass });
-                    alert("Profile and password updated successfully!");
+                    DB.showToast("Profile and password updated successfully!");
                 } else {
-                    alert("Profile updated successfully!");
+                    DB.showToast("Profile updated successfully!");
                 }
                 await DB.logAction('Teacher: Profile Updated', `User: ${user.name}`);
                 loadProfile();
@@ -265,7 +265,7 @@ function loadTeacherMessages() {
 window.viewTeacherMessage = function(id) {
     const m = DB.findById('messages', id);
     if(m) {
-        alert(`FROM: ${m.senderName} (${m.senderRole})\nDATE: ${new Date(m.date).toLocaleString()}\n\nSUBJECT: ${m.subject}\n\n${m.body}`);
+        DB.showToast(`FROM: ${m.senderName} (${m.senderRole})\nDATE: ${new Date(m.date).toLocaleString()}\n\nSUBJECT: ${m.subject}\n\n${m.body}`);
     }
 }
 
@@ -360,7 +360,7 @@ window.loadStudentsForClass = function(className) {
             <td><strong>${s.studentId}</strong></td>
             <td>${s.name}</td>
             <td><span class="badge badge-active">${s.status}</span></td>
-            <td><button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="alert('Viewing student...')">View</button></td>
+            <td><button class="btn btn-primary" style="padding:4px 8px; font-size:0.8rem;" onclick="DB.showToast('Viewing student...')">View</button></td>
         `;
         tbody.appendChild(tr);
     });
@@ -372,7 +372,7 @@ window.loadGradeEntryGrid = function() {
     const term = document.getElementById('gradeTermSelect').value;
 
     if(!cls || !sub || !term) {
-        alert("Please select Class, Subject, and Term.");
+        DB.showToast("Please select Class, Subject, and Term.");
         return;
     }
 
@@ -381,7 +381,7 @@ window.loadGradeEntryGrid = function() {
     tbody.innerHTML = '';
 
     if(students.length === 0) {
-        alert("No students in this class. Perhaps you need to assign some from Admin.");
+        DB.showToast("No students in this class. Perhaps you need to assign some from Admin.");
         return;
     }
 
@@ -453,7 +453,7 @@ window.submitGrades = async function() {
     const user = DB.getCurrentUser();
 
     if(!cls || !sub || !term) {
-        alert("Selection incomplete.");
+        DB.showToast("Selection incomplete.");
         return;
     }
 
@@ -486,7 +486,7 @@ window.submitGrades = async function() {
         savedCount++;
     }
     await DB.logAction('Submitted Grades', `Class: ${cls}, Subject: ${sub}, Students: ${savedCount}`);
-    alert(`Successfully submitted ${savedCount} student grades to Administration for approval.`);
+    DB.showToast(`Successfully submitted ${savedCount} student grades to Administration for approval.`);
     window.loadGradeEntryGrid(); 
 }
 
@@ -538,7 +538,7 @@ window.checkStudentFees = function() {
     const resArea = document.getElementById('feeResultArea');
     const notFound = document.getElementById('feeNotFound');
     const tbody = document.querySelector('#teacherFeeTable tbody');
-    if(!studId) { alert("Please enter a Student ID."); return; }
+    if(!studId) { DB.showToast("Please enter a Student ID."); return; }
     const student = DB.findOne('students', { studentId: studId });
     if(!student) { resArea.style.display = 'none'; notFound.style.display = 'block'; return; }
     notFound.style.display = 'none';
@@ -656,5 +656,5 @@ window.saveAttendance = async function() {
         count++;
     }
     await DB.logAction('Marked Attendance', `Class: ${cls}, Date: ${date}, Students: ${count}`);
-    alert(`Attendance for ${count} students saved successfully!`);
+    DB.showToast(`Attendance for ${count} students saved successfully!`);
 }

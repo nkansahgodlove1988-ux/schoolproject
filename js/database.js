@@ -220,5 +220,16 @@ const DB = {
         const totalPaid = payments.filter(p => (p.studentId == sid || p.student_id == sid) && (p.status === 'success' || p.status === 'Paid')).reduce((sum, p) => sum + parseFloat(p.amountPaid || p.amount_paid || 0), 0);
         return Math.max(0, totalBilled - totalPaid);
     },
-    getWardByParent: function(parent) { return this.getTable('students').find(s => s.parentPhone === parent.username || s.parentEmail === parent.username || s.guardianPhone === parent.username || s.parent_phone === parent.username || s.parent_email === parent.username || s.guardian_phone === parent.username); }
+    getWardByParent: function(parent) { return this.getTable('students').find(s => s.parentPhone === parent.username || s.parentEmail === parent.username || s.guardianPhone === parent.username || s.parent_phone === parent.username || s.parent_email === parent.username || s.guardian_phone === parent.username); },
+    showToast: function(message, type = 'success') {
+        let toast = document.querySelector('.toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast';
+            document.body.appendChild(toast);
+        }
+        toast.className = 'toast show toast-' + type;
+        toast.innerHTML = (type === 'success' ? '<i class="fas fa-check-circle"></i> ' : '<i class="fas fa-exclamation-circle"></i> ') + message;
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    }
 };

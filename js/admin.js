@@ -180,7 +180,7 @@ function setupForms() {
             const user = DB.getCurrentUser();
             await DB.insert('messages', { senderId: user.id, senderName: user.name, senderRole: 'admin', receiverRole: to, subject, body, date: new Date().toISOString() });
             await DB.logAction('Sent System Message', `To: ${to}, Subject: ${subject}`);
-            alert('Your message has been sent to the system!');
+            DB.showToast('Your message has been sent to the system!');
             adminMsgForm.reset();
         });
     }
@@ -223,12 +223,12 @@ function setupForms() {
                 const resp = await fetch('api.php?action=send_announcement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
                 const res = await resp.json();
                 if (res.success) {
-                    alert('Announcement broadcasted successfully via ' + data.notification_type + '!');
+                    DB.showToast('Announcement broadcasted successfully via ' + data.notification_type + '!');
                     hideModal('announcementNotifModal');
                     broadForm.reset();
                     loadAnnouncements();
                 }
-            } catch (err) { alert('Broadcast failed: ' + err.message); }
+            } catch (err) { DB.showToast('Broadcast failed: ' + err.message); }
             finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-bullhorn"></i> Send Notifications'; }
         });
     }
@@ -257,7 +257,7 @@ function setupForms() {
             const amount = document.getElementById('feeAmount').value;
             await DB.update('classes', classId, { tuitionFee: parseFloat(amount) });
             await DB.logAction('Updated Class Fees', `Class ID: ${classId}, New Fee: ${amount}`);
-            alert('Tuition fee updated successfully!');
+            DB.showToast('Tuition fee updated successfully!');
             hideModal('setFeesModal');
             setFeesForm.reset();
         });
@@ -271,7 +271,7 @@ function setupForms() {
             const amount = document.getElementById('adjAmount').value;
             await DB.update('students', id, { arrears: parseFloat(amount) || 0 });
             await DB.logAction('Updated Arrears', `Student ID: ${id}, New Arrears: ${amount}`);
-            alert('Student arrears updated successfully!');
+            DB.showToast('Student arrears updated successfully!');
             hideModal('updateArrearsModal');
             loadStudents();
         });
@@ -290,7 +290,7 @@ function setupForms() {
             reader.onload = async function(event) {
                 await DB.insert('timetables', { title, target, fileName: file.name, content: event.target.result, date: new Date().toISOString() });
                 await DB.logAction('Uploaded Timetable', `Title: ${title}, Target: ${target}`);
-                alert('Timetable uploaded and published successfully!');
+                DB.showToast('Timetable uploaded and published successfully!');
                 ttForm.reset();
                 loadTimetables();
             };
@@ -304,12 +304,12 @@ function setupForms() {
             e.preventDefault();
             const id = document.getElementById('resetUserId').value;
             const newPass = document.getElementById('newPassword').value;
-            if (newPass.length < 5) return alert('Password too short.');
+            if (newPass.length < 5) return DB.showToast('Password too short.');
             const userRec = DB.findById('users', id);
             if (userRec) {
                 await DB.update('users', id, { password: newPass });
                 await DB.logAction('Reset Password', `User: ${userRec.username}`);
-                alert('Password reset successfully!');
+                DB.showToast('Password reset successfully!');
                 hideModal('resetPasswordModal');
                 loadUsers();
             }
@@ -329,7 +329,7 @@ function setupForms() {
             e.preventDefault();
             const name = document.getElementById('deptName').value.trim();
             const head = document.getElementById('deptHead').value.trim();
-            if (DB.find('departments', { name }).length > 0) return alert('Department already exists.');
+            if (DB.find('departments', { name }).length > 0) return DB.showToast('Department already exists.');
             DB.insert('departments', { name, head });
             DB.logAction('Created Dept', `Name: ${name}`);
             hideModal('deptModal');
@@ -346,7 +346,7 @@ function setupForms() {
             const classId = document.getElementById('subjClassId').value;
             const className = classId ? document.getElementById('subjClassId').options[document.getElementById('subjClassId').selectedIndex].text : 'General';
             const code = document.getElementById('subjCode').value.trim();
-            if (DB.find('subjects', { name }).some(s => s.classId === classId)) return alert('Subject already exists for this class.');
+            if (DB.find('subjects', { name }).some(s => s.classId === classId)) return DB.showToast('Subject already exists for this class.');
             DB.insert('subjects', { name, code, classId, className, status: 'active' });
             DB.logAction('Added Subject', `Name: ${name}`);
             hideModal('subjectModal');
@@ -397,7 +397,7 @@ function setupForms() {
             const borrowerType = document.getElementById('issueBorrowerType').value;
             const dueDate = document.getElementById('issueDueDate').value;
             const book = DB.findById('library_books', bookId);
-            if (!book || book.availableCopies < 1) return alert('No copies available.');
+            if (!book || book.availableCopies < 1) return DB.showToast('No copies available.');
             DB.insert('library_issues', { bookId, bookTitle: book.title, borrower, borrowerType, issueDate: new Date().toISOString().split('T')[0], dueDate, status: 'issued' });
             DB.update('library_books', bookId, { availableCopies: book.availableCopies - 1, status: book.availableCopies - 1 === 0 ? 'out' : 'available' });
             DB.logAction('Issued Book', `Book: ${book.title}, To: ${borrower}`);
@@ -500,12 +500,12 @@ function loadClasses() {
 
 window.assignClassTeacher = function (classId) {
     const teachers = DB.getTable('teachers');
-    if (teachers.length === 0) return alert('No teachers found.');
+    if (teachers.length === 0) return DB.showToast('No teachers found.');
     let teacherList = teachers.map((t, idx) => `${idx + 1}. ${t.name}`).join('\n');
     const choice = prompt(`Select teacher:\n\n${teacherList}`);
     if (choice === null) return;
     const index = parseInt(choice) - 1;
-    if (isNaN(index) || index < 0 || index >= teachers.length) return alert('Invalid selection.');
+    if (isNaN(index) || index < 0 || index >= teachers.length) return DB.showToast('Invalid selection.');
     const selectedTeacher = teachers[index];
     const cls = DB.findById('classes', classId);
     DB.update('classes', classId, { teacherId: selectedTeacher.id });
@@ -549,10 +549,10 @@ function loadAdmissions() {
 
 window.viewAdmissionReport = function (id) {
     const adm = DB.findById('admissions', id);
-    if (!adm || !adm.reportCard) return alert('No report card uploaded.');
+    if (!adm || !adm.reportCard) return DB.showToast('No report card uploaded.');
     
     const view = document.getElementById('reportViewContent');
-    if (!view) return alert('Viewer modal not found.');
+    if (!view) return DB.showToast('Viewer modal not found.');
     
     if (adm.reportCard.startsWith('data:application/pdf')) {
         view.innerHTML = `<embed src="${adm.reportCard}" type="application/pdf" width="100%" height="500px">`;
@@ -595,7 +595,7 @@ window.approveAdmission = async function (id) {
         
         // Show the simulated SMS to the admin since local XAMPP cannot send real SMS without a paid API key
         const smsMsg = `Congratulations! ${adm.childName} has been admitted to Elyon Montessori. Student ID: ${studentId}. Welcome to the Elyon Family!`;
-        alert(`Successfully approved!\n\nThe following SMS/Email has been sent to ${adm.pnumber}:\n\n"${smsMsg}"`);
+        DB.showToast(`Successfully approved!\n\nThe following SMS/Email has been sent to ${adm.pnumber}:\n\n"${smsMsg}"`);
     }
 }
 
@@ -805,7 +805,7 @@ function loadUsers() {
 window.deleteUser = async function(id) {
     const user = DB.findById('users', id);
     if (!user) return;
-    if (user.role === 'admin') return alert('Cannot delete admin.');
+    if (user.role === 'admin') return DB.showToast('Cannot delete admin.');
     if (confirm(`Permanently delete account for ${user.name}?`)) {
         if (user.role === 'teacher') { const t = DB.findOne('teachers', { user_id: id }); if (t) await DB.delete('teachers', t.id); }
         if (user.role === 'student') { const s = DB.findOne('students', { user_id: id }); if (s) await DB.delete('students', s.id); }

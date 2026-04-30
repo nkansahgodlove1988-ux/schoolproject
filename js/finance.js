@@ -99,10 +99,10 @@ function loadFees() {
 
 window.viewFeeHistory = function(studId) {
     const p = DB.find('payments', { studentId: studId });
-    if (p.length === 0) return alert('No payments found.');
+    if (p.length === 0) return DB.showToast('No payments found.');
     let msg = `History for ${studId}:\n\n`;
     p.forEach(x => msg += `${new Date(x.date).toLocaleDateString()} - Receipt ${x.receiptNo}: GHS ${parseFloat(x.amountPaid).toFixed(2)}\n`);
-    alert(msg);
+    DB.showToast(msg);
 }
 
 window.recordDirectPayment = function(studId) { document.getElementById('pStudent').value = studId; showModal('paymentModal'); }
@@ -122,7 +122,7 @@ function loadArrears() {
     if (debtorList.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">Zero debtors!</td></tr>'; return; }
     debtorList.sort((a,b) => b.debt - a.debt).forEach(s => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${s.name}</strong></td><td>${s.studentId}</td><td>${s.className}</td><td style="color:var(--danger); font-weight:bold;">GHS ${s.debt.toFixed(2)}</td><td>${s.guardianPhone || 'N/A'}</td><td><button class="btn btn-primary" onclick="alert('Sending Reminder...')">Remind</button></td>`;
+        tr.innerHTML = `<td><strong>${s.name}</strong></td><td>${s.studentId}</td><td>${s.className}</td><td style="color:var(--danger); font-weight:bold;">GHS ${s.debt.toFixed(2)}</td><td>${s.guardianPhone || 'N/A'}</td><td><button class="btn btn-primary" onclick="DB.showToast('Sending Reminder...')">Remind</button></td>`;
         tbody.appendChild(tr);
     });
 }
@@ -149,7 +149,7 @@ function loadSalaries() {
     const staff = [...DB.getTable('teachers').map(t => ({ id: t.id, name: t.name, role: 'Teacher', salary: 1500 })), ...DB.getTable('users').filter(u => u.role === 'admin' || u.role === 'finance').map(u => ({ id: u.id, name: u.name, role: u.role.toUpperCase(), salary: 2500 }))];
     staff.forEach(s => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${s.name}</strong></td><td>${s.role}</td><td>GHS ${s.salary.toFixed(2)}</td><td>--</td><td><span class="badge badge-inactive">Unpaid</span></td><td><button class="btn btn-success" onclick="alert('Paying ${s.name}...')">Pay Salary</button></td>`;
+        tr.innerHTML = `<td><strong>${s.name}</strong></td><td>${s.role}</td><td>GHS ${s.salary.toFixed(2)}</td><td>--</td><td><span class="badge badge-inactive">Unpaid</span></td><td><button class="btn btn-success" onclick="DB.showToast('Paying ${s.name}...')">Pay Salary</button></td>`;
         tbody.appendChild(tr);
     });
 }
@@ -160,7 +160,7 @@ function loadMessages() {
     tbody.innerHTML = '';
     const msgs = DB.getTable('messages').filter(m => m.receiverRole === 'finance' || m.receiverRole === 'all').sort((a,b) => new Date(b.date) - new Date(a.date));
     if (msgs.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No messages.</td></tr>'; return; }
-    msgs.forEach(m => { const tr = document.createElement('tr'); tr.innerHTML = `<td><strong>${m.senderName}</strong></td><td>${m.subject}</td><td>${new Date(m.date).toLocaleDateString()}</td><td><button class="btn btn-primary" onclick="alert('${m.body}')">View</button></td>`; tbody.appendChild(tr); });
+    msgs.forEach(m => { const tr = document.createElement('tr'); tr.innerHTML = `<td><strong>${m.senderName}</strong></td><td>${m.subject}</td><td>${new Date(m.date).toLocaleDateString()}</td><td><button class="btn btn-primary" onclick="DB.showToast('${m.body}')">View</button></td>`; tbody.appendChild(tr); });
 }
 
 function setupFinanceForms() {
@@ -173,7 +173,7 @@ function setupFinanceForms() {
             const studId = document.getElementById('pStudent').value, amount = document.getElementById('pAmount').value, receipt = document.getElementById('pReceipt').value, status = document.getElementById('pStatus').value;
             await DB.insert('payments', { studentId: studId, amountPaid: amount, receiptNo: receipt, status: status, date: new Date().toISOString() });
             await DB.logAction('Finance: Payment Recorded', `Student: ${studId}`);
-            alert('Recorded successfully!');
+            DB.showToast('Recorded successfully!');
             hideModal('paymentModal'); payForm.reset();
             if (document.getElementById('fees').classList.contains('active')) loadFees(); else loadFinanceDashboard();
         });
@@ -185,7 +185,7 @@ function setupFinanceForms() {
             const cat = document.getElementById('expCategory').value, desc = document.getElementById('expDesc').value, amt = document.getElementById('expAmount').value, ref = document.getElementById('expRef').value;
             await DB.insert('expenses', { category: cat, description: desc, amount: amt, reference: ref });
             await DB.logAction('Finance: Expense Recorded', `Amount: ${amt}`);
-            alert('Logged successfully!');
+            DB.showToast('Logged successfully!');
             hideModal('expenseModal'); expForm.reset();
             if (document.getElementById('expenses').classList.contains('active')) loadExpenses(); else loadFinanceDashboard();
         });

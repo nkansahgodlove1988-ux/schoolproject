@@ -367,11 +367,11 @@
                 
                 // MOCK SUCCESS for demo purposes (Simulator)
                 setTimeout(async () => {
-                    alert('Redirecting to Payment Gateway Simulator...\n\nIn a real environment, you would be redirected to: ' + data.checkout_url);
+                    DB.showToast('Redirecting to Payment Gateway Simulator...\n\nIn a real environment, you would be redirected to: ' + data.checkout_url);
                     const verify = await fetch(`api.php?action=verify_payment&reference=${data.reference}&status=success`);
                     const vData = await verify.json();
                     if(vData.success) {
-                        alert('Payment Successful! Your receipt has been generated and sent to your email.');
+                        DB.showToast('Payment Successful! Your receipt has been generated and sent to your email.');
                         window.location.href = 'student-portal.html';
                     }
                 }, 2000);
@@ -379,7 +379,7 @@
                 throw new Error(data.error || 'Failed to initiate payment.');
             }
         } catch (err) {
-            alert('Error: ' + err.message);
+            DB.showToast('Error: ' + err.message);
             btn.disabled = false;
             btn.innerText = 'Proceed to Payment';
         }

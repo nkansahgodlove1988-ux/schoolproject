@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!user) return;
     document.getElementById('currentParentName').innerText = user.name || 'Parent';
     const ward = DB.getWardByParent(user);
-    if (!ward) alert("System linking in progress. Please contact the school.");
+    if (!ward) DB.showToast("System linking in progress. Please contact the school.");
     else { document.getElementById('dashParentName').innerText = user.name; document.getElementById('wardName').innerText = ward.name; loadDashboardData(ward); loadWardProfile(ward); }
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         msgForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             await DB.insert('messages', { senderId: user.id, senderName: user.name, senderRole: 'parent', receiverRole: document.getElementById('pMsgTo').value, subject: document.getElementById('pMsgSubject').value, body: document.getElementById('pMsgBody').value, date: new Date().toISOString() });
-            alert('Sent successfully!'); msgForm.reset(); loadMessages();
+            DB.showToast('Sent successfully!'); msgForm.reset(); loadMessages();
         });
     }
 });

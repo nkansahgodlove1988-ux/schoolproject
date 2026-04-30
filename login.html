@@ -240,6 +240,13 @@
         margin: 0 auto;
       }
     }
+
+    /* Toast Notifications */
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; border-radius: 8px; color: white; font-weight: 600; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; transition: 0.3s; transform: translateY(-100px); opacity: 0; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-success { background: #2ecc71; }
+    .toast-error { background: #e74c3c; }
+    .toast-info { background: #3498db; }
   </style>
 </head>
 
@@ -325,25 +332,27 @@
       let password = document.getElementById("password").value;
 
       if (typeof DB === 'undefined') {
-        alert("Database system not loaded. Please refresh.");
+        DB.showToast("Database system not loaded. Please refresh.");
         return;
       }
 
       const user = await DB.login(username, password);
 
       if (user) {
-        alert("Login successful!");
+        DB.showToast("Login successful!", 'success');
 
         // Simple role-based routing
-        if (user.role === 'admin') window.location.href = "admin-portal.html";
-        else if (user.role === 'teacher') window.location.href = "teacher-portal.html";
-        else if (user.role === 'student') window.location.href = "student-portal.html";
-        else if (user.role === 'applicant') window.location.href = "applicant-portal.html";
-        else if (user.role === 'finance') window.location.href = "finance-portal.html";
-        else if (user.role === 'parent') window.location.href = "parent-portal.html";
-        else window.location.href = "index.html";
+        setTimeout(() => {
+          if (user.role === 'admin') window.location.href = "admin-portal.html";
+          else if (user.role === 'teacher') window.location.href = "teacher-portal.html";
+          else if (user.role === 'student') window.location.href = "student-portal.html";
+          else if (user.role === 'applicant') window.location.href = "applicant-portal.html";
+          else if (user.role === 'finance') window.location.href = "finance-portal.html";
+          else if (user.role === 'parent') window.location.href = "parent-portal.html";
+          else window.location.href = "index.html";
+        }, 1000);
       } else {
-        alert("Invalid username or password. Please try again.");
+        DB.showToast("Invalid username or password. Please try again.", 'error');
       }
     }
   </script>
