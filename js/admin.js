@@ -251,11 +251,15 @@ function setupForms() {
             const status = document.getElementById('pStatus').value;
             await DB.insert('payments', { studentId, amountPaid: amount, receiptNo: receipt, status, date: new Date().toISOString() });
             await DB.logAction('Recorded Payment', `Student ID: ${studentId}, Amount: ${amount}`);
+            DB.showToast('Payment recorded and debt updated!');
             hideModal('paymentModal');
             paymentForm.reset();
             loadFees();
+            loadStudents();
+            loadDashboard();
         });
     }
+
 
     const setFeesForm = document.getElementById('formSetFees');
     if (setFeesForm) {
@@ -464,12 +468,14 @@ window.deleteTeacher = function (id) {
     if (confirm('Are you sure?')) {
         const teacher = DB.findById('teachers', id);
         if (teacher) {
-            if (teacher.userId) DB.delete('users', teacher.userId);
-            DB.delete('teachers', id);
-            DB.logAction('Deleted Teacher', `Name: ${teacher.name}`);
+            if (teacher.userId) await DB.delete('users', teacher.userId);
+            await DB.delete('teachers', id);
+            await DB.logAction('Deleted Teacher', `Name: ${teacher.name}`);
             loadTeachers();
             loadUsers();
+            loadDashboard();
         }
+
     }
 }
 
@@ -661,7 +667,9 @@ window.deleteStudent = async function (id) {
             await DB.logAction('Deleted Student', `Name: ${student.name}`);
             loadStudents();
             loadUsers();
+            loadDashboard();
         }
+
     }
 }
 

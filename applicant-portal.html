@@ -60,87 +60,109 @@
   <script src="js/database.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      await DB.init(); const user = DB.requireAuth('applicant'); if (!user) return;
+      await DB.init();
+      const user = DB.requireAuth('applicant');
+      if (!user) return;
+
       document.getElementById('currentApplicantName').innerText = user.name || 'Applicant';
-      const menuItems = document.querySelectorAll('.menu-item'); const sections = document.querySelectorAll('.section'); const sidebar = document.getElementById('sidebar');
+      
+      const menuItems = document.querySelectorAll('.menu-item');
+      const sections = document.querySelectorAll('.section');
+      const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.getElementById('toggleSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+
+      function closeSidebar() {
+        sidebar.classList.remove('show');
+        if (overlay) overlay.classList.remove('active');
+      }
+
       menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
-          e.preventDefault(); menuItems.forEach(mi => mi.classList.remove('active')); item.classList.add('active'); const target = item.getAttribute('data-target');
-          sections.forEach(sec => { if (sec.id === target) sec.classList.add('active'); else sec.classList.remove('active'); });
-      document.getElementById('toggleSidebar').addEventListener('click', () => { 
-        sidebar.classList.toggle('show'); 
-        if(overlay) overlay.classList.toggle('active');
+          e.preventDefault();
+          menuItems.forEach(mi => mi.classList.remove('active'));
+          item.classList.add('active');
+          const target = item.getAttribute('data-target');
+          sections.forEach(sec => {
+            if (sec.id === target) sec.classList.add('active');
+            else sec.classList.remove('active');
+          });
+          if (window.innerWidth <= 768) closeSidebar();
+        });
       });
-      if(overlay) overlay.addEventListener('click', () => {
-        sidebar.classList.remove('show');
-        overlay.classList.remove('active');
-      });
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('show');
+          if (overlay) overlay.classList.toggle('active');
+        });
+      }
+
+      if (overlay) overlay.addEventListener('click', closeSidebar);
 
       const admission = DB.findOne('admissions', { userId: user.id });
       if (admission) {
-        const icon = document.getElementById('statusIcon'); const text = document.getElementById('statusText');
+        const icon = document.getElementById('statusIcon');
+        const text = document.getElementById('statusText');
+        
         if (admission.status === 'approved') {
-          icon.className = 'fas fa-check-circle'; icon.style.color = '#28a745'; text.innerText = 'Approved';
+          icon.className = 'fas fa-check-circle';
+          icon.style.color = '#28a745';
+          text.innerText = 'Approved';
+          
           const student = DB.findOne('students', { admissionId: admission.id });
-          const sm = student ? `<p><strong>ID:</strong> ${student.studentId}<br><strong>Pass:</strong> password123</p>` : '';
-          const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
           const studentId = student ? student.studentId : 'PENDING';
-          const letterHTML = `
+          const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+          
+          document.getElementById('letterPanel').innerHTML = `
             <div class="letter-container" id="printableLetter">
-              <!-- Letterhead -->
               <div class="letter-header">
                 <img src="image/logo.jpeg" alt="School Logo" style="height: 80px; margin-bottom: 10px;">
                 <h1>Elyon Montessori School</h1>
                 <p style="color: #555; margin: 5px 0 0; font-style: italic;">Nurturing Potential, Building Character</p>
                 <p style="margin: 5px 0 0; font-size: 14px;">Brafoyaw, Cape Coast | Tel: 024-443-0918 | info@elyonmontessori.com</p>
               </div>
-              <!-- Date & Ref -->
               <div class="letter-meta">
                 <p style="margin: 0;"><strong>Ref:</strong> EMS/ADM/${new Date().getFullYear()}/${studentId}</p>
                 <p style="margin: 0;"><strong>Date:</strong> ${today}</p>
               </div>
-              <!-- Salutation -->
               <p class="letter-body">Dear <strong>${admission.pname || admission.guardianName || 'Parent/Guardian'}</strong>,</p>
-              <!-- Title -->
               <h2 style="text-align: center; text-decoration: underline; margin-bottom: 30px; font-size: 20px;">OFFER OF ADMISSION</h2>
-              <!-- Body text -->
               <p class="letter-body">
-                We are pleased to inform you that your child, <strong>${admission.childName}</strong>, has been officially offered admission to Elyon Montessori School for the upcoming academic term. Based on the application and academic records provided, we are confident that your ward will thrive in <strong>${admission.classApplying}</strong>.
+                We are pleased to inform you that your child, <strong>${admission.childName}</strong>, has been officially offered admission to Elyon Montessori School. Based on the application and academic records provided, we are confident that your ward will thrive in <strong>${admission.classApplying}</strong>.
               </p>
-              <p class="letter-body">
-                Please find below the official student credentials assigned to your child. These credentials are required to access the online Parent Portal, check terminal reports, and complete tuition fee payments:
-              </p>
-              <!-- Credentials Box -->
               <div class="letter-credentials">
                 <p style="margin: 0 0 10px;"><strong>Student ID:</strong> ${studentId}</p>
                 <p style="margin: 0 0 10px;"><strong>Default Password:</strong> password123</p>
-                <p style="margin: 0; font-size: 13px; color: #d9534f; font-style: italic;"><strong>*Important Note:</strong> For security purposes, please log into your Student Portal and change this default password immediately to a memorable password of your choice (minimum 6 characters).</p>
+                <p style="margin: 0; font-size: 13px; color: #d9534f; font-style: italic;">*Please change this password upon your first login to the Student Portal.</p>
               </div>
-              <p class="letter-body">
-                We look forward to partnering with you to provide an excellent educational experience for your child. Should you have any questions regarding the admission process, please do not hesitate to contact the school administration office.
-              </p>
-              <!-- Sign-off -->
               <div style="margin-top: 50px;">
-                <p class="letter-body" style="margin-bottom: 5px;">Yours faithfully,</p>
-                <div style="height: 40px;"></div> <!-- Space for physical signature -->
-                <p style="margin: 0; font-weight: bold; font-size: 16px;">The Principal</p>
-                <p style="margin: 0; font-size: 14px; color: #555;">Elyon Montessori School</p>
+                <p class="letter-body">Yours faithfully,</p>
+                <p style="margin: 20px 0 0; font-weight: bold;">The Principal</p>
               </div>
-              <!-- Print Button -->
-              <div style="text-align: center; margin-top: 50px;" class="hide-on-print">
-                <button class="btn btn-primary" onclick="window.print()" style="font-size: 16px; padding: 12px 30px; border-radius: 6px;"><i class="fas fa-print"></i> Download / Print Letter</button>
+              <div style="text-align: center; margin-top: 30px;" class="hide-on-print">
+                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Download / Print Letter</button>
               </div>
-            </div>
-          `;
-          document.getElementById('letterPanel').innerHTML = letterHTML;
+            </div>`;
           document.getElementById('letterPanel').style.background = '#f4f7fa';
           document.getElementById('letterPanel').style.padding = '0';
-          document.getElementById('letterPanel').style.boxShadow = 'none';
-        } else if (admission.status === 'rejected') { icon.className = 'fas fa-times-circle'; icon.style.color = '#e74c3c'; text.innerText = 'Declined'; }
-        document.getElementById('applicationDetails').innerHTML = `<p>Child: ${admission.childName}<br>Class: ${admission.classApplying}<br>Guardian: ${admission.pname || admission.guardianName}</p>`;
+        } else if (admission.status === 'rejected') {
+          icon.className = 'fas fa-times-circle'; icon.style.color = '#e74c3c'; text.innerText = 'Declined';
+        }
+        document.getElementById('applicationDetails').innerHTML = `
+          <p><strong>Child:</strong> ${admission.childName}<br>
+          <strong>Class:</strong> ${admission.classApplying}<br>
+          <strong>Guardian:</strong> ${admission.pname || admission.guardianName}<br>
+          <strong>Applied On:</strong> ${new Date(admission.createdAt).toLocaleDateString()}</p>`;
       }
-      document.getElementById('passForm').addEventListener('submit', async (e) => { e.preventDefault(); await DB.update('users', user.id, { password: document.getElementById('appNewPass').value }); DB.showToast('Updated!'); });
+      
+      document.getElementById('passForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await DB.update('users', user.id, { password: document.getElementById('appNewPass').value });
+        DB.showToast('Password updated successfully!');
+      });
     });
+
     function togglePassword(i, c) {
       const input = document.getElementById(i); const icon = document.getElementById(c);
       if (input.type === 'password') { input.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); }

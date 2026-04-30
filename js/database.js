@@ -250,9 +250,16 @@ const DB = {
         const tuition = cls ? parseFloat(cls.tuitionFee || cls.tuition_fee || 0) : 0;
         const totalBilled = tuition + parseFloat(student.arrears || 0);
         const sid = student.studentId || student.student_id;
-        const totalPaid = payments.filter(p => (p.studentId == sid || p.student_id == sid) && (p.status === 'success' || p.status === 'Paid')).reduce((sum, p) => sum + parseFloat(p.amountPaid || p.amount_paid || 0), 0);
+        
+        // Sum up ALL payments that are not 'Failed' or 'Cancelled'
+        const validStatuses = ['Paid', 'Partial', 'success', 'Approved'];
+        const totalPaid = payments
+            .filter(p => (p.studentId == sid || p.student_id == sid) && validStatuses.includes(p.status))
+            .reduce((sum, p) => sum + parseFloat(p.amountPaid || p.amount_paid || 0), 0);
+            
         return Math.max(0, totalBilled - totalPaid);
     },
+
     getWardByParent: function(parent) { return this.getTable('students').find(s => s.parentPhone === parent.username || s.parentEmail === parent.username || s.guardianPhone === parent.username || s.parent_phone === parent.username || s.parent_email === parent.username || s.guardian_phone === parent.username); },
     showToast: function(message, type = 'success') {
         let toast = document.querySelector('.toast');
