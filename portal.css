@@ -126,3 +126,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .toast-error { background: #e74c3c; }
 .toast-info { background: #3498db; }
 
+
+@media (max-width: 600px) {
+  .toast { top: 10px; right: 10px; left: 10px; padding: 10px 15px; font-size: 14px; text-align: center; justify-content: center; }
+}
