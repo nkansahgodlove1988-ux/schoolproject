@@ -329,8 +329,11 @@
 
       const response = await DB.login(username, password);
       
-      if (response.success) {
-        const user = response.user;
+      // Support both new {success, user} and old {id, role} response formats for cache resilience
+      const isSuccess = response && (response.success || (response.id && response.role));
+      const user = response.success ? response.user : response;
+
+      if (isSuccess) {
         DB.showToast("Login successful!", 'success');
 
         // Simple role-based routing
@@ -344,8 +347,10 @@
           else window.location.href = "index.html";
         }, 1000);
       } else {
-        DB.showToast(response.message || "Invalid username or password. Please try again.", 'error');
+        const errorMsg = (response && response.message) || "Invalid username or password. Please try again.";
+        DB.showToast(errorMsg, 'error');
       }
+
 
     }
   </script>

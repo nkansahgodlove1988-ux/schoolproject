@@ -192,11 +192,20 @@ const DB = {
         }
         
         // Search in the users table (for applicants, students, etc.)
-        const user = this.findOne('users', { username, password });
-        if (user) { this.setCurrentUser(user); return { success: true, user: user }; }
+        const users = this.getTable('users');
+        const userFound = users.find(u => u.username === username);
+        if (userFound) {
+            if (userFound.password === password) {
+                this.setCurrentUser(userFound);
+                return { success: true, user: userFound };
+            } else {
+                return { success: false, message: 'Invalid password' };
+            }
+        }
         
-        return { success: false, message: 'Invalid credentials' };
+        return { success: false, message: 'User not found' };
     },
+
 
     getCurrentUser: function() { const user = sessionStorage.getItem('ems_currentUser'); return user ? JSON.parse(user) : null; },
     setCurrentUser: function(user) { sessionStorage.setItem('ems_currentUser', JSON.stringify(user)); },
