@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost/ElyonMontessoriSMS/api.php';
+// Dynamically determine the API URL based on the current host so it works on mobile devices over local network
+const API_URL = window.location.origin + '/ElyonMontessoriSMS/api.php';
 
 // Maps JS camelCase keys to MySQL snake_case column names
 const COLUMN_MAP = {
