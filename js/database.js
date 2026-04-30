@@ -173,21 +173,31 @@ const DB = {
             if (res.success) { 
                 const camelUser = toCamelCase(res.user);
                 this.setCurrentUser(camelUser); 
-                return camelUser; 
+                return { success: true, user: camelUser }; 
+            } else {
+                return { success: false, message: res.message || 'Login failed' };
             }
         } catch (err) {
             console.warn('Login API failed, using fallback:', err);
         }
-        // Fallback for offline mode
-        if (username === 'admin' && password === 'admin123') { const u = { id: 1, username: 'admin', role: 'admin', name: 'System Admin' }; this.setCurrentUser(u); return u; }
-        if (username === 'finance' && password === 'password123') { const u = { id: 2, username: 'finance', role: 'finance', name: 'School Accountant' }; this.setCurrentUser(u); return u; }
+        
+        // Fallback for offline mode (keeping for dev convenience)
+        if (username === 'admin' && password === 'admin123') { 
+            const u = { id: 1, username: 'admin', role: 'admin', name: 'System Admin' }; 
+            this.setCurrentUser(u); return { success: true, user: u }; 
+        }
+        if (username === 'finance' && password === 'password123') { 
+            const u = { id: 2, username: 'finance', role: 'finance', name: 'School Accountant' }; 
+            this.setCurrentUser(u); return { success: true, user: u }; 
+        }
         
         // Search in the users table (for applicants, students, etc.)
         const user = this.findOne('users', { username, password });
-        if (user) { this.setCurrentUser(user); return user; }
+        if (user) { this.setCurrentUser(user); return { success: true, user: user }; }
         
-        return null;
+        return { success: false, message: 'Invalid credentials' };
     },
+
     getCurrentUser: function() { const user = sessionStorage.getItem('ems_currentUser'); return user ? JSON.parse(user) : null; },
     setCurrentUser: function(user) { sessionStorage.setItem('ems_currentUser', JSON.stringify(user)); },
     logout: function() { sessionStorage.removeItem('ems_currentUser'); window.location.href = 'login.html'; },

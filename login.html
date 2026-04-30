@@ -327,9 +327,10 @@
         return;
       }
 
-      const user = await DB.login(username, password);
-
-      if (user) {
+      const response = await DB.login(username, password);
+      
+      if (response.success) {
+        const user = response.user;
         DB.showToast("Login successful!", 'success');
 
         // Simple role-based routing
@@ -343,8 +344,9 @@
           else window.location.href = "index.html";
         }, 1000);
       } else {
-        DB.showToast("Invalid username or password. Please try again.", 'error');
+        DB.showToast(response.message || "Invalid username or password. Please try again.", 'error');
       }
+
     }
   </script>
 </body>
