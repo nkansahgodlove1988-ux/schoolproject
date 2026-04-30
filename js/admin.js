@@ -140,8 +140,10 @@ function setupForms() {
             hideModal('teacherModal');
             teacherForm.reset();
             loadTeachers();
+            loadDashboard();
         });
     }
+
 
     const classForm = document.getElementById('formAddClass');
     if (classForm) {
@@ -153,8 +155,10 @@ function setupForms() {
             hideModal('classModal');
             classForm.reset();
             loadClasses();
+            loadDashboard();
         });
     }
+
 
     const annForm = document.getElementById('announcementForm');
     if (annForm) {
@@ -167,8 +171,10 @@ function setupForms() {
             await DB.insert('announcements', { title, target, body, author: user.name, date: new Date().toISOString() });
             annForm.reset();
             loadAnnouncements();
+            loadDashboard();
         });
     }
+
 
     const adminMsgForm = document.getElementById('adminMsgForm');
     if (adminMsgForm) {
@@ -208,8 +214,10 @@ function setupForms() {
             hideModal('studentModal');
             studentForm.reset();
             loadStudents();
+            loadDashboard();
         });
     }
+
 
     const broadForm = document.getElementById('formBroadCast');
     if (broadForm) {
@@ -592,6 +600,8 @@ window.approveAdmission = async function (id) {
         }
         await DB.logAction('Approved Admission', `Applicant: ${adm.childName}`);
         loadAdmissions();
+        loadDashboard();
+
         
         // Show the simulated SMS to the admin since local XAMPP cannot send real SMS without a paid API key
         const smsMsg = `Congratulations! ${adm.childName} has been admitted to Elyon Montessori. Student ID: ${studentId}. Welcome to the Elyon Family!`;

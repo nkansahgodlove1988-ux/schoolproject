@@ -77,27 +77,32 @@ const DB = {
 
         try {
             const fetchPromises = tables.map(async (table) => {
+                // Try loading from localStorage first to show something immediately if offline
+                const localData = localStorage.getItem(`ems_cache_${table}`);
+                if (localData) this.cache[table] = JSON.parse(localData);
+
                 try {
                     const response = await fetch(`${API_URL}?action=fetch_all&table=${table}`, {
-                        signal: AbortSignal.timeout(10000) // 10 second timeout per request
+                        signal: AbortSignal.timeout(10000)
                     });
                     if (response.ok) {
                         const rawData = await response.json();
-                        // Convert snake_case keys from MySQL to camelCase for JS
                         this.cache[table] = Array.isArray(rawData) ? rawData.map(toCamelCase) : [];
+                        // Sync back to local storage for next offline use
+                        localStorage.setItem(`ems_cache_${table}`, JSON.stringify(this.cache[table]));
                     }
                 } catch (e) {
-                    console.warn(`Failed to fetch table ${table}:`, e);
+                    console.warn(`Failed to fetch table ${table}, using local storage fallback:`, e);
                 }
             });
 
             await Promise.allSettled(fetchPromises);
             this.isInitialized = true;
-            console.log('Database initialized successfully (some tables may have failed but UI is unblocked)');
         } catch (err) {
             console.error('Critical database initialization error:', err);
-            this.isInitialized = true; // Still set to true to unblock UI
+            this.isInitialized = true;
         }
+
     },
     getTable: function(table) { return this.cache[table] || []; },
     saveTable: async function(table, data) { this.cache[table] = data; },
@@ -119,8 +124,10 @@ const DB = {
         record.id = Math.floor(Math.random() * 100000);
         if (!this.cache[table]) this.cache[table] = [];
         this.cache[table].push(record);
+        localStorage.setItem(`ems_cache_${table}`, JSON.stringify(this.cache[table]));
         return record;
     },
+
     update: async function(table, id, updates) {
         try {
             // Convert camelCase to snake_case for MySQL
@@ -137,9 +144,13 @@ const DB = {
         }
         // Fallback: update local cache anyway
         const idx = this.cache[table].findIndex(item => item.id == id);
-        if (idx !== -1) this.cache[table][idx] = { ...this.cache[table][idx], ...updates };
+        if (idx !== -1) {
+            this.cache[table][idx] = { ...this.cache[table][idx], ...updates };
+            localStorage.setItem(`ems_cache_${table}`, JSON.stringify(this.cache[table]));
+        }
         return false;
     },
+
     delete: async function(table, id) {
         try {
             const resp = await fetch(`${API_URL}?action=delete&table=${table}&id=${id}`);
@@ -150,8 +161,10 @@ const DB = {
         }
         // Fallback: remove from local cache
         this.cache[table] = this.cache[table].filter(item => item.id != id);
+        localStorage.setItem(`ems_cache_${table}`, JSON.stringify(this.cache[table]));
         return false;
     },
+
     findById: function(table, id) { return this.getTable(table).find(item => item.id == id); },
     find: function(table, query) {
         return this.getTable(table).filter(item => Object.keys(query).every(key => item[key] == query[key]));
