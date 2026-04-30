@@ -1,5 +1,6 @@
-// Dynamically determine the API URL based on the current host so it works on mobile devices over local network
-const API_URL = window.location.origin + '/ElyonMontessoriSMS/api.php';
+// Use relative path for API so it works across different hosting environments (XAMPP subfolders or Vercel root)
+const API_URL = 'api.php';
+
 
 // Maps JS camelCase keys to MySQL snake_case column names
 const COLUMN_MAP = {
