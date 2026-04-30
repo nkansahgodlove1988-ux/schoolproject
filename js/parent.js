@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     else { document.getElementById('dashParentName').innerText = user.name; document.getElementById('wardName').innerText = ward.name; loadDashboardData(ward); loadWardProfile(ward); }
     const menuItems = document.querySelectorAll('.menu-item');
     const sections = document.querySelectorAll('.section');
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    function closeSidebar() { sidebar.classList.remove('show'); if(overlay) overlay.classList.remove('active'); }
     menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -18,10 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             item.classList.add('active');
             sections.forEach(sec => { if (sec.id === target) sec.classList.add('active'); else sec.classList.remove('active'); });
             if (ward) loadSectionData(target, ward);
-            if (window.innerWidth <= 768) sidebar.classList.remove('show');
+            if (window.innerWidth <= 768) closeSidebar();
         });
     });
-    if (toggleBtn) toggleBtn.addEventListener('click', () => sidebar.classList.toggle('show'));
+    if (toggleBtn) toggleBtn.addEventListener('click', () => { sidebar.classList.toggle('show'); if(overlay) overlay.classList.toggle('active'); });
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+
     const msgForm = document.getElementById('parentMsgForm');
     if (msgForm) {
         msgForm.addEventListener('submit', async (e) => {

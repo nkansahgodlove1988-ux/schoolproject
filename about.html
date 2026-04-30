@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | Elyon Montessori</title>
+    <meta name="description" content="Learn about the philosophy, mission, and vision of Elyon Montessori School in Cape Coast.">
     <link rel="icon" type="image/png" href="image/favicon2.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -314,15 +316,16 @@
             .nav-links {
                 position: absolute;
                 top: 100%;
-                right: 5%;
-                width: 260px;
+                right: 0;
+                width: 100%;
                 background: rgba(0, 51, 102, 0.98);
-                border-radius: 20px;
-                padding: 20px;
+                border-radius: 0 0 20px 20px;
+                padding: 25px;
                 display: none;
                 flex-direction: column;
-                gap: 12px;
+                gap: 15px;
                 box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+                z-index: 1001;
             }
 
             .nav-links.show {
@@ -332,8 +335,10 @@
             .nav-links a {
                 width: 100%;
                 text-align: center;
-                padding: 14px;
+                padding: 16px;
+                font-size: 1.1rem;
             }
+
 
             .mission-grid {
                 grid-template-columns: 1fr;

@@ -57,11 +57,13 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .btn-danger:hover { background: #c0392b; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
-.table-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); overflow-x: auto; }
-.table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.table-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); overflow-x: auto; position: relative; }
+.table-container::after { content: '← Scroll horizontally →'; display: none; position: absolute; bottom: 5px; right: 20px; font-size: 10px; color: #aaa; pointer-events: none; }
+.table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
 .table th, .table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
-.table th { background: #f8f9fa; color: #333; font-weight: 600; }
+.table th { background: #f8f9fa; color: #333; font-weight: 600; position: sticky; top: 0; z-index: 10; }
 .table tr:hover { background: rgba(0,0,0,0.01); }
+
 .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 .badge-pending { background: #fff3cd; color: #856404; }
 .badge-approved { background: #d4edda; color: #155724; }
@@ -86,15 +88,21 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 @media (max-width: 960px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } .dashboard-cards { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 768px) {
-  .sidebar { position: fixed; transform: translateX(-100%); height: 100%; } .sidebar.show { transform: translateX(0); } .toggle-btn { display: block; }
-  .topbar { padding: 0 12px; gap: 8px; } .topbar-right { gap: 10px; } .user-profile span { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; font-size: 0.85rem; }
-  .logout-btn { padding: 6px 10px; font-size: 0.8rem; } .logout-btn span { display: none; } .content-area { padding: 15px; } .section-header { flex-wrap: wrap !important; gap: 12px !important; }
-  .section-header .btn { width: 100%; justify-content: center; } .section-title { font-size: 1.4rem; } .dashboard-cards { grid-template-columns: 1fr; gap: 12px; }
-  .table-container { padding: 10px; margin: 0 -5px; } .table th, .table td { padding: 8px 10px; font-size: 0.82rem; white-space: nowrap; } .action-btns { flex-direction: column; gap: 4px; } .action-btns button { width: 100%; font-size: 0.75rem; }
-  .panel { padding: 15px; } .panel-title { font-size: 1rem; } .btn { padding: 8px 14px; font-size: 0.85rem; } .modal-content { margin: 15px; max-width: calc(100vw - 30px); padding: 20px; }
-  .card { padding: 15px; gap: 12px; } .card-icon { width: 42px; height: 42px; font-size: 1.2rem; } .card-info h2 { font-size: 1.3rem; }
-  .fees-summary-bar { flex-direction: column; align-items: flex-start; gap: 12px; } .fees-summary-bar > div { width: 100%; }
+  .sidebar { position: fixed; transform: translateX(-100%); width: 280px; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.2); }
+  .sidebar.show { transform: translateX(0); }
+  .toggle-btn { display: block; font-size: 1.5rem; }
+  .topbar { padding: 0 15px; height: 60px; }
+  .topbar-right { gap: 12px; }
+  .user-profile span { display: none; }
+  .logout-btn { padding: 8px 12px; font-size: 0.85rem; }
+  .content-area { padding: 20px 15px; }
+  .dashboard-cards { grid-template-columns: 1fr; gap: 15px; }
+  .card { padding: 18px; }
+  .section-title { font-size: 1.5rem; }
+  .modal-content { width: 95%; margin: 10px; }
+  .fees-summary-bar { flex-direction: column; align-items: flex-start; }
 }
+
 @media (max-width: 400px) { .topbar { height: 55px; } .user-profile span { display: none; } .section-title { font-size: 1.2rem; } .dashboard-cards { gap: 8px; } .card { padding: 12px; } .card-icon { width: 36px; height: 36px; font-size: 1rem; } .card-info h4 { font-size: 0.8rem; } .card-info h2 { font-size: 1.1rem; } .table th, .table td { padding: 6px 8px; font-size: 0.78rem; } }
 
 @media print {

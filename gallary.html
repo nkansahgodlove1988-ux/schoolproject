@@ -192,15 +192,16 @@
             .nav-links {
                 position: absolute;
                 top: 100%;
-                right: 5%;
-                width: 260px;
+                right: 0;
+                width: 100%;
                 background: rgba(0, 51, 102, 0.98);
-                border-radius: 20px;
-                padding: 20px;
+                border-radius: 0 0 20px 20px;
+                padding: 25px;
                 display: none;
                 flex-direction: column;
-                gap: 12px;
-                box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+                gap: 15px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+                z-index: 1001;
             }
 
             .nav-links.show {
@@ -210,8 +211,10 @@
             .nav-links a {
                 width: 100%;
                 text-align: center;
-                padding: 14px;
+                padding: 16px;
+                font-size: 1.1rem;
             }
+
 
             .footer-grid {
                 grid-template-columns: 1fr 1fr;

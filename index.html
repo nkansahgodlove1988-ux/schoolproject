@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | Elyon Montessori School</title>
+    <title>Elyon Montessori School | Excellence in Early Childhood Education</title>
+    <meta name="description" content="Elyon Montessori School in Brafoyaw, Cape Coast provides a nurturing and stimulating environment following the Montessori method for children to reach their full potential.">
+    <meta name="keywords" content="Montessori school, Cape Coast, Brafoyaw, early childhood education, school portal">
     <link rel="icon" type="image/png" href="image/favicon2.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -34,7 +38,7 @@
             min-height: 100vh;
             position: relative;
             overflow: hidden;
-            background-image: linear-gradient(rgba(0,0,0,0.38), rgba(0,0,0,0.38)), url("image/WhatsApp Image2.jpeg");
+            background-image: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.38)), url("image/WhatsApp Image2.jpeg");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -46,6 +50,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -56,6 +61,7 @@
             from {
                 background-position: center;
             }
+
             to {
                 background-position: top;
             }
@@ -74,8 +80,8 @@
             height: 120px;
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 18px 35px rgba(0,0,0,0.28);
-            border: 3px solid rgba(255,255,255,0.7);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.28);
+            border: 3px solid rgba(255, 255, 255, 0.7);
             animation: floatUpDown 6s ease-in-out infinite;
             transition: transform 0.4s ease;
             backdrop-filter: blur(6px);
@@ -120,18 +126,31 @@
             0% {
                 transform: translateY(0px) rotate(var(--rot, 0deg));
             }
+
             50% {
                 transform: translateY(-18px) rotate(var(--rot, 0deg));
             }
+
             100% {
                 transform: translateY(0px) rotate(var(--rot, 0deg));
             }
         }
 
-        .float-card.one { --rot: -8deg; }
-        .float-card.two { --rot: 7deg; }
-        .float-card.three { --rot: 5deg; }
-        .float-card.four { --rot: -6deg; }
+        .float-card.one {
+            --rot: -8deg;
+        }
+
+        .float-card.two {
+            --rot: 7deg;
+        }
+
+        .float-card.three {
+            --rot: 5deg;
+        }
+
+        .float-card.four {
+            --rot: -6deg;
+        }
 
         nav {
             width: 100%;
@@ -159,7 +178,7 @@
             height: 70px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.5);
+            border: 2px solid rgba(255, 255, 255, 0.5);
         }
 
         .logo {
@@ -167,7 +186,7 @@
             font-weight: bold;
             color: var(--white);
             letter-spacing: 1px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .nav-links {
@@ -183,8 +202,8 @@
             padding: 10px 16px;
             border-radius: 30px;
             transition: 0.3s ease;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
         .nav-links a:hover {
@@ -227,13 +246,13 @@
         .hero h1 {
             font-size: 3.5rem;
             margin: 0;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.45);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
         }
 
         .hero p {
             margin-top: 15px;
             font-size: 1.2rem;
-            text-shadow: 0 3px 10px rgba(0,0,0,0.4);
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
         }
 
         .apply-now {
@@ -246,7 +265,7 @@
             margin-top: 25px;
             display: inline-block;
             transition: 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .apply-now:hover {
@@ -257,7 +276,7 @@
             padding: 35px 10%;
             text-align: center;
             color: rgb(252, 252, 224);
-            text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
             position: relative;
             z-index: 2;
         }
@@ -303,7 +322,7 @@
             background: white;
             padding: 24px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             transition: 0.3s ease;
             text-align: left;
         }
@@ -342,14 +361,14 @@
             align-items: center;
             gap: 12px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            border-left: 3px solid #001f3f; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+            border-left: 3px solid #001f3f;
         }
 
         .core-values-list li:hover {
             transform: translateX(5px);
             background: #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             color: #001f3f;
         }
 
@@ -371,7 +390,7 @@
             background: white;
             padding: 24px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             transition: 0.3s ease;
             text-align: left;
         }
@@ -387,7 +406,7 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .contact-card h3 i {
             font-size: 1.4rem;
         }
@@ -418,7 +437,7 @@
 
         .contact-list li:hover {
             background: #fff;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
             transform: translateX(5px);
             border-left-color: var(--hover-color, #333);
             color: var(--hover-color, #333);
@@ -444,6 +463,7 @@
             transform: translateY(30px);
             transition: opacity 0.7s ease, transform 0.7s ease;
         }
+
         .reveal.revealed {
             opacity: 1;
             transform: translateY(0);
@@ -467,19 +487,21 @@
             background: white;
             padding: 30px 24px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             text-align: center;
             transition: 0.3s ease;
         }
+
         .program-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
         }
+
         .program-icon {
             width: 64px;
             height: 64px;
             border-radius: 16px;
-            background: rgba(0,51,102,0.08);
+            background: rgba(0, 51, 102, 0.08);
             color: var(--blue);
             display: flex;
             align-items: center;
@@ -487,11 +509,13 @@
             font-size: 1.8rem;
             margin: 0 auto 18px;
         }
+
         .program-card h3 {
             color: var(--blue);
             margin-bottom: 10px;
             font-size: 1.2rem;
         }
+
         .program-card p {
             color: #555;
             font-size: 0.95rem;
@@ -504,24 +528,31 @@
             gap: 25px;
             margin-top: 25px;
         }
+
         .testimonial-card {
             background: white;
             padding: 28px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
             transition: 0.3s ease;
             position: relative;
         }
+
         .testimonial-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
+
         .testimonial-stars {
             color: #f5a623;
             font-size: 0.95rem;
             margin-bottom: 14px;
         }
-        .testimonial-stars i { margin-right: 2px; }
+
+        .testimonial-stars i {
+            margin-right: 2px;
+        }
+
         .testimonial-text {
             color: #444;
             font-size: 0.95rem;
@@ -529,11 +560,13 @@
             font-style: italic;
             margin-bottom: 18px;
         }
+
         .testimonial-author {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .author-avatar {
             width: 42px;
             height: 42px;
@@ -545,11 +578,13 @@
             justify-content: center;
             font-size: 1.1rem;
         }
+
         .testimonial-author strong {
             display: block;
             color: var(--blue);
             font-size: 0.95rem;
         }
+
         .testimonial-author span {
             color: #888;
             font-size: 0.82rem;
@@ -557,32 +592,38 @@
 
         .site-footer {
             background: linear-gradient(135deg, #001f3f, var(--blue));
-            color: rgba(255,255,255,0.85);
+            color: rgba(255, 255, 255, 0.85);
             padding: 50px 10% 0;
         }
+
         .footer-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1.5fr;
             gap: 35px;
         }
+
         .footer-col {
             min-width: 0;
         }
+
         .footer-col h4 {
             color: var(--gold);
             font-size: 1.1rem;
             margin-bottom: 18px;
             letter-spacing: 0.5px;
         }
+
         .footer-col p {
             font-size: 0.9rem;
             line-height: 1.7;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
         }
+
         .footer-col ul {
             list-style: none;
             padding: 0;
         }
+
         .footer-col ul li {
             padding: 5px 0;
             font-size: 0.9rem;
@@ -590,33 +631,39 @@
             align-items: center;
             gap: 10px;
         }
+
         .footer-col ul li i {
             color: var(--gold);
             font-size: 0.85rem;
             width: 16px;
         }
+
         .footer-col ul li a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: 0.3s;
         }
+
         .footer-col ul li a:hover {
             color: var(--gold);
             padding-left: 5px;
         }
+
         .footer-col {
             overflow: hidden;
         }
+
         .footer-social {
             display: flex;
             gap: 12px;
             margin-top: 18px;
         }
+
         .footer-social a {
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.12);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -625,16 +672,19 @@
             transition: 0.3s;
             font-size: 0.95rem;
         }
+
         .footer-social a:hover {
             background: var(--gold);
             color: #000;
             transform: translateY(-3px);
         }
+
         .newsletter-form {
             display: flex;
             margin-top: 12px;
             gap: 0;
         }
+
         .newsletter-form input {
             flex: 1;
             padding: 10px 14px;
@@ -643,6 +693,7 @@
             font-size: 0.9rem;
             outline: none;
         }
+
         .newsletter-form button {
             padding: 10px 16px;
             background: var(--gold);
@@ -653,29 +704,38 @@
             font-weight: bold;
             transition: 0.3s;
         }
+
         .newsletter-form button:hover {
             background: #e0a800;
         }
+
         .footer-bottom {
             margin-top: 35px;
             padding: 20px 0;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
             font-size: 0.85rem;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .scrolling-text {
             overflow: hidden;
             white-space: nowrap;
         }
+
         .scrolling-text span {
             display: inline-block;
             animation: scrollText 20s linear infinite;
         }
+
         @keyframes scrollText {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
         }
 
         @media (max-width: 900px) {
@@ -699,16 +759,17 @@
             .nav-links {
                 position: absolute;
                 top: 100%;
-                right: 5%;
-                width: 240px;
-                background: rgba(0, 51, 102, 0.95);
-                backdrop-filter: blur(10px);
-                border-radius: 15px;
-                padding: 15px;
+                right: 0;
+                width: 100%;
+                background: rgba(0, 51, 102, 0.98);
+                backdrop-filter: blur(12px);
+                border-radius: 0 0 20px 20px;
+                padding: 25px;
                 display: none;
                 flex-direction: column;
-                gap: 12px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+                gap: 15px;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+                z-index: 1001;
             }
 
             .nav-links.show {
@@ -718,9 +779,11 @@
             .nav-links a {
                 width: 100%;
                 text-align: center;
-                padding: 12px;
+                padding: 14px;
                 margin: 0;
+                font-size: 1.1rem;
             }
+
 
             .hero h1 {
                 font-size: 2.2rem;
@@ -749,31 +812,10 @@
                 gap: 25px;
             }
 
-            .float-card {
-                width: 120px;
-                height: 85px;
-                opacity: 0.9;
+            .floating-images {
+                display: none;
             }
 
-            .float-card.one {
-                top: 16%;
-                left: 3%;
-            }
-
-            .float-card.two {
-                top: 23%;
-                right: 4%;
-            }
-
-            .float-card.three {
-                bottom: 24%;
-                left: 5%;
-            }
-
-            .float-card.four {
-                bottom: 20%;
-                right: 6%;
-            }
         }
 
         @media (max-width: 500px) {
@@ -812,7 +854,7 @@
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
+
             .site-footer {
                 padding: 30px 4% 0;
             }
@@ -823,338 +865,360 @@
         }
     </style>
 </head>
+
 <body id="top">
 
-<div class="hero-wrapper">
-    <div class="floating-images">
-        <div class="float-card one">
-            <img src="image/WhatsApp Image 2026-02-08 at 9.44.20 PM (1).jpeg" alt="School activity">
-        </div>
-        <div class="float-card two">
-            <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM (2).jpeg" alt="School activity">
-        </div>
-        <div class="float-card three">
-            <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM.jpeg" alt="School activity">
-        </div>
-        <div class="float-card four">
-            <img src="image/WhatsApp Image 2026-02-08 at 9.44.42 PM.jpeg" alt="School activity">
-        </div>
-    </div>
-
-    <nav>
-        <div class="nav-left">
-            <img src="image/fa123.jpeg" alt="school logo">
-            <div class="logo">ELYON MONTESSORI</div>
-        </div>
-
-        <div class="menu-toggle" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </div>
-
-        <div class="nav-links" id="navLinks">
-            <a href="#top" class="portal-btn">Home</a>
-            <a href="gallary.html">Gallery</a>
-            <a href="login.html">Portals</a>
-            <a href="#contact">Contact</a>
-            <a href="apply.html">Apply</a>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <h1>Nurturing Every Child's Potential</h1>
-        <p><b>Admissions Are Now Open</b></p>
-        <a href="apply.html" class="apply-now">APPLY NOW</a>
-    </header>
-
-    <section class="welcome-strip">
-        <h2>Welcome to Elyon Montessori</h2>
-        <p>
-        <div class="scrolling-text">
-                <span>We nurture and inspire to flourish! &nbsp;&nbsp;&nbsp; We nurture and inspire to flourish! &nbsp;&nbsp;&nbsp; We nurture and inspire to flourish! &nbsp;&nbsp;&nbsp; We nurture and inspire to flourish!</span>
+    <div class="hero-wrapper">
+        <div class="floating-images">
+            <div class="float-card one">
+                <img src="image/WhatsApp Image 2026-02-08 at 9.44.20 PM (1).jpeg" alt="School activity">
             </div>
-        </p>
-    </section>
-</div>
-
-<section id="about" class="section-block">
-    <h2 class="section-title">About Our School</h2>
-    <p class="section-subtitle">
-        Founded on the principles of Maria Montessori, Elyon Montessori School offers an environment
-        where children lead their own learning journey. We do not just teach; we inspire.
-    </p>
-
-    <div class="grid-2">
-        <div class="card">
-            <h3>Our Mission</h3>
-            <p>To provide a stimulating Montessori environment that guides children to reach their full potential.</p>
+            <div class="float-card two">
+                <img src="image/WhatsApp Image 2026-02-08 at 9.44.24 PM (2).jpeg" alt="School activity">
+            </div>
+            <div class="float-card three">
+                <img src="image/WhatsApp Image 2026-02-08 at 9.44.23 PM.jpeg" alt="School activity">
+            </div>
+            <div class="float-card four">
+                <img src="image/WhatsApp Image 2026-02-08 at 9.44.42 PM.jpeg" alt="School activity">
+            </div>
         </div>
 
-        <div class="card">
-            <h3>Our Vision</h3>
-            <p>To be a global leader in early childhood education, fostering future innovators and leaders.</p>
-        </div>
+        <nav>
+            <div class="nav-left">
+                <img src="image/fa123.jpeg" alt="school logo">
+                <div class="logo">ELYON MONTESSORI</div>
+            </div>
 
-        <div class="card">
-            <h3>Our Philosophy</h3>
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <div class="nav-links" id="navLinks">
+                <a href="#top" class="portal-btn">Home</a>
+                <a href="gallary.html">Gallery</a>
+                <a href="login.html">Portals</a>
+                <a href="#contact">Contact</a>
+                <a href="apply.html">Apply</a>
+            </div>
+        </nav>
+
+        <header class="hero">
+            <h1>Nurturing Every Child's Potential</h1>
+            <p><b>Admissions Are Now Open</b></p>
+            <a href="apply.html" class="apply-now">APPLY NOW</a>
+        </header>
+
+        <section class="welcome-strip">
+            <h2>Welcome to Elyon Montessori</h2>
             <p>
-                At Elyon Montessori, we believe every child is unique and capable. We create a learning space
-                that encourages discovery, independence, confidence, and creativity.
+            <div class="scrolling-text">
+                <span>We nurture and inspire to flourish! &nbsp;&nbsp;&nbsp; We nurture and inspire to flourish!
+                    &nbsp;&nbsp;&nbsp; We nurture and inspire to flourish! &nbsp;&nbsp;&nbsp; We nurture and inspire to
+                    flourish!</span>
+            </div>
             </p>
-        </div>
-
-        <div class="card">
-            <h3>Our Core Values</h3>
-            <ul class="core-values-list">
-                <li><i class="fas fa-heart"></i> Holistic humanity</li>
-                <li><i class="fas fa-balance-scale"></i> Self discipline</li>
-                <li><i class="fas fa-bullseye"></i> Goal-oriented</li>
-                <li><i class="fas fa-hammer"></i> Diligence and hard work</li>
-                <li><i class="fas fa-star"></i> Excellence</li>
-            </ul>
-        </div>
+        </section>
     </div>
-</section>
 
-<section id="programs" class="section-block alt">
-    <h2 class="section-title reveal">Our Programs</h2>
-    <p class="section-subtitle reveal">Age-appropriate, hands-on Montessori programs designed to ignite curiosity and love for learning.</p>
-    <div class="grid-4 reveal">
-        <div class="program-card">
-            <div class="program-icon"><i class="fas fa-baby"></i></div>
-            <h3>Crèche & Nursery</h3>
-            <p>Ages 6 months – 2 years. Nurturing environment focused on sensory exploration and early bonding.</p>
-        </div>
-        <div class="program-card">
-            <div class="program-icon" style="background: rgba(255,193,7,0.12); color: #d39e00;"><i class="fas fa-puzzle-piece"></i></div>
-            <h3>KG1 & KG2</h3>
-            <p>Ages 3 – 5. Montessori materials, practical life, early reading, and numeracy skills.</p>
-        </div>
-        <div class="program-card">
-            <div class="program-icon" style="background: rgba(40,167,69,0.1); color: #28a745;"><i class="fas fa-book-open"></i></div>
-            <h3>Primary (Basic 1–6)</h3>
-            <p>Ages 6 – 12. Full academic curriculum with STEM, arts, and character development.</p>
-        </div>
-        <div class="program-card">
-            <div class="program-icon" style="background: rgba(155,89,182,0.1); color: #9b59b6;"><i class="fas fa-user-graduate"></i></div>
-            <h3>JHS (Junior High)</h3>
-            <p>Ages 12 – 15. Focused on BECE preparation, advanced science, and leadership skills.</p>
-        </div>
-    </div>
-</section>
+    <section id="about" class="section-block">
+        <h2 class="section-title">About Our School</h2>
+        <p class="section-subtitle">
+            Founded on the principles of Maria Montessori, Elyon Montessori School offers an environment
+            where children lead their own learning journey. We do not just teach; we inspire.
+        </p>
 
-<section id="why-us" class="section-block">
-    <h2 class="section-title reveal">Why Choose Elyon Montessori?</h2>
-    <p class="section-subtitle reveal">We go above and beyond to ensure every child thrives.</p>
-    <div class="grid-2 reveal">
-        <div class="card">
-            <h3><i class="fas fa-users" style="color: var(--gold); margin-right: 10px;"></i> Small Class Sizes</h3>
-            <p>Our low student-to-teacher ratio ensures personalised attention for every learner.</p>
-        </div>
-        <div class="card">
-            <h3><i class="fas fa-laptop-code" style="color: var(--blue); margin-right: 10px;"></i> Digital Integration</h3>
-            <p>Online portals for parents and teachers. Real-time academic tracking and communication.</p>
-        </div>
-        <div class="card">
-            <h3><i class="fas fa-seedling" style="color: #28a745; margin-right: 10px;"></i> Holistic Growth</h3>
-            <p>Beyond academics — swimming, arts, music, sports, and moral education.</p>
-        </div>
-        <div class="card">
-            <h3><i class="fas fa-shield-alt" style="color: #e74c3c; margin-right: 10px;"></i> Safe & Secure</h3>
-            <p>CCTV-monitored premises. Background-checked staff. A place where your child is always safe.</p>
-        </div>
-    </div>
-</section>
-
-<section id="testimonials" class="section-block alt">
-    <h2 class="section-title reveal">What Parents Say</h2>
-    <p class="section-subtitle reveal">Hear from families who trust us with their children's education.</p>
-    <div class="testimonial-grid reveal">
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        <div class="grid-2">
+            <div class="card">
+                <h3>Our Mission</h3>
+                <p>To provide a stimulating Montessori environment that guides children to reach their full potential.
+                </p>
             </div>
-            <p class="testimonial-text">"My daughter has blossomed since starting at Elyon. The teachers genuinely care, and the Montessori approach has made her so independent and confident."</p>
-            <div class="testimonial-author">
-                <div class="author-avatar"><i class="fas fa-user"></i></div>
-                <div>
-                    <strong>Mrs. Akua Mensah</strong>
-                    <span>Parent of KG2 pupil</span>
+
+            <div class="card">
+                <h3>Our Vision</h3>
+                <p>To be a global leader in early childhood education, fostering future innovators and leaders.</p>
+            </div>
+
+            <div class="card">
+                <h3>Our Philosophy</h3>
+                <p>
+                    At Elyon Montessori, we believe every child is unique and capable. We create a learning space
+                    that encourages discovery, independence, confidence, and creativity.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Our Core Values</h3>
+                <ul class="core-values-list">
+                    <li><i class="fas fa-heart"></i> Holistic humanity</li>
+                    <li><i class="fas fa-balance-scale"></i> Self discipline</li>
+                    <li><i class="fas fa-bullseye"></i> Goal-oriented</li>
+                    <li><i class="fas fa-hammer"></i> Diligence and hard work</li>
+                    <li><i class="fas fa-star"></i> Excellence</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="programs" class="section-block alt">
+        <h2 class="section-title reveal">Our Programs</h2>
+        <p class="section-subtitle reveal">Age-appropriate, hands-on Montessori programs designed to ignite curiosity
+            and love for learning.</p>
+        <div class="grid-4 reveal">
+            <div class="program-card">
+                <div class="program-icon"><i class="fas fa-baby"></i></div>
+                <h3>Crèche & Nursery</h3>
+                <p>Ages 6 months – 2 years. Nurturing environment focused on sensory exploration and early bonding.</p>
+            </div>
+            <div class="program-card">
+                <div class="program-icon" style="background: rgba(255,193,7,0.12); color: #d39e00;"><i
+                        class="fas fa-puzzle-piece"></i></div>
+                <h3>KG1 & KG2</h3>
+                <p>Ages 3 – 5. Montessori materials, practical life, early reading, and numeracy skills.</p>
+            </div>
+            <div class="program-card">
+                <div class="program-icon" style="background: rgba(40,167,69,0.1); color: #28a745;"><i
+                        class="fas fa-book-open"></i></div>
+                <h3>Primary (Basic 1–6)</h3>
+                <p>Ages 6 – 12. Full academic curriculum with STEM, arts, and character development.</p>
+            </div>
+            <div class="program-card">
+                <div class="program-icon" style="background: rgba(155,89,182,0.1); color: #9b59b6;"><i
+                        class="fas fa-user-graduate"></i></div>
+                <h3>JHS (Junior High)</h3>
+                <p>Ages 12 – 15. Focused on BECE preparation, advanced science, and leadership skills.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="why-us" class="section-block">
+        <h2 class="section-title reveal">Why Choose Elyon Montessori?</h2>
+        <p class="section-subtitle reveal">We go above and beyond to ensure every child thrives.</p>
+        <div class="grid-2 reveal">
+            <div class="card">
+                <h3><i class="fas fa-users" style="color: var(--gold); margin-right: 10px;"></i> Small Class Sizes</h3>
+                <p>Our low student-to-teacher ratio ensures personalised attention for every learner.</p>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-laptop-code" style="color: var(--blue); margin-right: 10px;"></i> Digital
+                    Integration</h3>
+                <p>Online portals for parents and teachers. Real-time academic tracking and communication.</p>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-seedling" style="color: #28a745; margin-right: 10px;"></i> Holistic Growth</h3>
+                <p>Beyond academics — swimming, arts, music, sports, and moral education.</p>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-shield-alt" style="color: #e74c3c; margin-right: 10px;"></i> Safe & Secure</h3>
+                <p>CCTV-monitored premises. Background-checked staff. A place where your child is always safe.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="section-block alt">
+        <h2 class="section-title reveal">What Parents Say</h2>
+        <p class="section-subtitle reveal">Hear from families who trust us with their children's education.</p>
+        <div class="testimonial-grid reveal">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"My daughter has blossomed since starting at Elyon. The teachers genuinely
+                    care, and the Montessori approach has made her so independent and confident."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <strong>Mrs. Akua Mensah</strong>
+                        <span>Parent of KG2 pupil</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"The school management portal lets me track my son's progress in real-time.
+                    I always know how he's doing. Truly impressive for a school in our area."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <strong>Mr. Kwame Asante</strong>
+                        <span>Parent of Basic 3 pupil</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="testimonial-text">"The small class sizes mean my child is never lost in the crowd. The
+                    teachers know every student by name and give individualised support."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar"><i class="fas fa-user"></i></div>
+                    <div>
+                        <strong>Mrs. Esi Boateng</strong>
+                        <span>Parent of Nursery pupil</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"The JHS department at Elyon is top-notch. The BECE preparation is intense
+                    but balanced with character building. I'm confident in my son's high school future."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar" style="background:#9b59b6;"><i class="fas fa-user"></i></div>
+                    <div>
+                        <strong>Dr. Samuel Appiah</strong>
+                        <span>Parent of JHS 2 student</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                        class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"Seeing my daughter excel in science and leadership roles at Elyon's Junior
+                    High has been a joy. The individualised tracking really helps even at this age."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar" style="background:#9b59b6;"><i class="fas fa-user"></i></div>
+                    <div>
+                        <strong>Mrs. Gladys Opoku</strong>
+                        <span>Parent of JHS 1 student</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+    </section>
+
+    <section id="contact" class="section-block">
+        <h2 class="section-title reveal">Contact Our School</h2>
+        <p class="section-subtitle reveal">
+            Contact Elyon Montessori for more information or enquiries.
+        </p>
+
+        <div class="contact-grid reveal">
+            <div class="contact-card">
+                <h3><i class="fab fa-facebook" style="color: #1877F2;"></i> Facebook</h3>
+                <ul class="contact-list">
+                    <li style="--list-color: rgba(24, 119, 242, 0.4); --hover-color: #1877F2;">
+                        <i class="fab fa-facebook-square icon-prefix"></i> Elyon Montessori School
+                    </li>
+                    <li style="--list-color: rgba(24, 119, 242, 0.4); --hover-color: #1877F2;">
+                        <i class="fas fa-user-circle icon-prefix"></i> El-yon
+                    </li>
+                    <li style="--list-color: rgba(24, 119, 242, 0.4); --hover-color: #1877F2;">
+                        <i class="fas fa-users icon-prefix"></i> Brafoyaw Elyon
+                    </li>
+                </ul>
             </div>
-            <p class="testimonial-text">"The school management portal lets me track my son's progress in real-time. I always know how he's doing. Truly impressive for a school in our area."</p>
-            <div class="testimonial-author">
-                <div class="author-avatar"><i class="fas fa-user"></i></div>
-                <div>
-                    <strong>Mr. Kwame Asante</strong>
-                    <span>Parent of Basic 3 pupil</span>
+
+            <div class="contact-card">
+                <h3><i class="fab fa-tiktok" style="color: #000000;"></i> TikTok</h3>
+                <ul class="contact-list">
+                    <li style="--list-color: rgba(0, 0, 0, 0.3); --hover-color: #000000;">
+                        <i class="fas fa-at icon-prefix"></i> Elyon Montessori School - Brafoyaw
+                    </li>
+                </ul>
+            </div>
+
+            <div class="contact-card">
+                <h3><i class="fas fa-phone" style="color: var(--blue);"></i> Hotline</h3>
+                <ul class="contact-list">
+                    <li style="--list-color: rgba(0, 51, 102, 0.4); --hover-color: var(--blue);">
+                        <i class="fas fa-phone-alt icon-prefix"></i> 024-443-0918
+                    </li>
+                </ul>
+            </div>
+
+            <div class="contact-card">
+                <h3><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp</h3>
+                <ul class="contact-list">
+                    <li style="--list-color: rgba(37, 211, 102, 0.4); --hover-color: #25D366;">
+                        <i class="fab fa-whatsapp icon-prefix"></i> 024-443-0918
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Elyon Montessori</h4>
+                <p>Nurturing every child's potential through the Montessori method. Building confident, independent, and
+                    purpose-driven learners since day one.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
-        </div>
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#top">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#programs">Programs</a></li>
+                    <li><a href="gallary.html">Gallery</a></li>
+                    <li><a href="apply.html">Apply Now</a></li>
+                    <li><a href="login.html">Portals</a></li>
+                </ul>
             </div>
-            <p class="testimonial-text">"The small class sizes mean my child is never lost in the crowd. The teachers know every student by name and give individualised support."</p>
-            <div class="testimonial-author">
-                <div class="author-avatar"><i class="fas fa-user"></i></div>
-                <div>
-                    <strong>Mrs. Esi Boateng</strong>
-                    <span>Parent of Nursery pupil</span>
-                </div>
+            <div class="footer-col">
+                <h4>Contact Info</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Brafoyaw, Cape Coast</li>
+                    <li><i class="fas fa-phone"></i> 024-443-0918</li>
+                    <li><i class="fas fa-envelope"></i> info@elyonmontessori.com</li>
+                    <li><i class="fas fa-clock"></i> Mon – Fri: 7:00am – 4:00pm</li>
+                </ul>
             </div>
-        </div>
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-            <p class="testimonial-text">"The JHS department at Elyon is top-notch. The BECE preparation is intense but balanced with character building. I'm confident in my son's high school future."</p>
-            <div class="testimonial-author">
-                <div class="author-avatar" style="background:#9b59b6;"><i class="fas fa-user"></i></div>
-                <div>
-                    <strong>Dr. Samuel Appiah</strong>
-                    <span>Parent of JHS 2 student</span>
-                </div>
-            </div>
-        </div>
-        <div class="testimonial-card">
-            <div class="testimonial-stars">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-            <p class="testimonial-text">"Seeing my daughter excel in science and leadership roles at Elyon's Junior High has been a joy. The individualised tracking really helps even at this age."</p>
-            <div class="testimonial-author">
-                <div class="author-avatar" style="background:#9b59b6;"><i class="fas fa-user"></i></div>
-                <div>
-                    <strong>Mrs. Gladys Opoku</strong>
-                    <span>Parent of JHS 1 student</span>
-                </div>
+            <div class="footer-col">
+                <h4>Newsletter</h4>
+                <p>Subscribe to receive updates and announcements.</p>
+                <form class="newsletter-form"
+                    onsubmit="event.preventDefault(); this.querySelector('button').innerText='Subscribed ✓'; this.querySelector('input').disabled=true;">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
             </div>
         </div>
-    </div>
-</section>
-
-<section id="contact" class="section-block">
-    <h2 class="section-title reveal">Contact Our School</h2>
-    <p class="section-subtitle reveal">
-        Contact Elyon Montessori for more information or enquiries.
-    </p>
-
-    <div class="contact-grid reveal">
-        <div class="contact-card">
-            <h3><i class="fab fa-facebook" style="color: #1877F2;"></i> Facebook</h3>
-            <ul class="contact-list">
-                <li style="--list-color: rgba(24, 119, 242, 0.4); --hover-color: #1877F2;">
-                    <i class="fab fa-facebook-square icon-prefix"></i> Elyon Montessori School
-                </li>
-                <li style="--list-color: rgba(24, 119, 242, 0.4); --hover-color: #1877F2;">
-                    <i class="fas fa-user-circle icon-prefix"></i> El-yon
-                </li>
-                <li style="--list-color: rgba(24, 119, 242, 0.4); --hover-color: #1877F2;">
-                    <i class="fas fa-users icon-prefix"></i> Brafoyaw Elyon
-                </li>
-            </ul>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Elyon Montessori School. All rights reserved.</p>
         </div>
+    </footer>
 
-        <div class="contact-card">
-            <h3><i class="fab fa-tiktok" style="color: #000000;"></i> TikTok</h3>
-            <ul class="contact-list">
-                <li style="--list-color: rgba(0, 0, 0, 0.3); --hover-color: #000000;">
-                    <i class="fas fa-at icon-prefix"></i> Elyon Montessori School - Brafoyaw
-                </li>
-            </ul>
-        </div>
+    <script>
+        function toggleMenu() {
+            document.getElementById("navLinks").classList.toggle("show");
+        }
 
-        <div class="contact-card">
-            <h3><i class="fas fa-phone" style="color: var(--blue);"></i> Hotline</h3>
-            <ul class="contact-list">
-                <li style="--list-color: rgba(0, 51, 102, 0.4); --hover-color: var(--blue);">
-                    <i class="fas fa-phone-alt icon-prefix"></i> 024-443-0918
-                </li>
-            </ul>
-        </div>
-
-        <div class="contact-card">
-            <h3><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp</h3>
-            <ul class="contact-list">
-                <li style="--list-color: rgba(37, 211, 102, 0.4); --hover-color: #25D366;">
-                    <i class="fab fa-whatsapp icon-prefix"></i> 024-443-0918
-                </li>
-            </ul>
-        </div>
-    </div>
-</section>
-
-<footer class="site-footer">
-    <div class="footer-grid">
-        <div class="footer-col">
-            <h4>Elyon Montessori</h4>
-            <p>Nurturing every child's potential through the Montessori method. Building confident, independent, and purpose-driven learners since day one.</p>
-            <div class="footer-social">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-tiktok"></i></a>
-                <a href="#"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="#top">Home</a></li>
-                <li><a href="#about">About Us</a></li>
-                <li><a href="#programs">Programs</a></li>
-                <li><a href="gallary.html">Gallery</a></li>
-                <li><a href="apply.html">Apply Now</a></li>
-                <li><a href="login.html">Portals</a></li>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h4>Contact Info</h4>
-            <ul>
-                <li><i class="fas fa-map-marker-alt"></i> Brafoyaw, Cape Coast</li>
-                <li><i class="fas fa-phone"></i> 024-443-0918</li>
-                <li><i class="fas fa-envelope"></i> info@elyonmontessori.com</li>
-                <li><i class="fas fa-clock"></i> Mon – Fri: 7:00am – 4:00pm</li>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h4>Newsletter</h4>
-            <p>Subscribe to receive updates and announcements.</p>
-            <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').innerText='Subscribed ✓'; this.querySelector('input').disabled=true;">
-                <input type="email" placeholder="Your email address" required>
-                <button type="submit"><i class="fas fa-paper-plane"></i></button>
-            </form>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p>&copy; 2026 Elyon Montessori School. All rights reserved.</p>
-    </div>
-</footer>
-
-<script>
-    function toggleMenu() {
-        document.getElementById("navLinks").classList.toggle("show");
-    }
-
-    document.querySelectorAll('#navLinks a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.getElementById("navLinks").classList.remove("show");
+        document.querySelectorAll('#navLinks a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById("navLinks").classList.remove("show");
+            });
         });
-    });
 
-    const revealEls = document.querySelectorAll('.reveal');
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.15 });
-    revealEls.forEach(el => revealObserver.observe(el));
-</script>
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        revealEls.forEach(el => revealObserver.observe(el));
+    </script>
 
 </body>
+
 </html>

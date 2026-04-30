@@ -5,7 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portals Login | Elyon Montessori</title>
+  <meta name="description" content="Access the Elyon Montessori School portals for Admins, Teachers, Students, and Parents.">
   <link rel="icon" type="image/png" href="image/favicon2.png" />
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root {
@@ -199,47 +201,33 @@
     }
 
     @media (max-width: 900px) {
-      .menu-toggle {
-        display: block;
-      }
-
+      .menu-toggle { display: block; }
       .nav-links {
         display: none;
         position: absolute;
         top: 100%;
-        right: 5%;
-        width: 240px;
-        background: rgba(0, 51, 102, 0.96);
-        border-radius: 15px;
-        padding: 15px;
-        flex-direction: column;
-      }
-
-      .nav-links.show {
-        display: flex;
-      }
-
-      .login-container {
-        padding: 30px 10px;
-      }
-    }
-
-    @media (max-width: 500px) {
-      .logo {
-        font-size: 16px;
-      }
-
-      .nav-left img {
-        width: 50px;
-        height: 50px;
-      }
-
-      .portal-card {
+        right: 0;
         width: 100%;
-        max-width: 320px;
-        margin: 0 auto;
+        background: rgba(0, 51, 102, 0.98);
+        border-radius: 0 0 15px 15px;
+        padding: 20px;
+        flex-direction: column;
+        z-index: 1000;
+        text-align: center;
       }
+      .nav-links.show { display: flex; }
+      .portal-selection { grid-template-columns: repeat(2, 1fr); }
+      .login-container { padding: 40px 15px; }
     }
+
+
+    @media (max-width: 600px) {
+      .portal-selection { grid-template-columns: 1fr; }
+      .logo { font-size: 18px; }
+      .nav-left img { width: 50px; height: 50px; }
+      .portal-card { width: 100%; max-width: 320px; margin: 0 auto; }
+    }
+
 
     /* Toast Notifications */
     .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; border-radius: 8px; color: white; font-weight: 600; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; transition: 0.3s; transform: translateY(-100px); opacity: 0; }

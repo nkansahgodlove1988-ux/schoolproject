@@ -67,10 +67,15 @@
         item.addEventListener('click', (e) => {
           e.preventDefault(); menuItems.forEach(mi => mi.classList.remove('active')); item.classList.add('active'); const target = item.getAttribute('data-target');
           sections.forEach(sec => { if (sec.id === target) sec.classList.add('active'); else sec.classList.remove('active'); });
-          if (window.innerWidth <= 768) sidebar.classList.remove('show');
-        });
+      document.getElementById('toggleSidebar').addEventListener('click', () => { 
+        sidebar.classList.toggle('show'); 
+        if(overlay) overlay.classList.toggle('active');
       });
-      document.getElementById('toggleSidebar').addEventListener('click', () => { sidebar.classList.toggle('show'); });
+      if(overlay) overlay.addEventListener('click', () => {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('active');
+      });
+
       const admission = DB.findOne('admissions', { userId: user.id });
       if (admission) {
         const icon = document.getElementById('statusIcon'); const text = document.getElementById('statusText');
