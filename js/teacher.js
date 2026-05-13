@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (target === 'communication') loadTeacherMessages();
             if (target === 'fees') {
                 document.getElementById('feeResultArea').style.display = 'none';
-                document.getElementById('feeNotFound').style.display = 'none';
                 document.getElementById('searchFeeStudId').value = '';
             }
             if(target === 'attendance') {
@@ -536,12 +535,10 @@ function getStandardRemark(grade) {
 window.checkStudentFees = function() {
     const studId = document.getElementById('searchFeeStudId').value.trim();
     const resArea = document.getElementById('feeResultArea');
-    const notFound = document.getElementById('feeNotFound');
     const tbody = document.querySelector('#teacherFeeTable tbody');
     if(!studId) { DB.showToast("Please enter a Student ID."); return; }
     const student = DB.findOne('students', { studentId: studId });
-    if(!student) { resArea.style.display = 'none'; notFound.style.display = 'block'; return; }
-    notFound.style.display = 'none';
+    if(!student) { resArea.style.display = 'none'; DB.showToast('Student not found. Please check the ID.', 'error'); return; }
     resArea.style.display = 'block';
     document.getElementById('feeResName').innerText = student.name;
     let tuitionFee = 0;

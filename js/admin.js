@@ -1,68 +1,93 @@
-document.addEventListener('DOMContentLoaded', async () => {
+async function initAdminPortal() {
+    console.log("Admin Portal Initializing...");
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuItems = document.querySelectorAll('.menu-item');
+    const sections = document.querySelectorAll('.section');
+    const adminNameEl = document.getElementById('currentAdminName');
+
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('show');
+        if (overlay) overlay.classList.remove('active');
+    }
+
+    // 1. Attach UI listeners immediately so the interface is "responsive" to clicks
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log("Toggling sidebar");
+            if (sidebar) sidebar.classList.toggle('show');
+            if (overlay) overlay.classList.toggle('active');
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = item.getAttribute('data-target');
+            if (!target) return;
+
+            console.log("Navigating to section:", target);
+
+            // UI Update (Immediate)
+            menuItems.forEach(mi => mi.classList.remove('active'));
+            item.classList.add('active');
+            
+            sections.forEach(sec => {
+                if (sec.id === target) sec.classList.add('active');
+                else sec.classList.remove('active');
+            });
+
+            if (window.innerWidth <= 768) closeSidebar();
+            
+            // Data Update (Async)
+            if (DB.isInitialized) {
+                try { loadSectionData(target); } catch (err) { console.error("Load section error:", err); }
+            } else {
+                console.warn("DB not initialized yet, data for section " + target + " will load once ready.");
+            }
+        });
+    });
+
+    // 2. Initialize Database and Auth
     try {
         await DB.init();
         const user = DB.requireAuth('admin');
         if (!user) return;
 
-        const adminNameEl = document.getElementById('currentAdminName');
         if (adminNameEl) adminNameEl.innerText = user.name || 'Administrator';
-
-        const menuItems = document.querySelectorAll('.menu-item');
-        const sections = document.querySelectorAll('.section');
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggleSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        function closeSidebar() {
-            if (sidebar) sidebar.classList.remove('show');
-            if (overlay) overlay.classList.remove('active');
-        }
-
-        menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = item.getAttribute('data-target');
-                if (!target) return;
-
-                // UI Update
-                menuItems.forEach(mi => mi.classList.remove('active'));
-                item.classList.add('active');
-                
-                sections.forEach(sec => {
-                    if (sec.id === target) sec.classList.add('active');
-                    else sec.classList.remove('active');
-                });
-
-                if (window.innerWidth <= 768) closeSidebar();
-                
-                // Data Update (Protected)
-                try { loadSectionData(target); } catch (err) { console.error("Load section error:", err); }
-            });
-        });
-
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => {
-                if (sidebar) sidebar.classList.toggle('show');
-                if (overlay) overlay.classList.toggle('active');
-            });
-        }
-
-        if (overlay) overlay.addEventListener('click', closeSidebar);
 
         setupForms();
         
-        // Dynamic event listeners
+        // Dynamic event listeners for search/filter
         document.getElementById('searchStudent')?.addEventListener('input', () => loadStudents());
         document.getElementById('filterStudentClass')?.addEventListener('change', () => loadStudents());
         document.getElementById('searchAdmissions')?.addEventListener('input', () => loadAdmissions());
         document.getElementById('searchTeachers')?.addEventListener('input', () => loadTeachers());
+        document.getElementById('searchSubject')?.addEventListener('input', () => loadSubjects());
+        document.getElementById('filterSubjectClass')?.addEventListener('change', () => loadSubjects());
+        document.getElementById('searchBook')?.addEventListener('input', () => loadBookCatalogue());
 
         // Initial Load
         loadSectionData('dashboard');
     } catch (error) {
         console.error("Initialization error:", error);
     }
-});
+}
+
+
+// Execute initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminPortal);
+} else {
+    initAdminPortal();
+}
+
 
 
 window.showModal = function (id) {
@@ -276,6 +301,31 @@ function setupForms() {
         });
     }
 
+    const expenseForm = document.getElementById('formRecordExpense');
+    if (expenseForm) {
+        expenseForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const existingId = document.getElementById('expId').value;
+            const category = document.getElementById('expCategory').value;
+            const description = document.getElementById('expDesc').value;
+            const amount = document.getElementById('expAmount').value;
+            const date = document.getElementById('expDate').value;
+            if (existingId) {
+                await DB.update('expenses', existingId, { category, description, amount: parseFloat(amount), date });
+                await DB.logAction('Updated Expense', `Amount: ${amount}`);
+                DB.showToast('Expense updated!');
+            } else {
+                await DB.insert('expenses', { category, description, amount: parseFloat(amount), date });
+                await DB.logAction('Recorded Expense', `Category: ${category}, Amount: ${amount}`);
+                DB.showToast('Expense recorded!');
+            }
+            hideModal('expenseModal');
+            expenseForm.reset();
+            document.getElementById('expId').value = '';
+            loadExpenses();
+            loadDashboard();
+        });
+    }
 
     const setFeesForm = document.getElementById('formSetFees');
     if (setFeesForm) {
@@ -385,15 +435,22 @@ function setupForms() {
 
     const termForm = document.getElementById('formAddTerm');
     if (termForm) {
-        termForm.addEventListener('submit', (e) => {
+        termForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('termName').value.trim();
             const year = document.getElementById('termYear').value.trim();
-            const isActive = document.getElementById('termActive').value === 'true';
-            if (isActive) DB.find('terms', { isActive: true }).forEach(t => DB.update('terms', t.id, { isActive: false }));
-            DB.insert('terms', { name, year, isActive });
-            DB.logAction('Created Term', `Name: ${name}`);
-            hideModal('termModal');
+            const start = document.getElementById('termStart').value;
+            const end = document.getElementById('termEnd').value;
+            const isActive = document.getElementById('termActive').checked;
+            if (isActive) {
+                const activeTerms = DB.find('terms', { isActive: true });
+                for (const t of activeTerms) {
+                    await DB.update('terms', t.id, { isActive: false });
+                }
+            }
+            await DB.insert('terms', { name, year, start, end, isActive });
+            await DB.logAction('Created Term', `Name: ${name}`);
+            DB.showToast('Academic term created successfully!');
             termForm.reset();
             loadTerms();
         });
@@ -484,7 +541,7 @@ function loadTeachers() {
     });
 }
 
-window.deleteTeacher = function (id) {
+window.deleteTeacher = async function (id) {
     if (confirm('Are you sure?')) {
         const teacher = DB.findById('teachers', id);
         if (teacher) {
@@ -495,7 +552,6 @@ window.deleteTeacher = function (id) {
             loadUsers();
             loadDashboard();
         }
-
     }
 }
 
@@ -530,6 +586,7 @@ function loadClasses() {
         tr.innerHTML = `<td><strong>${cls.name}</strong></td><td>${teacher ? teacher.name : '<span class="badge badge-inactive">Unassigned</span>'}</td><td>${count}</td><td><div class="action-btns"><button class="btn btn-primary" onclick="assignClassTeacher('${cls.id}')">Assign Teacher</button></div></td>`;
         tbody.appendChild(tr);
     });
+    loadDepartments();
 }
 
 window.assignClassTeacher = function (classId) {
@@ -758,6 +815,40 @@ window.deletePayment = async function(id) {
     if (confirm('Delete?')) { await DB.delete('payments', id); await DB.logAction('Deleted Payment Record', `ID: ${id}`); loadFees(); }
 }
 
+function loadExpenses() {
+    const tbody = document.querySelector('#expensesTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    const expenses = DB.getTable('expenses').sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
+    if (expenses.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No expenses recorded.</td></tr>'; return; }
+    expenses.forEach(e => {
+        const tr = document.createElement('tr');
+        const expDate = e.date || e.createdAt || '';
+        tr.innerHTML = `<td>${expDate ? new Date(expDate).toLocaleDateString() : '--'}</td><td><span class="badge badge-inactive">${e.category || '--'}</span></td><td>${e.description || e.details || '--'}</td><td><strong>GHS ${parseFloat(e.amount || 0).toFixed(2)}</strong></td><td><div class="action-btns"><button class="btn btn-primary" onclick="window.editExpense('${e.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger" onclick="window.deleteExpense('${e.id}')"><i class="fas fa-trash"></i></button></div></td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+window.deleteExpense = async function(id) {
+    if (confirm('Delete this expense?')) {
+        await DB.delete('expenses', id);
+        await DB.logAction('Deleted Expense', `ID: ${id}`);
+        loadExpenses();
+        loadDashboard();
+    }
+}
+
+window.editExpense = function(id) {
+    const expense = DB.findById('expenses', id);
+    if (!expense) return;
+    document.getElementById('expId').value = expense.id;
+    document.getElementById('expCategory').value = expense.category || 'Other';
+    document.getElementById('expDesc').value = expense.description || expense.details || '';
+    document.getElementById('expAmount').value = expense.amount || '';
+    document.getElementById('expDate').value = expense.date || '';
+    showModal('expenseModal');
+}
+
 function loadResults() {
     const tbody = document.querySelector('#resultsTable tbody');
     if (!tbody) return;
@@ -876,22 +967,21 @@ window.toggleUserStatus = async function(id) {
 }
 
 function loadAttendance() {
-    const panel = document.getElementById('attendanceOverviewTable');
+    const panel = document.getElementById('attendancePanel');
     if (!panel) return;
-    const classF = document.getElementById('admAttClass')?.value || 'all';
-    const dateF = document.getElementById('admAttDate')?.value;
-    const listBody = document.querySelector('#attendanceOverviewTable tbody');
     let records = DB.getTable('attendance');
-    if(dateF) records = records.filter(r => r.date === dateF);
-    if(classF !== 'all') records = records.filter(r => r.className === classF);
     records.sort((a,b) => new Date(b.date) - new Date(a.date));
-    listBody.innerHTML = '';
-    if(records.length === 0) { listBody.innerHTML = '<tr><td colspan="5" style="text-align:center">No records.</td></tr>'; return; }
-    records.forEach(r => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${new Date(r.date).toLocaleDateString()}</td><td><strong>${r.studentName}</strong></td><td>${r.className}</td><td><span class="badge ${r.status === 'Absent' ? 'badge-rejected' : 'badge-active'}">${r.status}</span></td><td>${r.remark || '-'}</td>`;
-        listBody.appendChild(tr);
+    const recent = records.slice(0, 50);
+    if (recent.length === 0) {
+        panel.innerHTML = '<p style="text-align:center; color:#666; padding:30px;">No attendance records found.</p>';
+        return;
+    }
+    let html = '<div class="table-container"><table class="table"><thead><tr><th>Date</th><th>Student</th><th>Class</th><th>Status</th><th>Remark</th></tr></thead><tbody>';
+    recent.forEach(r => {
+        html += `<tr><td>${new Date(r.date).toLocaleDateString()}</td><td><strong>${r.studentName || 'N/A'}</strong></td><td>${r.className || '-'}</td><td><span class="badge ${r.status === 'Absent' ? 'badge-rejected' : (r.status === 'Late' ? 'badge-pending' : 'badge-active')}">${r.status}</span></td><td>${r.remark || '-'}</td></tr>`;
     });
+    html += '</tbody></table></div>';
+    panel.innerHTML = html;
 }
 
 function loadMessages() {
@@ -980,9 +1070,17 @@ function loadSubjects() {
     if (!tbody) return;
     tbody.innerHTML = '';
     const subjects = DB.getTable('subjects');
-    subjects.forEach(s => {
+    const searchTerm = document.getElementById('searchSubject')?.value.toLowerCase();
+    const classFilter = document.getElementById('filterSubjectClass')?.value;
+    let filtered = subjects;
+    if (searchTerm) filtered = filtered.filter(s => s.name.toLowerCase().includes(searchTerm));
+    if (classFilter && classFilter !== 'all') filtered = filtered.filter(s => s.className === classFilter || s.classId === classFilter);
+    const filterSel = document.getElementById('filterSubjectClass');
+    if (filterSel && filterSel.options.length <= 1) DB.getTable('classes').forEach(c => filterSel.add(new Option(c.name, c.name)));
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No subjects found.</td></tr>'; return; }
+    filtered.forEach(s => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${s.name}</strong></td><td>${s.code || '--'}</td><td>${s.className}</td><td><div class="action-btns"><button class="btn btn-danger" onclick="window.deleteSubject('${s.id}')"><i class="fas fa-trash"></i></button></div></td>`;
+        tr.innerHTML = `<td><strong>${s.name}</strong></td><td>${s.code || '--'}</td><td>${s.className || 'General'}</td><td><span class="badge badge-${s.status === 'active' ? 'active' : 'inactive'}">${s.status || 'active'}</span></td><td><div class="action-btns"><button class="btn btn-danger" onclick="window.deleteSubject('${s.id}')"><i class="fas fa-trash"></i></button></div></td>`;
         tbody.appendChild(tr);
     });
 }
@@ -994,41 +1092,97 @@ function loadTerms() {
     if (!tbody) return;
     tbody.innerHTML = '';
     const terms = DB.getTable('terms');
+    const activeDisplay = document.getElementById('activeTermDisplay');
+    const activeTerm = terms.find(t => t.isActive);
+    if (activeDisplay) {
+        activeDisplay.innerHTML = activeTerm ? `<div class="fees-summary-bar"><div><h4>Active Term</h4><h3>${activeTerm.name} - ${activeTerm.year}</h3></div></div>` : '<p style="color:#888; margin-bottom:15px;">No active term set.</p>';
+    }
+    if (terms.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No terms created yet.</td></tr>'; return; }
     terms.forEach(t => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${t.name}</strong></td><td>${t.year}</td><td>${t.isActive ? 'Active' : 'No'}</td><td><button class="btn btn-success" onclick="window.setActiveTerm('${t.id}')">Set Active</button></td>`;
+        const startDate = t.start ? new Date(t.start).toLocaleDateString() : '--';
+        const endDate = t.end ? new Date(t.end).toLocaleDateString() : '--';
+        tr.innerHTML = `<td><strong>${t.name}</strong></td><td>${t.year}</td><td>${startDate}</td><td>${endDate}</td><td><span class="badge badge-${t.isActive ? 'active' : 'inactive'}">${t.isActive ? 'Active' : 'Inactive'}</span></td><td><div class="action-btns"><button class="btn btn-success" onclick="window.setActiveTerm('${t.id}')">Set Active</button><button class="btn btn-danger" onclick="window.deleteTerm('${t.id}')"><i class="fas fa-trash"></i></button></div></td>`;
         tbody.appendChild(tr);
     });
 }
 
 window.setActiveTerm = async function(id) {
-    DB.getTable('terms').forEach(t => DB.update('terms', t.id, { isActive: false }));
-    DB.update('terms', id, { isActive: true });
+    const terms = DB.getTable('terms');
+    for (const t of terms) {
+        await DB.update('terms', t.id, { isActive: false });
+    }
+    await DB.update('terms', id, { isActive: true });
+    DB.showToast('Active term updated!');
     loadTerms();
 }
 
-function loadLibrary() { loadBookCatalogue(); loadActiveIssues(); }
+window.deleteTerm = async function(id) {
+    if (confirm('Delete this term?')) {
+        await DB.delete('terms', id);
+        await DB.logAction('Deleted Term', `ID: ${id}`);
+        loadTerms();
+    }
+}
+
+function loadLibrary() { loadBookCatalogue(); loadActiveIssues(); updateLibraryStats(); }
+
+function updateLibraryStats() {
+    const books = DB.getTable('library_books');
+    const totalBooks = books.reduce((sum, b) => sum + (parseInt(b.totalCopies) || 1), 0);
+    const totalAvail = books.reduce((sum, b) => sum + (parseInt(b.availableCopies) || 0), 0);
+    const totalIssued = totalBooks - totalAvail;
+    const statTotal = document.getElementById('libStatTotal');
+    const statAvail = document.getElementById('libStatAvail');
+    const statIssued = document.getElementById('libStatIssued');
+    if (statTotal) statTotal.innerText = totalBooks;
+    if (statAvail) statAvail.innerText = totalAvail;
+    if (statIssued) statIssued.innerText = totalIssued;
+}
 
 function loadBookCatalogue() {
     const tbody = document.querySelector('#booksTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    DB.getTable('library_books').forEach(b => {
+    const searchTerm = document.getElementById('searchBook')?.value.toLowerCase();
+    let books = DB.getTable('library_books');
+    if (searchTerm) books = books.filter(b => b.title.toLowerCase().includes(searchTerm) || (b.author && b.author.toLowerCase().includes(searchTerm)));
+    if (books.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No books found.</td></tr>'; return; }
+    books.forEach(b => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${b.title}</strong></td><td>${b.author}</td><td><button class="btn btn-success" onclick="window.openIssueModal('${b.id}')">Issue</button></td>`;
+        const avail = parseInt(b.availableCopies) || 0;
+        tr.innerHTML = `<td><strong>${b.title}</strong></td><td>${b.author || '--'}</td><td>${b.isbn || '--'}</td><td>${b.category || '--'}</td><td>${b.totalCopies || 1}</td><td><span class="badge badge-${avail > 0 ? 'active' : 'rejected'}">${avail > 0 ? 'Available (' + avail + ')' : 'All Issued'}</span></td><td><div class="action-btns"><button class="btn btn-success" onclick="window.openIssueModal('${b.id}')">Issue</button><button class="btn btn-danger" onclick="window.deleteBook('${b.id}')"><i class="fas fa-trash"></i></button></div></td>`;
         tbody.appendChild(tr);
     });
+}
+
+window.deleteBook = async function(id) {
+    if (confirm('Delete this book?')) {
+        await DB.delete('library_books', id);
+        await DB.logAction('Deleted Library Book', `ID: ${id}`);
+        loadLibrary();
+    }
 }
 
 function loadDepartments() {
     const tbody = document.querySelector('#deptsTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    DB.getTable('departments').forEach(d => {
+    const depts = DB.getTable('departments');
+    if (depts.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">No departments found.</td></tr>'; return; }
+    depts.forEach(d => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${d.name}</strong></td><td><button class="btn btn-danger" onclick="DB.delete('departments', '${d.id}'); loadDepartments();">Delete</button></td>`;
+        tr.innerHTML = `<td><strong>${d.name}</strong></td><td>${d.head || 'Unassigned'}</td><td><button class="btn btn-danger" onclick="window.deleteDepartment('${d.id}')"><i class="fas fa-trash"></i></button></td>`;
         tbody.appendChild(tr);
     });
+}
+
+window.deleteDepartment = async function(id) {
+    if (confirm('Delete this department?')) {
+        await DB.delete('departments', id);
+        await DB.logAction('Deleted Department', `ID: ${id}`);
+        loadDepartments();
+    }
 }
 
 window.exportSystemBackup = function() {
@@ -1056,9 +1210,11 @@ function loadActiveIssues() {
     const tbody = document.querySelector('#issuesTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    DB.getTable('library_issues').filter(i => i.status === 'issued').forEach(i => {
+    const issues = DB.getTable('library_issues').filter(i => i.status === 'issued');
+    if (issues.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No active issues.</td></tr>'; return; }
+    issues.forEach(i => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><strong>${i.bookTitle}</strong></td><td>${i.borrower}</td><td><button class="btn btn-success" onclick="window.returnBook('${i.id}')">Return</button></td>`;
+        tr.innerHTML = `<td><strong>${i.bookTitle}</strong></td><td>${i.borrower}</td><td>${i.borrowerType || '--'}</td><td>${i.issueDate || '--'}</td><td>${i.dueDate || '--'}</td><td><button class="btn btn-success" onclick="window.returnBook('${i.id}')">Return</button></td>`;
         tbody.appendChild(tr);
     });
 }

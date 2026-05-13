@@ -126,6 +126,12 @@ function loadDashboardData() {
     const list = document.getElementById('announcementList'); if (!list) return; list.innerHTML = '';
     const anns = DB.getTable('announcements').filter(a => a.target === 'all' || a.target === 'students').sort((a, b) => new Date(b.date) - new Date(a.date));
     document.getElementById('statNotices').innerText = anns.length;
+    // Update fee balance on dashboard
+    const sRec = DB.findOne('students', { userId: DB.getCurrentUser().id });
+    if (sRec) {
+        const balance = DB.calculateStudentDebt(sRec);
+        document.getElementById('statBalance').innerText = `GHS ${balance.toFixed(2)}`;
+    }
     if (anns.length === 0) { list.innerHTML = '<p style="color:#666">No announcements.</p>'; return; }
     anns.slice(0, 3).forEach(a => {
         const div = document.createElement('div'); div.style.padding = '12px 0'; div.style.borderBottom = '1px solid #eee';
